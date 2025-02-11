@@ -1,9 +1,11 @@
 <template>
   <component :is="layout">
     <router-view />
+    <toasts-wrapper />
   </component>
 </template>
 <script lang="ts" setup>
+import ToastsWrapper from '@/components/toast/wrapper.vue'
 import { computed, type Component } from 'vue';
 import { useRoute } from 'vue-router';
 import DefaultLayout from '@/layouts/default.vue'
