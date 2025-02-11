@@ -9,7 +9,7 @@ import ToastsWrapper from '@/components/toast/wrapper.vue'
 import { computed, type Component } from 'vue';
 import { useRoute } from 'vue-router';
 import DefaultLayout from '@/layouts/default.vue'
-import AuthLayout from '@/layouts/default.vue'
+import AuthLayout from '@/layouts/auth.vue'
 import HomeLayout from '@/layouts/home.vue'
 import BlankLayout from '@/layouts/blank.vue'
 
