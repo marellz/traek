@@ -7,13 +7,18 @@ export const useErrorStore = defineStore(
   () => {
     const error = ref<any>(null)
     const toasts = useToastsStore()
-    const setError = (message: string, description: string) => {
+    const handleError = (message: string, description: any) => {
       error.value = {
         message,
         description,
       }
 
       toasts.addError(message, description)
+
+      console.error({
+        message,
+        error: description,
+      })
     }
     const resetError = () => {
       error.value = null
@@ -21,7 +26,7 @@ export const useErrorStore = defineStore(
 
     return {
       error,
-      setError,
+      handleError,
       resetError,
     }
   },
