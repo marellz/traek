@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@/views/index.vue'
+import dashboardRoutes from './dashboard'
 import authRoutes from './auth'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,6 +16,9 @@ const router = createRouter({
 
     // auth
     ...authRoutes,
+
+    // dashboard
+    ...dashboardRoutes,
 
     // other
   ],
