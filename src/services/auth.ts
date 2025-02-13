@@ -6,10 +6,14 @@ export interface AuthPayload {
   password: string
 }
 
+const getUser = async () => {
+  return await account.get()
+}
+
 const init = async () => {
   const session = await account.getSession('current')
   if (session) {
-    return await account.get()
+    return await getUser()
   } else {
     return null
   }
@@ -28,15 +32,21 @@ const logout = async () => {
 }
 
 const resetPassword = async (email: string) => {
-  console.log(email)
+  const url = import.meta.env.VITE_APP_URL
+  return await account.createRecovery(email, url)
 }
 
-const updatePassword = async (password: string) => {
-  console.log('updating password', password)
+const updatePassword = async (id: string, secret: string, password: string) => {
+  return await account.updateRecovery(
+    id, // userId
+    secret,
+    password,
+  )
 }
 
 export default {
   init,
+  getUser,
   login,
   logout,
   register,

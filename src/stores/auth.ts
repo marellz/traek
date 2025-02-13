@@ -2,14 +2,9 @@ import { acceptHMRUpdate, defineStore } from 'pinia'
 import AuthService, { type AuthPayload } from '@/services/auth'
 import { computed, ref } from 'vue'
 import { useErrorStore } from './errors'
-import { useRouter } from 'vue-router'
+import type { Models } from 'appwrite'
 
-export interface User {
-  email: string
-  name: string | null
-  phone: string
-  $id: string
-}
+export type User = Models.User<Models.Preferences>
 
 export const useAuthStore = defineStore(
   'auth',
@@ -19,7 +14,6 @@ export const useAuthStore = defineStore(
     const loading = ref(false)
     const errors = ref<any[]>([])
     const errorStore = useErrorStore()
-    const router = useRouter()
 
     const isAuthenticated = computed(() => user.value !== null)
 
@@ -31,9 +25,8 @@ export const useAuthStore = defineStore(
         } else {
           user.value = null
         }
-      } catch (error) {
+      } catch {
         user.value = null
-        errorStore.handleError('Auth init', error)
       }
     }
 
@@ -41,18 +34,30 @@ export const useAuthStore = defineStore(
       try {
         const response = await AuthService.login(payload)
         if (response) {
-          router.push('/dashboard')
+          await getUser()
+          return true
         }
+        return false
       } catch (error) {
         errorStore.handleError('Login error', error)
+        return false
+      }
+    }
+
+    const getUser = async () => {
+      try {
+        const response = await AuthService.getUser()
+        if (response) {
+          user.value = response
+        }
+      } catch (error) {
+        errorStore.handleError('Getting user error', error)
       }
     }
 
     const register = async (payload: AuthPayload) => {
-      console.log('register!')
       try {
         const response = await AuthService.register(payload)
-        console.log(response)
         if (response) {
           await login(payload)
         }
@@ -72,11 +77,21 @@ export const useAuthStore = defineStore(
     }
 
     const resetPassword = async (email: string) => {
-      await AuthService.resetPassword(email)
+      const token = await AuthService.resetPassword(email)
+      if (token) {
+        return true
+      }
+
+      return false
     }
 
-    const updatePassword = async (password: string) => {
-      await AuthService.resetPassword(password)
+    const updatePassword = async (userId: string, secret: string, password: string) => {
+      const token = await AuthService.updatePassword(userId, secret, password)
+      if (token) {
+        return true
+      }
+
+      return false
     }
 
     const resetErrors = () => {
