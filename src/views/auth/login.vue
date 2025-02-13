@@ -46,10 +46,11 @@ import { onMounted, ref } from "vue"
 import { useAuthStore } from "@/stores/auth"
 import { Form, useForm } from "vee-validate"
 import * as yup from "yup"
+import { useRouter } from 'vue-router'
 
 const auth = useAuthStore()
 
-const { errors, defineField, handleSubmit } = useForm({
+const { errors, defineField, handleSubmit, resetForm } = useForm({
   validationSchema: yup.object({
     email: yup.string().email().required("Email is required"),
     password: yup.string().min(6).required("Password is required"),
@@ -60,16 +61,36 @@ const [email] = defineField("email")
 const [password] = defineField("password")
 
 const rememberMe = ref(false)
+const router = useRouter()
 
 const login = handleSubmit(async (values) => {
-  await auth.login({
+  const success = await auth.login({
     email: values.email,
     password: values.password,
   })
+
+  if (success) {
+    router.push({ name: "dashboard" })
+  }
 })
 
 onMounted(() => {
   auth.resetErrors()
+
+  const email = import.meta.env.VITE_TEST_EMAIL
+  const password = import.meta.env.VITE_TEST_PASSWORD
+
+  if (!(email && password)) {
+    return
+  }
+
+  resetForm({
+    values: {
+      email,
+      password,
+    }
+  })
+
 })
 
 </script>
