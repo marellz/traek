@@ -7,7 +7,12 @@ export interface AuthPayload {
 }
 
 const init = async () => {
-  return await account.get()
+  const session = await account.getSession('current')
+  if (session) {
+    return await account.get()
+  } else {
+    return null
+  }
 }
 
 const login = async ({ email, password }: AuthPayload) => {
@@ -19,7 +24,7 @@ const register = async ({ email, password }: AuthPayload) => {
 }
 
 const logout = async () => {
-  return await account.deleteSession('current')
+  await account.deleteSession('current')
 }
 
 const resetPassword = async (email: string) => {

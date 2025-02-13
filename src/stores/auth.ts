@@ -1,17 +1,27 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import AuthService, { type AuthPayload } from '@/services/auth'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useErrorStore } from './errors'
 import { useRouter } from 'vue-router'
+
+export interface User {
+  email: string
+  name: string | null
+  phone: string
+  $id: string
+}
+
 export const useAuthStore = defineStore(
   'auth',
   () => {
-    const user = ref()
+    const user = ref<User | null>(null)
     const profile = ref()
     const loading = ref(false)
     const errors = ref<any[]>([])
     const errorStore = useErrorStore()
     const router = useRouter()
+
+    const isAuthenticated = computed(() => user.value !== null)
 
     const init = async () => {
       try {
@@ -22,6 +32,7 @@ export const useAuthStore = defineStore(
           user.value = null
         }
       } catch (error) {
+        user.value = null
         errorStore.handleError('Auth init', error)
       }
     }
@@ -51,7 +62,13 @@ export const useAuthStore = defineStore(
     }
 
     const logout = async () => {
-      AuthService.logout()
+      try {
+        await AuthService.logout()
+      } catch (error) {
+        errorStore.handleError('Logout error', error)
+      } finally {
+        user.value = null
+      }
     }
 
     const resetPassword = async (email: string) => {
@@ -67,6 +84,7 @@ export const useAuthStore = defineStore(
     }
 
     return {
+      isAuthenticated,
       user,
       profile,
       loading,
