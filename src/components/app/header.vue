@@ -5,9 +5,9 @@
         <li>
           <router-link class="p-2 inline-block hover:underline" to="/">Home</router-link>
         </li>
-        <template v-if="isAuthenticated">
+        <template v-if="auth.isAuthenticated">
           <li class="!ml-auto">
-            <a class="p-2 inline-block hover:underline" href="#logout" @click.prevent="logout">Logout</a>
+            <a class="p-2 inline-block hover:underline" href="#logout" @click.prevent="onLogout">Logout</a>
           </li>
         </template>
         <template v-else>
@@ -26,7 +26,13 @@
 <script lang="ts" setup>
 import LayoutContainer from '@/components/layout/container.vue'
 import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 
-const { isAuthenticated, logout } = useAuthStore()
+const auth = useAuthStore()
+const router = useRouter()
+const onLogout = async () => {
+  await auth.logout()
+  router.push('/')
+}
 
 </script>
