@@ -1,7 +1,8 @@
 <template>
-  <div class="mx-auto container px-2 md:px-6">
+  <h1 class="text-2xl font-bold">
     <slot />
-  </div>
+  </h1>
 </template>
 <script lang="ts" setup>
+
 </script>

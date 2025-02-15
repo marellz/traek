@@ -1,8 +1,8 @@
 <template>
   <div>
     <label :for="id" class="flex items-center">
-      <input class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" type="checkbox" :value :required
-        :disabled :name :id v-model="model">
+      <input class="rounded border-gray-300 text-primary focus:ring-primary" type="checkbox" :value :required :disabled
+        :name :id v-model="model">
       <slot>
         <p class="ml-2 text-sm text-gray-600">
           {{ label }}

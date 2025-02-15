@@ -1,7 +1,7 @@
 <template>
   <label :for="id" class="flex items-center">
-    <input class="rounded-full border-gray-300 text-indigo-600 focus:ring-indigo-500" type="radio" :value :disabled
-      :required v-model="proxyChecked" :id />
+    <input class="rounded-full border-gray-300 text-primary focus:ring-primary" type="radio" :value :disabled :required
+      v-model="proxyChecked" :id />
     <slot>
       <p class="ml-2 text-sm text-gray-600">{{ label }}</p>
     </slot>

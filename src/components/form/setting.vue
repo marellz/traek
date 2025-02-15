@@ -1,34 +1,17 @@
 <template>
   <label :for="id" class="flex items-cente">
-    <input
-      class="invisible h-0 w-0 absolute -z-10"
-      type="checkbox"
-      v-model="model"
-      :value
-      :required
-      :disabled
-      :name
-      :id
-    />
+    <input class="invisible h-0 w-0 absolute -z-10" type="checkbox" v-model="model" :value :required :disabled :name
+      :id />
 
-    <div
-      class="flex flex-auto items-start space-x-2 border border-gray-300 rounded-lg p-2 select-none"
-      :class="{
-        'border-indigo-600': checked,
-        'bg-gray-200 border-gray-200': disabled,
-      }"
-    >
-      <span
-        class="text-gray-300"
-        :class="{ '!text-indigo-600': checked, 'text-gray-500': disabled }"
-      >
+    <div class="flex flex-auto items-start space-x-2 border border-gray-300 rounded-lg p-2 select-none" :class="{
+      'border-primary': checked,
+      'bg-gray-200 border-gray-200': disabled,
+    }">
+      <span class="text-gray-300" :class="{ '!text-primary': checked, 'text-gray-500': disabled }">
         <CheckCircle2 :size="24" stroke-width="1.5" />
       </span>
       <div>
-        <h1
-          class="font-medium font-secondary"
-          :class="{ 'text-indigo-600': checked, 'text-gray-500': disabled }"
-        >
+        <h1 class="font-medium font-secondary" :class="{ 'text-primary': checked, 'text-gray-500': disabled }">
           {{ label }}
         </h1>
         <p class="text-sm text-slate-500">{{ subtitle }}</p>
