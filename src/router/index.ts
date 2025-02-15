@@ -1,8 +1,13 @@
 import { createRouter, createWebHistory, type RouteRecordNameGeneric } from 'vue-router'
 import Home from '@/views/index.vue'
-import dashboardRoutes from './dashboard'
-import authRoutes from './auth'
+import dashboardRoutes from './routes/dashboard'
+import authRoutes from './routes/auth'
+import projectRoutes from './routes/projects'
+import userRoutes from './routes/user'
+import homeRoutes from './routes/home'
+
 import { useAuthStore } from '@/stores/auth'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -20,8 +25,11 @@ const router = createRouter({
 
     // dashboard
     ...dashboardRoutes,
+    ...projectRoutes,
+    ...userRoutes,
 
     // other
+    ...homeRoutes,
   ],
 })
 
