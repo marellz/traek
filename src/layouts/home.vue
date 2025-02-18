@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen min-h-screen flex flex-col">
+  <div class="h-screen min-h-screen flex flex-col bg-slate-100">
     <Header></Header>
     <!-- home -->
     <main class="flex-auto">
