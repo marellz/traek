@@ -38,10 +38,11 @@ export const useProjectStore = defineStore(
 
     const getUserProjects = async () => {
       fetching.value = true
+      projects.value = []
       try {
         const { documents } = await service.list()
         if (documents) {
-          projects.value = documents as Project[]
+          projects.value = [...(documents as Project[])]
         }
       } catch (error) {
         handleError('Getting user projects', error)
@@ -144,7 +145,7 @@ export const useProjectStore = defineStore(
     }
 
     const init = async () => {
-      await getUserProjects()
+      // await getUserProjects()
     }
 
     return {

@@ -17,8 +17,24 @@
   </nav>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue'
-const menu = ref({
+import { useProjectStore } from '@/stores/project'
+import { onMounted, ref, watch } from 'vue'
+type NavSection = 'home' | 'projects'
+type Nav = Record<
+  NavSection,
+  {
+    title: string
+    links: Array<{
+      label: string
+      path: {
+        name: string
+        params?: Record<string, string>
+      }
+    }>
+  }
+>
+
+const menu = ref<Nav>({
   home: {
     title: 'Links',
     links: [
@@ -26,12 +42,31 @@ const menu = ref({
       { label: 'Tasks', path: { name: 'tasks' } },
       { label: 'Projects', path: { name: 'projects' } },
       { label: 'Calendar', path: { name: 'calendar' } },
-      // { label: "Members", path: "/members" },
     ],
   },
   projects: {
     title: 'My projects',
-    links: [{ label: 'Project 1', path: { name: 'project', params: {id: "abcd"} }}],
+    links: [],
   },
+})
+
+const projectStore = useProjectStore()
+
+watch(
+  () => projectStore.projects,
+  (v) => {
+    if (v) {
+      menu.value.projects.links = v.map((item) => ({
+        label: item.name,
+        path: {
+          name: 'project',
+          params: { id: item.$id },
+        },
+      }))
+    }
+  },
+)
+onMounted(async () => {
+  await projectStore.getUserProjects()
 })
 </script>
