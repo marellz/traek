@@ -4,7 +4,10 @@ import { computed, ref } from 'vue'
 import { useErrorStore } from './errors'
 import type { Models } from 'appwrite'
 
-export type User = Models.User<Models.Preferences>
+export interface User extends Models.User<Models.Preferences> {
+  name: string;
+}
+
 export type UserProfile = {
   id: string
   email: string
