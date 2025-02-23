@@ -1,10 +1,7 @@
 <template>
   <button
     class="px-3 py-2 md:px-6 md:py-2.5 text-sm md:text-base font-semibold font-secondary rounded-lg transition-colors border inline-flex items-center space-x-2 justify-center relative focus:ring disabled:cursor-not-allowed focus:ring-offset-2 focus:outline-none disabled:pointer-events-none"
-    :type
-    :class="themes[variant]"
-    :disabled="loading || disabled"
-  >
+    :type :class="themes[variant]" :disabled="loading || disabled">
     <slot />
     <base-loader class="absolute right-0" loader-class="h-4" v-if="loading" />
   </button>
@@ -36,9 +33,9 @@ withDefaults(
 
 const themes: VariantThemes = {
   primary:
-    "text-white border-indigo-600 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/40 disabled:border-indigo-600/10 focus:ring-indigo-200",
+    "text-white border-primary bg-primary hover:bg-primary-darker disabled:bg-primary/40 disabled:border-primary/10 focus:ring-primary-lighter",
   "primary-outline":
-    "border-current text-indigo-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 disabled:text-indigo-900/4 0 disabled:hover:bg-transparent disabled:border-indigo-900/30 focus:ring-indigo-200",
+    "border-current text-primary hover:bg-primary hover:text-white hover:border-primary disabled:text-primary-darker/4 0 disabled:hover:bg-transparent disabled:border-primary-darker/30 focus:ring-primary-lighter",
   secondary:
     "text-white border-gray-800 bg-gray-800 hover:bg-gray-700 hover:border-gray-700 disabled:bg-gray-500/50 disabled:border-gray-500/10 focus:ring-slate-400",
   "secondary-outline":

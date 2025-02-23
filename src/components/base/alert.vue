@@ -1,30 +1,28 @@
 <template>
   <div
-    class="rounded-xl px-4 flex items-start space-x-2 border border-slate-600/10"
+    v-show="display"
+    class="flex items-start space-x-2 rounded-xl border border-slate-600/10 px-4 py-2"
     :class="themes[variant].bg"
   >
     <!-- <icon-component /> -->
-    <div class="pt-1.5 pl-0 flex-none">
-      <span class="p-1 rounded-full block" :class="themes[variant].color">
-        <component :size="24" :stroke-width="1.5" :is="icons[variant]" />
+    <div class="flex-none pt-1.5 pl-0">
+      <span class="block rounded-full p-1" :class="themes[variant].color">
+        <component :size="32" :stroke-width="1.5" :is="icons[variant]" />
       </span>
     </div>
-    <div class="flex-auto pt-2 pb-2">
-      <h1
-        class="text-lg font-medium font-secondary leading-snug"
-        :class="themes[variant].color"
-      >
+    <div class="flex-auto space-y-1 pt-2 pb-2">
+      <h1 class="font-secondary text-xl leading-snug font-medium" :class="themes[variant].color">
         {{ title }}
       </h1>
-      <div class="text-sm">
+      <div>
         <slot></slot>
       </div>
     </div>
     <div class="pt-2" v-if="dismissible">
       <button
         type="button"
-        @click="$emit('dismiss')"
-        class="p-2 hover:bg-slate-900/20 rounded-full"
+        @click="dismiss"
+        class="rounded-full p-2 hover:bg-slate-900/20"
       >
         <X />
       </button>
@@ -32,10 +30,10 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { AlertCircle, CircleCheck, Info, X } from "lucide-vue-next"
-import type { Component } from "vue"
+import { AlertCircle, CircleCheck, Info, X } from 'lucide-vue-next'
+import { ref, type Component } from 'vue'
 
-export type AlertVariants = "success" | "info" | "error"
+export type AlertVariants = 'success' | 'info' | 'error'
 type VariantThemes = {
   [key in AlertVariants]: {
     bg: string
@@ -52,12 +50,12 @@ withDefaults(
     title?: string
   }>(),
   {
-    variant: "info",
-    title: "Alert",
+    variant: 'info',
+    title: 'Alert',
   },
 )
 
-defineEmits(["dismiss"])
+const emit = defineEmits(['dismiss'])
 
 const icons: VariantIcons = {
   error: AlertCircle,
@@ -67,13 +65,19 @@ const icons: VariantIcons = {
 
 const themes: VariantThemes = {
   error: {
-    bg: "bg-red-100/50",
-    color: "text-red-500",
+    bg: 'bg-red-100/50',
+    color: 'text-red-500',
   },
-  info: { bg: "bg-blue-100/50", color: "text-blue-500" },
+  info: { bg: 'bg-blue-100/50', color: 'text-blue-500' },
   success: {
-    bg: "bg-green-100/50",
-    color: "text-green-500",
+    bg: 'bg-green-100/50',
+    color: 'text-green-500',
   },
+}
+
+const display = ref(true)
+const dismiss = () => {
+  emit('dismiss')
+  display.value = false
 }
 </script>

@@ -33,7 +33,7 @@
       <div>
         <p class="text-gray-600 text-center">
           Already have an account?
-          <router-link class="text-indigo-600 font-medium" to="/login">Login</router-link>
+          <router-link class="text-primary font-medium" to="/login">Login</router-link>
         </p>
       </div>
     </div>

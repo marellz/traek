@@ -6,6 +6,11 @@
           <router-link class="p-2 inline-block hover:underline" to="/">Home</router-link>
         </li>
         <template v-if="auth.isAuthenticated">
+          <li>
+            <router-link :to="{ name: 'dashboard' }" class="p-2 inline-block hover:underline">
+              Dashboard
+            </router-link>
+          </li>
           <li class="!ml-auto">
             <a class="p-2 inline-block hover:underline" href="#logout" @click.prevent="onLogout">Logout</a>
           </li>
@@ -17,7 +22,6 @@
           <li>
             <router-link class="p-2 inline-block hover:underline" to="/register">Register</router-link>
           </li>
-
         </template>
       </ul>
     </layout-container>

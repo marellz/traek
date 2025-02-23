@@ -14,7 +14,7 @@
           allow-password-toggle type="password" required></form-input>
         <div class="flex flex-col items-start md:flex-row md:items-center space-y-4 md:space-y-0 justify-between">
           <form-checkbox v-model="rememberMe" label="Remember me" />
-          <router-link class="text-indigo-600 font-medium" to="/forgot-password">Forgot password?
+          <router-link class="text-primary font-medium" to="/forgot-password">Forgot password?
           </router-link>
         </div>
         <base-button class="w-full" :loading="auth.loading">
@@ -28,7 +28,7 @@
         <div class="space-y-2">
           <p class="text-gray-600 text-center">
             Dont have an account?
-            <router-link class="text-indigo-600 font-medium" to="/register">Register</router-link>
+            <router-link class="text-primary font-medium" to="/register">Register</router-link>
           </p>
         </div>
       </div>

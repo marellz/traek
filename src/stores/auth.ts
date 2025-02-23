@@ -4,13 +4,24 @@ import { computed, ref } from 'vue'
 import { useErrorStore } from './errors'
 import type { Models } from 'appwrite'
 
-export type User = Models.User<Models.Preferences>
+export interface User extends Models.User<Models.Preferences> {
+  name: string;
+}
+
+export type UserProfile = {
+  $id: string
+  email: string
+  username: string
+  name: string | null
+  phone: string | null
+  avatar: string | null
+}
 
 export const useAuthStore = defineStore(
   'auth',
   () => {
     const user = ref<User | null>(null)
-    const profile = ref()
+    const profile = ref<UserProfile | null>(null)
     const loading = ref(false)
     const errors = ref<any[]>([])
     const errorStore = useErrorStore()
@@ -94,6 +105,26 @@ export const useAuthStore = defineStore(
       return false
     }
 
+    /**
+     * PROFILE
+     */
+
+    const getProfiles = async (params: { name?: string; email?: string } = {}) => {
+      console.log(params)
+    }
+
+    const getProfile = async (id: string) => {
+      console.log(id)
+    }
+
+    const updateProfile = async (form: UserProfile) => {
+      if (!(user.value !== null && form.$id === user.value?.$id)) {
+        return null // todo: forbidden
+      }
+
+      // update
+    }
+
     const resetErrors = () => {
       errors.value = []
     }
@@ -111,6 +142,11 @@ export const useAuthStore = defineStore(
       resetErrors,
       resetPassword,
       updatePassword,
+
+      // profile
+      getProfile,
+      getProfiles,
+      updateProfile,
     }
   },
   {
