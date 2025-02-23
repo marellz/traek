@@ -223,7 +223,10 @@ export const useAuthStore = defineStore(
     }
   },
   {
-    persist: true,
+    persist: {
+      storage: sessionStorage,
+      pick: ['user', 'profile'],
+    },
   },
 )
 
