@@ -4,20 +4,8 @@
   </layout-banner>
   <div class="mt-10">
     <layout-container>
-      <div class="flex items-center">
-        <h1 class="text-3xl">My projects</h1>
-        <div class="ml-auto">
-          <base-button>
-            <span>Create project</span>
-          </base-button>
-        </div>
-      </div>
-      <div class="mt-10">
-        <base-alert title="Empty">You have no projects</base-alert>
-      </div>
+      <h1 class="text-3xl">My dashboard.</h1>
     </layout-container>
   </div>
 </template>
-<script lang="ts" setup>
-
-</script>
+<script lang="ts" setup></script>
