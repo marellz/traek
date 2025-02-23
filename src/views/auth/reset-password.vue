@@ -69,16 +69,12 @@ import BaseButton from "@/components/base/button.vue"
 import { useAuthStore } from "@/stores/auth"
 import { Form, useForm } from "vee-validate"
 import * as yup from "yup"
-import { computed, ref } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import { ref } from "vue"
+import { useRouter } from "vue-router"
 // import { AlertCircle, MoveRight } from "lucide-vue-next"
 
 const auth = useAuthStore()
 const router = useRouter()
-const route = useRoute()
-
-const userId = computed(() => route.params.userId as string)
-const resetToken = computed(() => route.params.secret as string)
 
 const schema = yup.object({
   password: yup.string().min(6).required("Password is required"),
@@ -103,7 +99,7 @@ const updatePassword = handleSubmit(async (values) => {
     return
   }
 
-  const success = await auth.updatePassword(userId.value, resetToken.value, values.password)
+  const success = await auth.updatePassword(values.password)
   if (success) {
     router.push("/login")
   }

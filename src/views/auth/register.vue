@@ -23,13 +23,13 @@
           <span>Register</span>
         </base-button>
       </div>
-      <!-- <base-alert v-if="errors.length" variant="error" title="Authentication error">
+      <base-alert v-if="errors" variant="error" title="Authentication error">
         <div class="space-y-2">
           <p v-for="(err, key) in errors" :key>
             <span>{{ err }}</span>
           </p>
         </div>
-      </base-alert> -->
+      </base-alert>
       <div>
         <p class="text-gray-600 text-center">
           Already have an account?
