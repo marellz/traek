@@ -3,12 +3,12 @@ import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import type { Models } from 'appwrite'
 import { ref } from 'vue'
-import { useAuthStore, type User } from '@/stores/auth'
+import { useAuthStore, type UserProfile } from '@/stores/auth'
 
 export interface Project extends Models.Document {
   name: string
   description: string
-  creator: User
+  creator: UserProfile
   closed_at?: string | null
 }
 
@@ -56,7 +56,7 @@ export const useProjectStore = defineStore(
       try {
         const response = await service.get(id)
         if (response) {
-          return response
+          return response as Project
         }
         return null
       } catch (error) {

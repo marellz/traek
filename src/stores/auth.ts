@@ -9,7 +9,7 @@ export interface User extends Models.User<Models.Preferences> {
 }
 
 export type UserProfile = {
-  id: string
+  $id: string
   email: string
   username: string
   name: string | null
@@ -118,7 +118,7 @@ export const useAuthStore = defineStore(
     }
 
     const updateProfile = async (form: UserProfile) => {
-      if (!(user.value !== null && form.id === user.value?.$id)) {
+      if (!(user.value !== null && form.$id === user.value?.$id)) {
         return null // todo: forbidden
       }
 
