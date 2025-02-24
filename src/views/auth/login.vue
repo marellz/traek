@@ -20,9 +20,9 @@
         <base-button class="w-full" :loading="auth.loading">
           <span>Login</span>
         </base-button>
-        <base-alert v-if="auth.errors.length" variant="error" title="Authentication error">
+        <base-alert v-if="auth.errors" variant="error" title="Authentication error">
           <p v-for="(err, key) in auth.errors" :key>
-            <span class="font-bold">{{ key }}</span>: <span>{{ err }}</span>
+            <span>{{ err }}</span>
           </p>
         </base-alert>
         <div class="space-y-2">
@@ -69,8 +69,16 @@ const login = handleSubmit(async (values) => {
     password: values.password,
   })
 
-  if (success) {
+  if (!success) {
+    return false;
+    // show error
+  }
+
+  if (auth.hasProfile) {
     router.push({ name: "dashboard" })
+  } else {
+    if (auth.user)
+      router.push({ name: "user-profile", params: { id: auth.user.id } })
   }
 })
 

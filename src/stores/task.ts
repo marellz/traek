@@ -64,14 +64,14 @@ export const useTaskStore = defineStore(
       }
     }
 
-    const create = async (form: Omit<TaskForm, "creator">) => {
+    const create = async (form: Omit<TaskForm, 'created_by'>) => {
       if (!auth.user) {
         handleError('Forbidden', 'Action not authorized')
         return
       }
       begin('create-task')
       try {
-        const response = await service.create({ ...form, creator: auth.user.$id })
+        const response = await service.create({ ...form, creator: auth.user.id })
         if (response) {
           return response
         }

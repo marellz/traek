@@ -23,13 +23,13 @@
           <span>Register</span>
         </base-button>
       </div>
-      <!-- <base-alert v-if="errors.length" variant="error" title="Authentication error">
+      <base-alert v-if="auth.errors" variant="error" title="Authentication error">
         <div class="space-y-2">
-          <p v-for="(err, key) in errors" :key>
+          <p v-for="(err, key) in auth.errors" :key>
             <span>{{ err }}</span>
           </p>
         </div>
-      </base-alert> -->
+      </base-alert>
       <div>
         <p class="text-gray-600 text-center">
           Already have an account?
@@ -45,7 +45,7 @@ import AuthSubtitle from '@/components/auth/subtitle.vue'
 import { Form, useForm } from "vee-validate"
 import FormInput from "@/components/form/input.vue"
 import BaseButton from "@/components/base/button.vue"
-// import BaseAlert from "@/components/base/alert.vue"
+import BaseAlert from "@/components/base/alert.vue"
 import { computed, onMounted } from "vue"
 import { useAuthStore } from "@/stores/auth"
 
