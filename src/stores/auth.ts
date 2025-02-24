@@ -2,15 +2,24 @@ import { acceptHMRUpdate, defineStore } from 'pinia'
 import AuthService, { type AuthPayload } from '@/services/auth'
 import { computed, ref, watch } from 'vue'
 import { useErrorStore } from './errors'
-import type { AuthUser } from '@supabase/supabase-js'
-
-export type User = AuthUser
+import type { User } from '@supabase/supabase-js'
 
 export type UserProfile = {
   id: string
   email: string
   username: string
   name: string | null
+  phone: string | null
+  avatar: string | null
+  avatar_url: string | null
+  created_at: string
+}
+
+export type UserProfileForm = {
+  id: string
+  name: string
+  email: string
+  username: string
   phone: string | null
   avatar: string | null
   avatar_url: string | null
@@ -154,6 +163,9 @@ export const useAuthStore = defineStore(
      */
 
     const profile = ref<UserProfile | null>(null)
+    const hasProfile = computed(
+      () => profile.value !== null && profile.value.name && profile.value.username,
+    )
 
     const getProfiles = async (params: { name?: string; email?: string } = {}) => {
       console.log(params)
@@ -172,7 +184,7 @@ export const useAuthStore = defineStore(
 
         if (data) {
           profile.value = data[0]
-          return true
+          return data[0]
         }
 
         return false
@@ -181,7 +193,7 @@ export const useAuthStore = defineStore(
       }
     }
 
-    const updateProfile = async (form: UserProfile) => {
+    const updateProfile = async (form: UserProfileForm) => {
       if (!user.value) {
         return
       }
@@ -189,12 +201,30 @@ export const useAuthStore = defineStore(
       try {
         const { status } = await AuthService.updateProfile(user.value.id, form)
         if (status === 204) {
-          profile.value = { ...profile, ...form }
+          profile.value = { ...profile.value, ...form }
         }
 
         return false
       } catch (error) {
         handleError('Updating profile', error)
+      }
+    }
+
+    const checkUsername = async (username: string) => {
+      try {
+        const { count, status } = await AuthService.checkUsername(username)
+        if (status !== 200) {
+          handleError('Checking username', 'Unknown error')
+        }
+
+        if (count && count === 0) {
+          return true
+        }
+
+        return false
+      } catch (error) {
+        handleError('Checking username', error)
+      } finally {
       }
     }
 
@@ -205,7 +235,6 @@ export const useAuthStore = defineStore(
     return {
       isAuthenticated,
       user,
-      profile,
       loading,
       errors,
       init,
@@ -217,14 +246,16 @@ export const useAuthStore = defineStore(
       updatePassword,
 
       // profile
+      profile,
+      hasProfile,
       getProfile,
       getProfiles,
       updateProfile,
+      checkUsername,
     }
   },
   {
     persist: {
-      storage: sessionStorage,
       pick: ['user', 'profile'],
     },
   },

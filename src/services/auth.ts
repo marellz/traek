@@ -53,7 +53,20 @@ const updatePassword = async (password: string) => {
 }
 
 const updateProfile = async (id: string, form: UserProfile) => {
-  return await supabase.from('users').update(form).eq('id', id)
+  return await supabase
+    .from('users')
+    .upsert(form, {
+      ignoreDuplicates: false,
+      onConflict: 'id',
+    })
+    .select()
+}
+
+const checkUsername = async (username: string) => {
+  return await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true })
+    .eq('username', username)
 }
 
 export default {
@@ -66,4 +79,5 @@ export default {
   resetPassword,
   updatePassword,
   updateProfile,
+  checkUsername,
 }
