@@ -1,38 +1,26 @@
-import type { ProjectForm, PartialProjectForm } from '@/stores/project'
-import collectionService from './collection'
-import { Permission, Role } from 'appwrite'
+import type { ProjectForm } from '@/stores/project'
+import { supabase } from '@/database/supabase'
 
 export const useProjectService = () => {
-  const collectionId = import.meta.env.VITE_APPWRITE_PROJECTS
-  const projectsCollection = new collectionService(collectionId)
-
-  const list = async () => {
-    return await projectsCollection.list()
+  const list = async (user: string) => {
+    const { data, error } = await supabase.from('project_members').select('*').eq('user_id', user)
+    if (error) {
+      throw 'Error on fetching projects'
+    }
+    const ids = data.map((d) => d.project_id)
+    return await supabase.from('projects').select().in('id', ids)
   }
 
   const get = async (id: string) => {
-    return await projectsCollection.get(id)
+    return await supabase.from('projects').select().eq('id', id)
   }
 
   const create = async (form: ProjectForm) => {
-    let permissions = [
-      Permission.read(Role.any()),
-      Permission.write(Role.any()),
-    ]
-
-    if(form.creator){
-      permissions = [
-        ...permissions,
-        Permission.update(Role.user(form.creator)),
-        Permission.delete(Role.user(form.creator)),
-      ]
-    }
-
-    return await projectsCollection.create(form, permissions)
+    return await supabase.from('projects').insert(form).select()
   }
 
-  const update = async (id: string, form: PartialProjectForm) => {
-    return await projectsCollection.update(id, form)
+  const update = async (id: string, form: ProjectForm) => {
+    return await supabase.from('projects').insert(form).eq('id', id)
   }
 
   return {
