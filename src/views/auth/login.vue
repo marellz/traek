@@ -69,8 +69,16 @@ const login = handleSubmit(async (values) => {
     password: values.password,
   })
 
-  if (success) {
+  if (!success) {
+    return false;
+    // show error
+  }
+
+  if (auth.hasProfile) {
     router.push({ name: "dashboard" })
+  } else {
+    if (auth.user)
+      router.push({ name: "user-profile", params: { id: auth.user.id } })
   }
 })
 
