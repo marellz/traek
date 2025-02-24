@@ -4,47 +4,30 @@ import { computed, ref, watch } from 'vue'
 import { useErrorStore } from './errors'
 import type { User } from '@supabase/supabase-js'
 
-export type UserProfile = {
-  id: string
-  email: string
-  username: string
-  name: string | null
-  phone: string | null
-  avatar: string | null
-  avatar_url: string | null
-  created_at: string
-}
-
-export type UserProfileForm = {
-  id: string
-  name: string
-  email: string
-  username: string
-  phone: string | null
-  avatar: string | null
-  avatar_url: string | null
-  created_at: string
-}
-
 export const useAuthStore = defineStore(
   'auth',
   () => {
+    const { handleError } = useErrorStore()
+
     const user = ref<User | null>(null)
     const loading = ref(false)
     const errors = ref<Record<string, string> | null>(null)
-    const { handleError } = useErrorStore()
     const isAuthenticated = computed(() => user.value !== null)
+    const userId = computed(() => (user.value ? user.value.id : null))
 
     const init = async () => {
       try {
-        const response = await AuthService.init()
-        if (response) {
-          getUser()
+        const {
+          data: { user: sessionUser },
+        } = await AuthService.getUser()
+
+        if (sessionUser) {
+          user.value = sessionUser
         } else {
           user.value = null
         }
       } catch {
-        user.value = null
+        handleError('Auth initialization', 'Error occurred initializing user')
       }
     }
 
@@ -172,11 +155,11 @@ export const useAuthStore = defineStore(
     }
 
     const getProfile = async () => {
-      if (!user.value) {
+      if (!userId.value) {
         return null
       }
       try {
-        const { data, error } = await AuthService.getProfile(user.value.id)
+        const { data, error } = await AuthService.getProfile(userId.value)
         if (error) {
           handleError('Getting profile', error)
           return false
@@ -194,12 +177,12 @@ export const useAuthStore = defineStore(
     }
 
     const updateProfile = async (form: UserProfileForm) => {
-      if (!user.value) {
+      if (!userId.value) {
         return
       }
       // update
       try {
-        const { status } = await AuthService.updateProfile(user.value.id, form)
+        const { status } = await AuthService.updateProfile(userId.value, form)
         if (status === 204) {
           profile.value = { ...profile.value, ...form }
         }
@@ -235,6 +218,7 @@ export const useAuthStore = defineStore(
     return {
       isAuthenticated,
       user,
+      userId,
       loading,
       errors,
       init,
@@ -256,6 +240,7 @@ export const useAuthStore = defineStore(
   },
   {
     persist: {
+      storage: localStorage,
       pick: ['user', 'profile'],
     },
   },
@@ -263,4 +248,26 @@ export const useAuthStore = defineStore(
 
 if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useAuthStore, import.meta.hot))
+}
+
+export type UserProfile = {
+  id: string
+  email: string
+  username: string
+  name: string | null
+  phone: string | null
+  avatar: string | null
+  avatar_url: string | null
+  created_at: string
+}
+
+export type UserProfileForm = {
+  id: string
+  name: string
+  email: string
+  username: string
+  phone: string | null
+  avatar: string | null
+  avatar_url: string | null
+  created_at: string
 }

@@ -15,18 +15,6 @@ const getProfile = async (id: string) => {
   return await supabase.from('users').select('*').eq('id', id)
 }
 
-const init = async () => {
-  const {
-    data: { user },
-  } = await getUser()
-  if (user) {
-    // todo: get profile.
-    getProfile(user.id)
-  } else {
-    return null
-  }
-}
-
 const login = async (credentials: AuthPayload) => {
   return await supabase.auth.signInWithPassword(credentials)
 }
@@ -70,7 +58,6 @@ const checkUsername = async (username: string) => {
 }
 
 export default {
-  init,
   getUser,
   getProfile,
   login,
