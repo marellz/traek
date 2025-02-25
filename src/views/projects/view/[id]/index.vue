@@ -14,9 +14,8 @@
         <p class="text-sm mt-1">
           Created by
           <strong>
-            {{ project.creator.name }}
+            {{ project.created_by }}
           </strong>
-          ({{ project.creator.username }})
         </p>
 
         <p class="mt-5">{{ project.description ?? 'No description' }}</p>
@@ -28,7 +27,7 @@
               {{ section.label }}
             </p>
             <div class="mt-4 text-4xl">
-              {{ project[section.key].length }}
+              0
             </div>
           </layout-card>
         </router-link>

@@ -74,6 +74,7 @@ export const useProjectStore = defineStore(
       }
     }
 
+
     const getProject = async (id: string) => {
       getting.value = true
       try {
@@ -92,16 +93,35 @@ export const useProjectStore = defineStore(
       }
     }
 
+    const getProjectStats = async (project: string) => {
+      try {
+        const { error, data } = await service.getStats(project)
+        if (error) {
+          handleError('Getting project stats', error.message)
+        }
+
+        if (data) {
+          return data
+        }
+
+        return null
+      } catch (error) {
+        handleError('Getting project stats', error)
+      }
+    }
+
+
     const sendJoinRequest = async () => {}
 
     const createProject = async (form: ProjectForm) => {
-      if (!auth.user) {
+      if (!auth.userId) {
         handleError('Forbidden', "You're not allowed to perform this action")
         return null
       }
 
       try {
-        form.created_by = auth.user.id
+        form.created_by = auth.userId
+        form.created_at = new Date().toISOString()
 
         creating.value = true
 
@@ -113,7 +133,11 @@ export const useProjectStore = defineStore(
         if (data && data.length) {
           // todo: know what to do depending on origin/purpose
           projects.value = [...projects.value, data[0]]
+
+          await addMemberById(auth.userId, data[0].id)
+
           return data
+
         }
 
         return null
@@ -121,6 +145,23 @@ export const useProjectStore = defineStore(
         handleError('Creating project', error)
       } finally {
         creating.value = false
+      }
+    }
+
+    const addMemberById = async (user: string, project: string) => {
+      try {
+        const {status, error} = await service.createProjectMember(user, project)
+        if(error){
+          handleError("Adding member to project", error.message)
+        }
+
+        if(status===204){
+
+        }
+
+        return false
+      } catch (error) {
+        handleError("Adding member to project", error)
       }
     }
 
@@ -198,6 +239,7 @@ export const useProjectStore = defineStore(
 
       getUserProjects,
       getProject,
+      getProjectStats,
       sendJoinRequest,
       createProject,
       updateProject,
