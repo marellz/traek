@@ -7,7 +7,7 @@
       :disabled
       :required
       :name
-      v-model="proxyChecked"
+      v-model="model"
       :id
     />
     <slot>
@@ -17,9 +17,7 @@
 </template>
 <script setup lang="ts">
 import useCustomId from '@/composables/useCustomId'
-import { computed, onMounted, ref } from 'vue'
-
-const emit = defineEmits(['update:checked'])
+import { onMounted, ref } from 'vue'
 
 const props = defineProps<{
   checked?: boolean
@@ -32,17 +30,12 @@ const props = defineProps<{
 
 const id = ref()
 
-const proxyChecked = computed({
-  get() {
-    return props.checked
-  },
-
-  set(val) {
-    emit('update:checked', val)
-  },
-})
+const model =defineModel()
 
 onMounted(() => {
   id.value = useCustomId()
+  if(props.value){
+    model.value = props.value
+  }
 })
 </script>
