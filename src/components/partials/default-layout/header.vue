@@ -15,7 +15,6 @@
             </form>
           </div>
           <span class="border-l border-slate-200"></span>
-
           <user-menu></user-menu>
           <button type="button" class="p-1">
             <Bell />

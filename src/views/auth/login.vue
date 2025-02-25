@@ -63,7 +63,10 @@ const [password] = defineField("password")
 const rememberMe = ref(false)
 const router = useRouter()
 
+const stack = ref('')
+
 const login = handleSubmit(async (values) => {
+  stack.value = 'Logging you in'
   const success = await auth.login({
     email: values.email,
     password: values.password,
@@ -74,13 +77,19 @@ const login = handleSubmit(async (values) => {
     // show error
   }
 
-  if (auth.hasProfile) {
+  await getProfile()
+})
+
+const getProfile = async () => {
+  const _profile = await auth.getProfile()
+
+   if (_profile && auth.hasProfile) {
     router.push({ name: "dashboard" })
   } else {
     if (auth.user)
       router.push({ name: "user-profile", params: { id: auth.user.id } })
   }
-})
+}
 
 onMounted(() => {
   auth.resetErrors()

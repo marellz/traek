@@ -36,20 +36,21 @@ export const useAuthStore = defineStore(
       resetErrors()
       try {
         const {
-          data: { user },
+          data: { user: _user },
           error,
         } = await AuthService.login(payload)
         if (error) {
           errors.value = {
             Login: error.message,
           }
-          return
         }
-        if (user) {
-          await getUser()
-          return true
+
+        if (_user) {
+          user.value = _user
+          return user
         }
-        return false
+
+        return null
       } catch (error) {
         handleError('Login error', error)
         return false
@@ -61,7 +62,7 @@ export const useAuthStore = defineStore(
     const getUser = async () => {
       try {
         const { data, error } = await AuthService.getUser()
-        if(error){
+        if (error) {
           handleError('Getting user', error.message)
         }
         if (data.user) {
@@ -79,10 +80,18 @@ export const useAuthStore = defineStore(
       resetErrors()
       loading.value = true
       try {
-        const response = await AuthService.register(payload)
-        if (response) {
-          await login(payload)
+        const { data, error } = await AuthService.register(payload)
+        if (error) {
+          handleError('Registering user', error.message)
         }
+
+        if (data.user) {
+          user.value = data.user
+
+          return data.user
+        }
+
+        return null
       } catch (error) {
         handleError('Registration error', error)
       } finally {
@@ -93,7 +102,13 @@ export const useAuthStore = defineStore(
     const logout = async () => {
       loading.value = true
       try {
-        await AuthService.logout()
+        const { error } = await AuthService.logout()
+        if (error) {
+          handleError('Logging out', error.message)
+          return false
+        }
+
+        return true
       } catch (error) {
         handleError('Logout error', error)
       } finally {
