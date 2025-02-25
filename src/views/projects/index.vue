@@ -19,8 +19,8 @@
         <div v-else-if="projects.length" class="grid grid-cols-2 gap-10">
           <router-link
             v-for="project in projects"
-            :key="project.$id"
-            :to="`/projects/view/${project.$id}`"
+            :key="project.id"
+            :to="{ name: 'project', params: { id: project.id } }"
           >
             <div class="space-y-2 rounded-xl border border-slate-300 p-4">
               <h1 class="text-2xl font-light">
@@ -28,8 +28,8 @@
               </h1>
               <p v-if="project.description">{{ project.description }}</p>
               <p class="text-sm text-slate-600">
-                Created on {{ parseDate(project.$createdAt) }}
-                <span v-if="project.creator">by {{ project.creator.name }}</span>
+                Created on {{ parseDate(project.created_at) }}
+                <span v-if="project.created_by">by {{ project.created_by }}</span>
               </p>
             </div>
           </router-link>
