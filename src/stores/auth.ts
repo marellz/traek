@@ -60,10 +60,16 @@ export const useAuthStore = defineStore(
 
     const getUser = async () => {
       try {
-        const { data } = await AuthService.getUser()
+        const { data, error } = await AuthService.getUser()
+        if(error){
+          handleError('Getting user', error.message)
+        }
         if (data.user) {
           user.value = data.user
+          return data.user
         }
+
+        return null
       } catch (error) {
         handleError('Getting user error', error)
       }
@@ -228,6 +234,7 @@ export const useAuthStore = defineStore(
       resetErrors,
       resetPassword,
       updatePassword,
+      getUser,
 
       // profile
       profile,
@@ -263,11 +270,11 @@ export type UserProfile = {
 
 export type UserProfileForm = {
   id: string
-  name: string
+  name?: string
   email: string
-  username: string
-  phone: string | null
-  avatar: string | null
-  avatar_url: string | null
-  created_at: string
+  username?: string
+  phone?: string | null
+  avatar?: string | null
+  avatar_url?: string | null
+  created_at?: string
 }

@@ -1,45 +1,75 @@
 <template>
   <layout-banner>
-    <layout-banner-title>
-      User profile
-    </layout-banner-title>
+    <layout-banner-title> User profile </layout-banner-title>
   </layout-banner>
   <layout-container class="m-10">
     <div>
-      <form @submit.prevent="submit">
+      <Form @submit="submit()">
         <div class="space-y-4">
-          <form-input v-model="form.name" label="Name" required></form-input>
-          <form-input type="email" v-model="form.email" label="Email" disabled></form-input>
-          <form-input v-model="form.username" label="Username" required></form-input>
-          <form-input v-model="form.phone" label="Phone number"></form-input>
+          <form-input v-model="name" label="Name" required :error="errors.name"></form-input>
+          <form-input
+            type="email"
+            v-model="email"
+            label="Email"
+            :disabled="email !== null"
+            :error="errors.email"
+          ></form-input>
+          <form-input
+            v-model="username"
+            label="Username"
+            required
+            :error="errors.username"
+          ></form-input>
+          <form-input v-model="phone" label="Phone number" :error="errors.phone"></form-input>
           <base-button>
             <span>Update changes</span>
           </base-button>
         </div>
-      </form>
+      </Form>
     </div>
   </layout-container>
-
 </template>
 <script lang="ts" setup>
 import FormInput from '@/components/form/input.vue'
-import { useAuthStore, type UserProfileForm } from '@/stores/auth';
-import { watchDebounced } from '@vueuse/core';
-import { onMounted, ref } from 'vue';
+import { useAuthStore, type UserProfileForm } from '@/stores/auth'
+import { watchDebounced } from '@vueuse/core'
+import { onMounted } from 'vue'
+
+import { Form, useForm } from 'vee-validate'
+import * as yup from 'yup'
 
 const auth = useAuthStore()
-const form = ref<Omit<UserProfileForm, 'created_at'> | null>(null)
+const { errors, defineField, handleSubmit, resetForm } = useForm({
+  validationSchema: yup.object({
+    id: yup.string().required('ID is required'),
+    email: yup.string().email().required('Email is required'),
+    name: yup.string().required('Name is required'),
+    username: yup.string().required('Username is required'),
+    phone: yup.string().nullable(),
+  }),
+})
 
-const errors = ref<Record<string, string>>({})
+const [name] = defineField('name')
+const [email] = defineField('email')
+const [username] = defineField('username')
+const [phone] = defineField('phone')
 
-
-const submit = async () => {
-  if (!auth.user) {
+const submit = handleSubmit(async (values: Partial<UserProfileForm>) => {
+  if (!auth.userId) {
     console.error('NO authentication')
     return
   }
-  await auth.updateProfile(form.value)
-}
+
+  console.log('Handle submit')
+
+  const form = {
+    ...values,
+    id: auth.userId,
+    email: values.email as string,
+  }
+
+  await auth.updateProfile(form)
+})
 
 const getProfile = async () => {
   if (!auth.user) {
@@ -49,18 +79,22 @@ const getProfile = async () => {
 
   const _profile = await auth.getProfile()
   if (_profile) {
-    form.value = { ..._profile as UserProfileForm }
+    resetForm({
+      values: _profile,
+    })
   } else {
-    const { id, email } = auth.user.email
-    form.value = {
-      id,
-      name: "",
-      email,
-      username: "",
-      phone: "",
-      avatar: "",
-      avatar_url: "",
-    }
+    const { id, email } = auth.user
+    resetForm({
+      values: {
+        id,
+        name: '',
+        email,
+        username: '',
+        phone: '',
+        avatar: '',
+        avatar_url: '',
+      },
+    })
   }
 }
 
@@ -72,9 +106,7 @@ const checkUsername = async (username: string) => {
   }
 }
 
-watchDebounced(() => form.value.username,
-  checkUsername,
-  { debounce: 500, maxWait: 1000 },)
+watchDebounced(username, checkUsername, { debounce: 500, maxWait: 1000 })
 
 onMounted(getProfile)
 </script>
