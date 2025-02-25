@@ -17,9 +17,10 @@ import FormInput from '@/components/form/input.vue'
 import FormText from '@/components/form/text.vue'
 import * as yup from 'yup'
 import { useProjectStore, type ProjectForm } from '@/stores/project'
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, /*onMounted, */ onUnmounted } from 'vue'
+// import { faker } from '@faker-js/faker'
 
-const props = defineProps<{
+defineProps<{
   form?: ProjectForm
 }>()
 
@@ -28,7 +29,7 @@ const projectStore = useProjectStore()
 const loading = computed(() => projectStore.creating)
 const validationSchema = yup.object({
   name: yup.string().required('Project name is required'),
-  description: yup.string().nullable()
+  description: yup.string().nullable(),
 })
 
 const { errors, defineField, resetForm, handleSubmit } = useForm({
@@ -42,13 +43,16 @@ const submitForm = handleSubmit(async (values) => {
   emit('submit', values as ProjectForm)
 })
 
-onMounted(() => {
-  if (props.form) {
-    resetForm({
-      values: props.form,
-    })
-  }
-})
+// onMounted(() => {
+//   const _default = {
+//     name: 'Test project',
+//     description: faker.lorem.lines({ min: 2, max: 5 }),
+//   }
+
+//   resetForm({
+//     values: _default,
+//   })
+// })
 
 onUnmounted(() => {
   resetForm({
