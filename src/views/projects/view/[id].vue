@@ -16,7 +16,7 @@
     </layout-banner>
     <div>
       <layout-container class="py-10">
-        <router-view />
+        <router-view :key="id" />
       </layout-container>
     </div>
   </div>
@@ -24,9 +24,8 @@
 <script lang="ts" setup>
 import LayoutContainer from '@/components/layout/container.vue'
 import LayoutBanner from '@/components/layout/banner.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-// import { useProjectStore } from '@/stores/project'
 
 const links = ref([
   {
@@ -53,18 +52,5 @@ const links = ref([
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)
-// const project = ref()
 
-// const projectStore = useProjectStore()
-// const getting = computed(() => projectStore.getting)
-// const getProject = async ()  => {
-//   const _p = await projectStore.getProject(id.value);
-//   if(_p){
-//     project.value = _p
-//   }
-// }
-
-onMounted(() => {
-  // getProject()
-})
 </script>
