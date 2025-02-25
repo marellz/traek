@@ -59,7 +59,7 @@ watch(
         label: item.name,
         path: {
           name: 'project',
-          params: { id: item.$id },
+          params: { id: item.id },
         },
       }))
     }
