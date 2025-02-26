@@ -5,6 +5,7 @@ import authRoutes from './routes/auth'
 import projectRoutes from './routes/projects'
 import userRoutes from './routes/user'
 import homeRoutes from './routes/home'
+import testRoutes from './routes/test'
 
 import { useAuthStore } from '@/stores/auth'
 
@@ -30,6 +31,7 @@ const router = createRouter({
 
     // other
     ...homeRoutes,
+    ...testRoutes
   ],
 })
 
