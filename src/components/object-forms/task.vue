@@ -1,7 +1,8 @@
 <template>
   <div>
     <Form @submit="submitForm()">
-      <div class="space-y-4">
+      <base-loader v-if="loading.getting"></base-loader>
+      <div v-else class="space-y-4">
         <form-input label="Task name" v-model="title" :error="errors.title"></form-input>
         <form-text
           label="Task description"
@@ -35,11 +36,14 @@
               </form-radio>
             </div>
           </form-group>
-          <form-input type="date" label="Due date" v-model="due_date"></form-input>
         </div>
+        <form-datepicker label="Due date" v-model="due_date"></form-datepicker>
         <div>
-          <base-button type="submit" :loading> <span>Save changes</span></base-button>
+          <base-button type="submit" :loading="loading.updating || loading.creating">
+            <span>Save changes</span></base-button
+          >
         </div>
+        <!-- <div class="mt-10">{{ errors }}</div> -->
       </div>
     </Form>
   </div>
@@ -47,17 +51,23 @@
 <script lang="ts" setup>
 import FormInput from '@/components/form/input.vue'
 import FormText from '@/components/form/text.vue'
-// import FormSelect from '@/components/form/select.vue'
 import FormGroup from '@/components/form/group.vue'
 import FormRadio from '@/components/form/radio.vue'
+import FormDatepicker from '@/components/form/datepicker.vue'
 import * as yup from 'yup'
 import { Form, useForm } from 'vee-validate'
-import { computed, onMounted } from 'vue'
-import type { TaskForm, TaskPriority, TaskStatus } from '@/stores/task'
-import { useLoadingState } from '@/composables/useLoading'
+import { computed, ref, watch } from 'vue'
+import {
+  useTaskStore,
+  TASK_LOADING,
+  type TaskForm,
+  type TaskPriority,
+  type TaskStatus,
+} from '@/stores/task'
 
 const props = defineProps<{
-  form?: TaskForm
+  edit?: string | null
+  active: boolean
 }>()
 
 const emit = defineEmits(['submit'])
@@ -94,7 +104,8 @@ const statuses: { label: string; value: TaskStatus }[] = [
 const validationSchema = yup.object({
   title: yup.string().required('Task title is required'),
   description: yup.string().nullable(),
-  end_date: yup.date(),
+  start_date: yup.date().nullable(),
+  end_date: yup.date().nullable(),
   priority: yup
     .string()
     .required('Task priority is required')
@@ -104,6 +115,7 @@ const validationSchema = yup.object({
     .required('Task priority is status')
     .oneOf(statuses.map((s) => s.value)),
 })
+
 const { errors, defineField, resetForm, handleSubmit } = useForm({
   validationSchema,
 })
@@ -118,22 +130,57 @@ const submitForm = handleSubmit(async (values) => {
   emit('submit', values as TaskForm)
 })
 
-const loadingState = useLoadingState()
+const tasksStore = useTaskStore()
+const loading = computed(() => ({
+  creating: tasksStore.isLoading(TASK_LOADING.CREATING),
+  getting: tasksStore.isLoading(TASK_LOADING.GETTING_ONE),
+  updating: tasksStore.isLoading(TASK_LOADING.UPDATING),
+}))
 
-const loading = computed(() => loadingState.loading.value.includes('create-task'))
+const _form = ref()
 
-onMounted(() => {
-  if (props.form) {
-    resetForm({
-      values: props.form,
-    })
-  } else {
-    resetForm({
-      values: {
-        status: 'pending',
-        priority: 'medium',
-      },
-    })
+const reset = () => {
+  resetForm({
+    values: {
+      title: '',
+      description: '',
+      due_date: '',
+      status: 'pending',
+      priority: 'medium',
+    },
+  })
+}
+
+const getForm = async () => {
+  if (!props.edit) {
+    return
   }
-})
+  const _task = await tasksStore.get(props.edit as string)
+  if (!_task) {
+    return
+  }
+  _form.value = _task
+
+  resetForm({
+    values: _task,
+  })
+}
+
+watch(
+  () => props.active,
+  () => {
+    if (!props.active) {
+      reset()
+    }
+  },
+)
+
+watch(
+  () => props.edit,
+  (v) => {
+    if (v) {
+      getForm()
+    }
+  },
+)
 </script>
