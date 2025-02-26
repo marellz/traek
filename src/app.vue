@@ -1,8 +1,8 @@
 <template>
   <component :is="layout">
     <router-view />
-    <toasts-wrapper />
   </component>
+  <toasts-wrapper />
 </template>
 <script lang="ts" setup>
 import ToastsWrapper from '@/components/toast/wrapper.vue'
