@@ -86,7 +86,6 @@ export const useAuthStore = defineStore(
         }
 
         if (data.user) {
-
           user.value = data.user
 
           return data.user
@@ -172,10 +171,6 @@ export const useAuthStore = defineStore(
       () => profile.value !== null && profile.value.name && profile.value.username,
     )
 
-    const getProfiles = async (params: { name?: string; email?: string } = {}) => {
-      console.log(params)
-    }
-
     const getProfile = async () => {
       if (!userId.value) {
         return null
@@ -235,6 +230,54 @@ export const useAuthStore = defineStore(
       }
     }
 
+    /**
+     *
+     * USERS SERVICES
+     *
+     */
+
+    const queryUsers = async (query: string) => {
+      if (!userId.value) {
+        return
+      }
+
+      try {
+        const { data, error } = await AuthService.queryUsers({ query })
+        if (error) {
+          handleError('Querying users', error.message)
+        }
+
+        if (data) {
+          return data.filter((u) => u.id !== userId.value && u.username !== null)
+        }
+
+        return null
+      } catch (error) {
+        handleError('Querying users', error)
+      }
+    }
+
+    const getProfiles = async (list: string[], column: 'id' | 'username' = 'id') => {
+      if (!userId.value) {
+        return
+      }
+
+      try {
+        const { error, data } = await AuthService.getProfiles(list, column)
+        if (error) {
+          handleError('Getting profiles', error.message)
+        }
+
+        if (data) {
+          return data
+        }
+
+        return null
+      } catch (error) {
+        handleError('Getting profiles', error)
+      }
+    }
+
     const resetErrors = () => {
       errors.value = null
     }
@@ -261,6 +304,9 @@ export const useAuthStore = defineStore(
       getProfiles,
       updateProfile,
       checkUsername,
+
+      //user
+      queryUsers,
     }
   },
   {
