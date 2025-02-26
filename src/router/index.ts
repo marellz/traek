@@ -39,11 +39,10 @@ router.beforeEach((to, from, next) => {
   const auth = useAuthStore()
   const guestOnlyRoutes: RouteRecordNameGeneric[] = [
     'login',
-    'register',
     'forgot-password',
     'update-password',
   ]
-  const noAuthRoutes: RouteRecordNameGeneric[] = ['home', ...guestOnlyRoutes]
+  const noAuthRoutes: RouteRecordNameGeneric[] = ['home', 'register', ...guestOnlyRoutes]
 
   if (!noAuthRoutes.includes(to.name) && !auth.isAuthenticated) next({ name: 'login' })
   else if (guestOnlyRoutes.includes(to.name) && auth.isAuthenticated) next({ name: 'home' })
