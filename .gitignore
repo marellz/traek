@@ -31,3 +31,5 @@ coverage
 .env
 *.old
 .vscode
+src/views/test/*
+src/router/routes/test.ts
