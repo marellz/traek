@@ -43,11 +43,8 @@ const updatePassword = async (password: string) => {
 const updateProfile = async (id: string, form: UserProfile) => {
   return await supabase
     .from('users')
-    .upsert(form, {
-      ignoreDuplicates: false,
-      onConflict: 'id',
-    })
-    .select()
+    .update(form)
+    .eq('id', id)
 }
 
 const checkUsername = async (username: string) => {

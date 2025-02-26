@@ -86,6 +86,7 @@ export const useAuthStore = defineStore(
         }
 
         if (data.user) {
+
           user.value = data.user
 
           return data.user
@@ -206,6 +207,8 @@ export const useAuthStore = defineStore(
         const { status } = await AuthService.updateProfile(userId.value, form)
         if (status === 204) {
           profile.value = { ...profile.value, ...form }
+
+          return true
         }
 
         return false
@@ -274,22 +277,22 @@ if (import.meta.hot) {
 
 export type UserProfile = {
   id: string
-  email: string
+  email?: string
   username: string
   name: string | null
-  phone: string | null
-  avatar: string | null
-  avatar_url: string | null
+  phone?: string | null
+  avatar?: string | null
+  avatar_url?: string | null
   created_at: string
 }
 
 export type UserProfileForm = {
   id: string
-  name?: string
-  email: string
-  username?: string
+  name: string
+  email?: string
+  username: string
   phone?: string | null
   avatar?: string | null
   avatar_url?: string | null
-  created_at?: string
+  created_at: string
 }
