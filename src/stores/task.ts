@@ -1,93 +1,134 @@
-import type { Models } from 'appwrite'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { ref } from 'vue'
 import { useErrorStore } from './errors'
 import { useTaskService } from '@/services/tasks'
-import type { Project } from './project'
 import { useLoadingState } from '@/composables/useLoading'
 import { useAuthStore } from './auth'
 
-export interface Task extends Models.Document {
-  title: string
-  description?: string | null
-  creator: string
-  project: Project
+export enum TASK_LOADING {
+  CREATING = 'creating-task',
+  UPDATING = 'updating-task',
+  DELETING = 'deleting-task',
+  GETTING_ONE = 'getting-task',
+  GETTING_ALL = 'getting-tasks',
 }
 
 export type TaskStatus = 'pending' | 'in_progress' | 'completed'
 
 export type TaskPriority = 'high' | 'medium' | 'low'
 
-export interface TaskForm {
+export interface Task {
+  id: string
+  project_id: string
   title: string
-  description?: string | null
-  creator: string
-  project: string
-  status: TaskStatus
+  description: string | null
+  priority: string
+  status: string
+  created_by: string
+  created_at: string
+  due_date: string | null
+  end_date: string | null
+  start_date: string | null
+  updated_at: string | null
+  closed_at: string | null
+}
+
+export interface TaskForm {
+  id?: string
+  project_id: string
+  title?: string
+  description?: string
   priority: TaskPriority
+  status: TaskStatus
+  created_by: string
+  created_at?: string
+  due_date?: string
+  start_date?: string
+  end_date?: string
+  updated_at?: string
+  closed_at?: string
 }
 
 export const useTaskStore = defineStore(
   'project_tasks',
   () => {
-    const tasks = ref<Task[]>([])
     const service = useTaskService()
     const { handleError } = useErrorStore()
-    const { begin, finish } = useLoadingState()
+    const { begin, finish, isLoading } = useLoadingState()
     const auth = useAuthStore()
 
     const list = async (project: string) => {
-      begin('list-tasks')
+      begin(TASK_LOADING.GETTING_ALL)
+
       try {
-        const { documents } = await service.list(project)
-        if (documents) {
-          tasks.value = documents as Task[]
+        const { error, data } = await service.getProjectTasks(project)
+        if (error) {
+          handleError('Getting tasks', error.message)
         }
+
+        if (data) {
+          return data
+        }
+        return null
       } catch (error) {
         handleError('Getting tasks', error)
       } finally {
-        finish('list-tasks')
+        finish(TASK_LOADING.GETTING_ALL)
       }
     }
 
     const get = async (id: string) => {
+      begin(TASK_LOADING.GETTING_ONE)
       try {
-        const response = await service.get(id)
-        if (response) {
-          return response
+        const { data, error } = await service.get(id)
+        if (error) {
+          handleError('Getting task', error.message)
+        }
+
+        if (data && data.length) {
+          return data[0]
         }
 
         return null
       } catch (error) {
         handleError('Getting task', error)
       } finally {
+        finish(TASK_LOADING.GETTING_ONE)
       }
     }
 
     const create = async (form: Omit<TaskForm, 'created_by'>) => {
-      if (!auth.user) {
+      begin(TASK_LOADING.CREATING)
+      if (!auth.userId) {
         handleError('Forbidden', 'Action not authorized')
         return
       }
-      begin('create-task')
       try {
-        const response = await service.create({ ...form, creator: auth.user.id })
-        if (response) {
-          return response
+        const { data, error } = await service.create({ ...form, created_by: auth.userId })
+        if (error) {
+          handleError('Getting tasks', error.message)
+        }
+        if (data && data.length) {
+          return data[0]
         }
 
         return null
       } catch (error) {
         handleError('Creating task', error)
       } finally {
-        finish('create-task')
+        finish(TASK_LOADING.CREATING)
       }
     }
 
     const update = async (id: string, form: TaskForm) => {
+      begin(TASK_LOADING.UPDATING)
       try {
-        const response = await service.update(id, form)
-        if (response) {
+        const { status, error } = await service.update(id, form)
+
+        if (error) {
+          handleError('Updating task', error)
+        }
+
+        if (status === 204) {
           return true
         }
 
@@ -95,14 +136,19 @@ export const useTaskStore = defineStore(
       } catch (error) {
         handleError('Updating task', error)
       } finally {
+        finish(TASK_LOADING.UPDATING)
       }
     }
 
     const destroy = async (id: string) => {
+      begin(TASK_LOADING.DELETING)
       try {
-        const response = await service.destroy(id)
+        const { status, error } = await service.destroy(id)
 
-        if (response) {
+        if (error) {
+          handleError('Deleting task', error.message)
+        }
+        if (status === 204) {
           return true
         }
 
@@ -110,16 +156,18 @@ export const useTaskStore = defineStore(
       } catch (error) {
         handleError('Deleting task', error)
       } finally {
+        finish(TASK_LOADING.DELETING)
       }
     }
 
     return {
-      tasks,
+      // tasks,
       list,
       get,
       create,
       update,
       destroy,
+      isLoading,
     }
   },
   {

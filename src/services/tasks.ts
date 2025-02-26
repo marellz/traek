@@ -1,65 +1,44 @@
-import type { TaskForm } from "@/stores/task"
-import collectionService from "./collection"
-import { ref } from "vue"
-import { Permission, Role } from "appwrite"
+import { supabase } from '@/database/supabase'
+import type { TaskForm } from '@/stores/task'
 export type TasksListCriteria = 'project_id' | 'creator' | 'assigned'
+
 export const useTaskService = () => {
-  const collectionId = import.meta.env.VITE_APPWRITE_TASKS
-  const tasksCollection = new collectionService(collectionId)
 
-  const list = async (id: string, criteria: TasksListCriteria ='project_id') => {
-    const queries = ref([])
-    switch (criteria) {
-      case 'creator':
-        queries.value.push(
-
-        )
-        break;
-      case 'assigned':
-
-        break;
-
-      default:
-        // project_idd
-        break;
-    }
-
-    return await tasksCollection.list()
+  const getMyTasks = async (user: string) => {
+    return await supabase.from('tasks').select('*').eq('created_by', user)
   }
 
-  const create = async (form: TaskForm) => {
-    let permissions = [
-          Permission.read(Role.any()),
-          Permission.write(Role.any()),
-        ]
+  const getAssignedTasks = async (user: string) => {
+    return await supabase.from('task_assignees').select('*').eq('user_id', user)
+  }
 
-        if(form.creator){
-          permissions = [
-            ...permissions,
-            Permission.update(Role.user(form.creator)),
-            Permission.delete(Role.user(form.creator)),
-          ]
-        }
-    return await tasksCollection.create(form, permissions)
+  const getProjectTasks = async (project: string) => {
+    return await supabase.from('tasks').select('*').eq('project_id', project)
+  }
+
+  const create = async (form: Task) => {
+    return await supabase.from('tasks').insert(form).select()
   }
 
   const get = async (id: string) => {
-    return await tasksCollection.get(id)
+    return await supabase.from('tasks').select().eq('id', id)
   }
 
   const update = async (id: string, form: TaskForm) => {
-    return await tasksCollection.update(id, form)
+    return await supabase.from('tasks').update(form).eq('id', id)
   }
 
   const destroy = async (id: string) => {
-    return await tasksCollection.destroy(id)
+    return await supabase.from('tasks').delete().eq('id', id)
   }
 
   return {
     create,
-    list,
+    getMyTasks,
+    getAssignedTasks,
+    getProjectTasks,
     get,
     update,
-    destroy
+    destroy,
   }
 }
