@@ -1,11 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordNameGeneric } from 'vue-router'
 import Home from '@/views/index.vue'
-import dashboardRoutes from './routes/dashboard'
-import authRoutes from './routes/auth'
-import projectRoutes from './routes/projects'
-import userRoutes from './routes/user'
-import homeRoutes from './routes/home'
-import testRoutes from './routes/test'
 
 import { useAuthStore } from '@/stores/auth'
 
@@ -21,17 +15,141 @@ const router = createRouter({
       },
     },
 
-    // auth
-    ...authRoutes,
+    /**
+     *
+     *
+     * AUTHENTICATION
+     *
+     *
+     */
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/auth/login.vue'),
+      meta: {
+        layout: 'auth',
+      },
+    },
+    {
+      path: '/register',
+      name: 'register',
+      component: () => import('@/views/auth/register.vue'),
+      meta: {
+        layout: 'auth',
+      },
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('@/views/auth/forgot-password.vue'),
+      meta: {
+        layout: 'auth',
+      },
+    },
+    {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: () => import('@/views/auth/reset-password.vue'),
+      meta: {
+        layout: 'auth',
+      },
+    },
 
-    // dashboard
-    ...dashboardRoutes,
-    ...projectRoutes,
-    ...userRoutes,
+    /**
+     *
+     *
+     * DASHBOARD
+     *
+     *
+     */
 
-    // other
-    ...homeRoutes,
-    ...testRoutes
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('@/views/dashboard/index.vue'),
+    },
+    {
+      path: '/tasks',
+      name: 'tasks',
+      component: () => import('@/views/tasks/index.vue'),
+    },
+    {
+      path: '/calendar',
+      name: 'calendar',
+      component: () => import('@/views/calendar/index.vue'),
+    },
+
+    /**
+     *
+     *
+     * PROJECT ROUTES
+     *
+     *
+     */
+
+    {
+      path: '/projects/',
+      name: 'projects',
+      // default projects page is tasks
+      component: () => import('@/views/projects/index.vue'),
+    },
+    {
+      path: '/projects/view/:id',
+      // default projects page is tasks
+      component: () => import('@/views/projects/view/[id].vue'),
+      children: [
+        {
+          path: '', // overview -> default
+          name: 'project',
+          component: () => import('@/views/projects/view/[id]/index.vue'),
+        },
+        {
+          path: 'tasks',
+          name: 'project-tasks',
+          component: () => import('@/views/projects/view/[id]/tasks.vue'),
+        },
+        {
+          path: 'members',
+          name: 'project-members',
+          component: () => import('@/views/projects/view/[id]/members.vue'),
+        },
+        {
+          path: 'events',
+          name: 'project-events',
+          component: () => import('@/views/projects/view/[id]/events.vue'),
+        },
+        {
+          path: 'about',
+          name: 'project-about',
+          component: () => import('@/views/projects/view/[id]/about.vue'),
+        },
+      ],
+    },
+
+    {
+      path: '/projects/new',
+      name: 'create-project',
+      component: () => import('@/views/projects/create.vue'),
+    },
+    {
+      path: '/projects/update/:id',
+      name: 'update-project',
+      component: () => import('@/views/projects/update.vue'),
+    },
+
+    /**
+     *
+     *
+     * USER PROFILE/SETTING ROUTES
+     *
+     *
+     */
+
+    {
+      name: 'user-profile',
+      path: '/profile/:id',
+      component: () => import('@/views/profile/[id].vue'),
+    },
   ],
 })
 
