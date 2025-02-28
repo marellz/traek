@@ -31,9 +31,9 @@
 </template>
 <script lang="ts" setup>
 import FormInput from '@/components/form/input.vue'
-import { useAuthStore, type UserProfileForm } from '@/stores/auth'
+import { useAuthStore, type UserProfile, type UserProfileForm } from '@/stores/auth'
 import { watchDebounced } from '@vueuse/core'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import { Form, useForm } from 'vee-validate'
 import * as yup from 'yup'
@@ -54,18 +54,20 @@ const [email] = defineField('email')
 const [username] = defineField('username')
 const [phone] = defineField('phone')
 
-const submit = handleSubmit(async (values: Partial<UserProfileForm>) => {
-  if (!auth.userId) {
-    console.error('NO authentication')
-    return
+const profile = ref<UserProfile | null>(null)
+
+type ProfileFormValues = Pick<UserProfileForm, 'name' | 'email' | 'username' | 'phone'>
+
+const submit = handleSubmit(async (values) => {
+  if (!auth.user) {
+    throw new Error('No authentication')
   }
 
-  console.log('Handle submit')
-
   const form = {
-    ...values,
-    id: auth.userId,
+    ...(values as ProfileFormValues),
+    id: auth.user.id,
     email: values.email as string,
+    created_at: profile.value?.created_at || auth.user.created_at,
   }
 
   await auth.updateProfile(form)
@@ -73,17 +75,17 @@ const submit = handleSubmit(async (values: Partial<UserProfileForm>) => {
 
 const getProfile = async () => {
   if (!auth.user) {
-    //fail
-    return null
+    throw new Error('No authentication')
   }
 
   const _profile = await auth.getProfile()
   if (_profile) {
+    profile.value = _profile
     resetForm({
       values: _profile,
     })
   } else {
-    const { id, email } = auth.user
+    const { id, email, created_at } = auth.user
     resetForm({
       values: {
         id,
@@ -93,6 +95,7 @@ const getProfile = async () => {
         phone: '',
         avatar: '',
         avatar_url: '',
+        created_at,
       },
     })
   }

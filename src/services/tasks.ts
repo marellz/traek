@@ -16,7 +16,7 @@ export const useTaskService = () => {
     return await supabase.from('tasks').select('*').eq('project_id', project)
   }
 
-  const create = async (form: Task) => {
+  const create = async (form: TaskForm) => {
     return await supabase.from('tasks').insert(form).select()
   }
 

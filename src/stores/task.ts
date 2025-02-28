@@ -35,7 +35,7 @@ export interface Task {
 export interface TaskForm {
   id?: string
   project_id: string
-  title?: string
+  title: string
   description?: string
   priority: TaskPriority
   status: TaskStatus
