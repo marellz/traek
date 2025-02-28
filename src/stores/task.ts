@@ -25,11 +25,11 @@ export interface Task {
   status: string
   created_by: string
   created_at: string
-  due_date: string | null
-  end_date: string | null
-  start_date: string | null
-  updated_at: string | null
-  closed_at: string | null
+  due_date?: string | null
+  end_date?: string | null
+  start_date?: string | null
+  updated_at?: string | null
+  closed_at?: string | null
 }
 
 export interface TaskForm {
