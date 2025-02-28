@@ -74,7 +74,6 @@ export const useProjectStore = defineStore(
       }
     }
 
-
     const getProject = async (id: string) => {
       getting.value = true
       try {
@@ -90,6 +89,22 @@ export const useProjectStore = defineStore(
         handleError('Getting project', error)
       } finally {
         getting.value = false
+      }
+    }
+
+    const getProjectMembers = async (id: string) => {
+      try {
+        const { error, data } = await service.getProjectMembers(id)
+        if (error) {
+          handleError('Getting project members', error.message)
+        }
+        if (data) {
+          return data
+        }
+
+        return null
+      } catch (error) {
+        handleError('Getting project members', error)
       }
     }
 
@@ -109,7 +124,6 @@ export const useProjectStore = defineStore(
         handleError('Getting project stats', error)
       }
     }
-
 
     const sendJoinRequest = async () => {}
 
@@ -137,7 +151,6 @@ export const useProjectStore = defineStore(
           await addMemberById(auth.userId, data[0].id)
 
           return data
-
         }
 
         return null
@@ -150,18 +163,17 @@ export const useProjectStore = defineStore(
 
     const addMemberById = async (user: string, project: string) => {
       try {
-        const {status, error} = await service.createProjectMember(user, project)
-        if(error){
-          handleError("Adding member to project", error.message)
+        const { status, error } = await service.createProjectMember(user, project)
+        if (error) {
+          handleError('Adding member to project', error.message)
         }
 
-        if(status===204){
-
+        if (status === 204) {
         }
 
         return false
       } catch (error) {
-        handleError("Adding member to project", error)
+        handleError('Adding member to project', error)
       }
     }
 
@@ -239,6 +251,7 @@ export const useProjectStore = defineStore(
 
       getUserProjects,
       getProject,
+      getProjectMembers,
       getProjectStats,
       sendJoinRequest,
       createProject,

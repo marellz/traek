@@ -19,6 +19,10 @@ export const useProjectService = () => {
     return await supabase.from('projects').select().eq('id', id)
   }
 
+  const getProjectMembers = async(id: string) => {
+    return await supabase.from('project_members').select('').eq('project_id', id)
+  }
+
   const getStats = async(id: string) => {
     return await supabase.from('projects').select().eq('id', id);
   }
@@ -31,6 +35,7 @@ export const useProjectService = () => {
     return await supabase.from('projects').insert(form).eq('id', id)
   }
 
+
   return {
     get,
     getStats,
@@ -40,5 +45,6 @@ export const useProjectService = () => {
 
     //
     createProjectMember,
+    getProjectMembers,
   }
 }
