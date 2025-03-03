@@ -44,7 +44,7 @@
           </form-dropdown>
         </form-group>
         <div>
-          <base-button type="submit" :loading> <span>Save changes</span></base-button>
+          <base-button type="submit" :loading="loading.creating || loading.updating"> <span>Save changes</span></base-button>
         </div>
       </div>
     </Form>
@@ -57,12 +57,11 @@ import FormGroup from '@/components/form/group.vue'
 import FormText from '@/components/form/text.vue'
 import FormDropdown from '@/components/form/dropdown.vue'
 import * as yup from 'yup'
-import { useProjectStore, type ProjectForm } from '@/stores/project'
+import { ProjectLoading, useProjectStore, type ProjectForm } from '@/stores/project'
 import { computed, onUnmounted, ref } from 'vue'
 import { useAuthStore, type UserProfile } from '@/stores/auth'
 import { watchDebounced } from '@vueuse/core'
 import { Trash2 } from 'lucide-vue-next'
-// import { faker } from '@faker-js/faker'
 
 const props = defineProps<{
   id?: string
@@ -72,7 +71,12 @@ const emit = defineEmits(['submit'])
 const projectStore = useProjectStore()
 const auth = useAuthStore()
 
-const loading = computed(() => projectStore.creating)
+const loading = computed(()=> {
+  return {
+    updating: projectStore.isLoading(ProjectLoading.UPDATING),
+    creating: projectStore.isLoading(ProjectLoading.CREATING),
+  }
+})
 const validationSchema = yup.object({
   name: yup.string().required('Project name is required'),
   description: yup.string().nullable(),
@@ -126,7 +130,7 @@ const submitForm = handleSubmit(async (values) => {
 const init = async () => {
   if (props.id) {
     const _form = await projectStore.getProject(props.id)
-    const _members = await projectStore.getProjectMembers(props.id)
+    const _members = await projectStore.getMembers(props.id)
     if (_form) {
       resetForm({
         values: _form,
