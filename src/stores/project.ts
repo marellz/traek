@@ -3,6 +3,7 @@ import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useLoadingState } from '@/composables/useLoading'
 
 export type Project = {
   id: string
@@ -32,6 +33,21 @@ export interface ProjectMember {
 
 export type PartialProjectForm = Partial<Record<keyof ProjectForm, any>>
 
+export enum ProjectLoading {
+  GETTING_ALL = 'getting-projects',
+  GETTING_ONE = 'getting-project',
+  GETTING_INFO = 'getting-project-info',
+  CREATING = 'creating-project',
+  UPDATING = 'updating-project',
+  CLOSING = 'closing-project',
+
+  //
+  GETTING_USER = 'getting-user-project',
+  ADDING_MEMBERS = 'adding-members',
+  REMOVING_MEMBER = 'removing-member',
+  GETTING_MEMBERS = 'getting-members',
+}
+
 export const useProjectStore = defineStore(
   'projects',
   () => {
@@ -39,27 +55,25 @@ export const useProjectStore = defineStore(
     const service = useProjectService()
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
+    const { begin, finish } = useLoadingState()
 
-    //loading states
-    const fetching = ref(false)
-    const getting = ref(false)
-    const creating = ref(false)
-    const updating = ref(false)
-    const closing = ref(false)
-
-    const getUserProjects = async () => {
-      if (!auth.user) {
-        return forbiddenAction()
+    const ensureAuth = (user_id?: string) => {
+      if (!(auth.user && (user_id ? auth.user.id !== user_id : true))) {
+        throw new Error('Forbidden action')
       }
 
-      fetching.value = true
-      projects.value = []
-      try {
-        const { data, error } = await service.list(auth.user.id)
+      return true
+    }
 
-        if (error) {
-          handleError('Getting user projects', error.message)
-        }
+    const getUserProjects = async () => {
+      ensureAuth()
+      projects.value = []
+
+      try {
+        begin(ProjectLoading.GETTING_USER)
+        const { data, error } = await service.list(auth.userId!)
+
+        if (error) throw new Error(error.message)
 
         if (data) {
           projects.value = data
@@ -70,85 +84,54 @@ export const useProjectStore = defineStore(
       } catch (error) {
         handleError('Getting user projects', error)
       } finally {
-        fetching.value = false
+        finish(ProjectLoading.GETTING_USER)
       }
     }
 
     const getProject = async (id: string) => {
-      getting.value = true
       try {
+        begin(ProjectLoading.GETTING_ONE)
         const { data, error } = await service.get(id)
-        if (error) {
-          handleError('Getting project', error.message)
-        }
-        if (data) {
-          return data[0]
-        }
+        if (error) throw new Error(error.message)
+        if (data) return data[0]
         return null
       } catch (error) {
         handleError('Getting project', error)
       } finally {
-        getting.value = false
+        finish(ProjectLoading.GETTING_ONE)
       }
     }
 
-    const getProjectMembers = async (id: string) => {
+    const getProjectInfo = async (project: string) => {
       try {
-        const { error, data } = await service.getProjectMembers(id)
-        if (error) {
-          handleError('Getting project members', error.message)
-        }
-        if (data) {
-          return data
-        }
-
-        return null
-      } catch (error) {
-        handleError('Getting project members', error)
-      }
-    }
-
-    const getProjectStats = async (project: string) => {
-      try {
+        begin(ProjectLoading.GETTING_INFO)
         const { error, data } = await service.getStats(project)
-        if (error) {
-          handleError('Getting project stats', error.message)
-        }
+        if (error) throw new Error(error.message)
 
-        if (data) {
-          return data
-        }
+        if (data) return data[0]
 
         return null
       } catch (error) {
         handleError('Getting project stats', error)
+      } finally {
+        finish(ProjectLoading.GETTING_INFO)
       }
     }
 
-    const sendJoinRequest = async () => {}
-
-    const createProject = async (form: ProjectForm) => {
-      if (!auth.userId) {
-        handleError('Forbidden', "You're not allowed to perform this action")
-        return null
-      }
+    const createProject = async (form: ProjectForm, members: string[]) => {
+      ensureAuth()
 
       try {
-        form.created_by = auth.userId
+        begin(ProjectLoading.CREATING)
+        form.created_by = auth.userId!
         form.created_at = new Date().toISOString()
-
-        creating.value = true
-
         const { data, error } = await service.create(form)
-        if (error) {
-          handleError('Creating project', error.message)
-        }
-
+        if (error) throw new Error(error.message)
         if (data && data.length) {
           // todo: know what to do depending on origin/purpose
           projects.value = [...projects.value, data[0]]
 
-          await addMemberById(auth.userId, data[0].id)
+          await addMembers(data[0].id, [...members, auth.userId!])
 
           return data
         }
@@ -157,37 +140,20 @@ export const useProjectStore = defineStore(
       } catch (error) {
         handleError('Creating project', error)
       } finally {
-        creating.value = false
-      }
-    }
-
-    const addMemberById = async (user: string, project: string) => {
-      try {
-        const { status, error } = await service.createProjectMember(user, project)
-        if (error) {
-          handleError('Adding member to project', error.message)
-        }
-
-        if (status === 204) {
-        }
-
-        return false
-      } catch (error) {
-        handleError('Adding member to project', error)
+        finish(ProjectLoading.CREATING)
       }
     }
 
     const updateProject = async (id: string, form: ProjectForm) => {
-      if (!auth.user || form.created_by !== auth.user.id) {
-        return forbiddenAction()
-      }
-
-      updating.value = true
+      ensureAuth(form.created_by)
 
       try {
+        begin(ProjectLoading.UPDATING)
         form.updated_at = new Date().toISOString()
-        const response = await service.update(id, form)
-        if (response) {
+        const { status, error } = await service.update(id, form)
+        if (error) throw new Error(error.message)
+
+        if (status === 204) {
           return true
         }
 
@@ -195,75 +161,105 @@ export const useProjectStore = defineStore(
       } catch (error) {
         handleError('Updating project', error)
       } finally {
-        updating.value = false
+        finish(ProjectLoading.UPDATING)
       }
     }
 
     const closeProject = async (id: string) => {
-      const form = projects.value.find((p) => p.id === id)
-
-      if (!form) {
-        handleError('Not found', 'Project is invalid or does not exist')
-        return null
-      }
-
-      if (!auth.user || form.created_by !== auth.user.id) {
-        return forbiddenAction()
-      }
-
-      closing.value = true
-      const _project = await getProject(id)
-      if (!_project) {
-        return
-      }
-
       try {
+        begin(ProjectLoading.CLOSING)
+        const form = projects.value.find((p) => p.id === id)
+
+        if (!form) {
+          throw new Error('Project not found')
+        }
+
+        ensureAuth(form.created_by)
         const closed_at = new Date().toISOString()
-        const response = await service.update(id, {
-          ..._project,
+        const { error, status } = await service.update(id, {
+          ...form,
           closed_at,
           updated_at: closed_at,
         })
 
-        if (response) form.closed_at = closed_at
+        if (error) throw new Error(error.message)
+        if (status === 204) {
+          form.closed_at = closed_at
+          return true
+        }
+
+        return false
       } catch (error) {
         handleError('Closing project', error)
       } finally {
-        closing.value = false
+        finish(ProjectLoading.CLOSING)
       }
     }
 
-    const init = async () => {
-      // await getUserProjects()
+    /**
+     * MEMBERS
+     */
+
+    const addMembers = async (project: string, members: string[]) => {
+      try {
+        begin(ProjectLoading.ADDING_MEMBERS)
+        const payload = members.map((user_id) => ({ user_id, project_id: project }))
+        const { status, error } = await service.addMembers(payload)
+        if (error) throw new Error(error.message)
+        if (status === 204) {
+          return true
+        }
+
+        return false
+      } catch (error) {
+        handleError('Adding member to project', error)
+      } finally {
+        finish(ProjectLoading.ADDING_MEMBERS)
+      }
     }
 
-    const forbiddenAction = () => {
-      handleError(
-        'Forbiddden action',
-        ' You need to be properly authorized/authenticated to perform this action.',
-      )
-      return false
+    const getMembers = async (project: string) => {
+      try {
+        begin(ProjectLoading.GETTING_MEMBERS)
+        const { error, data } = await service.getMembers(project)
+        if (error) throw new Error(error.message)
+        if (data) return data
+
+        return null
+      } catch (error) {
+        handleError('Getting project members', error)
+      } finally {
+        finish(ProjectLoading.GETTING_MEMBERS)
+      }
+    }
+
+    const removeMember = async (user_id: string, project_id: string) => {
+      try {
+        begin(ProjectLoading.REMOVING_MEMBER)
+        const { status, error } = await service.removeMember(user_id, project_id)
+        if (error) throw new Error(error.message)
+        if (status === 204) return true
+
+        return false
+      } catch (error) {
+        handleError('Removing member from project', error)
+      } finally {
+        finish(ProjectLoading.REMOVING_MEMBER)
+      }
     }
 
     return {
       projects,
-      init,
 
       getUserProjects,
       getProject,
-      getProjectMembers,
-      getProjectStats,
-      sendJoinRequest,
+      getProjectInfo,
       createProject,
       updateProject,
       closeProject,
 
-      // loading
-      fetching,
-      getting,
-      creating,
-      updating,
-      closing,
+      getMembers,
+      removeMember,
     }
   },
   {
