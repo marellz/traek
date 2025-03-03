@@ -27,6 +27,6 @@ import { useProjectStore } from '@/stores/project';
 
 const projectStore = useProjectStore()
 onMounted(async () => {
-  await projectStore.init()
+  await projectStore.getUserProjects()
 })
 </script>
