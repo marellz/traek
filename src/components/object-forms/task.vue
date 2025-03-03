@@ -59,7 +59,7 @@ import { Form, useForm } from 'vee-validate'
 import { computed, ref, watch } from 'vue'
 import {
   useTaskStore,
-  TASK_LOADING,
+  TaskLoading,
   type TaskForm,
   type TaskPriority,
   type TaskStatus,
@@ -125,16 +125,17 @@ const [description] = defineField('description')
 const [due_date] = defineField('due_date')
 const [status] = defineField('status')
 const [priority] = defineField('priority')
+const assignees = ref<string[]>([])
 
 const submitForm = handleSubmit(async (values) => {
-  emit('submit', values as TaskForm)
+  emit('submit', values as TaskForm, assignees)
 })
 
 const tasksStore = useTaskStore()
 const loading = computed(() => ({
-  creating: tasksStore.isLoading(TASK_LOADING.CREATING),
-  getting: tasksStore.isLoading(TASK_LOADING.GETTING_ONE),
-  updating: tasksStore.isLoading(TASK_LOADING.UPDATING),
+  creating: tasksStore.isLoading(TaskLoading.CREATING),
+  getting: tasksStore.isLoading(TaskLoading.GETTING_ONE),
+  updating: tasksStore.isLoading(TaskLoading.UPDATING),
 }))
 
 const _form = ref()
