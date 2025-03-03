@@ -89,9 +89,7 @@ export const useTaskStore = defineStore(
         const { data, error } = await service.get(id)
         if (error) throw new Error(error.message)
 
-        if (data && data.length) {
-          return data[0]
-        }
+        if (data) return data[0]
 
         return null
       } catch (error) {
@@ -128,11 +126,7 @@ export const useTaskStore = defineStore(
 
         if (error) throw new Error(error.message)
 
-        if (status === 204) {
-          return true
-        }
-
-        return false
+        return status === 204
       } catch (error) {
         handleError('Updating task', error)
       } finally {
@@ -147,11 +141,7 @@ export const useTaskStore = defineStore(
         const { status, error } = await service.destroy(id)
 
         if (error) throw new Error(error.message)
-        if (status === 204) {
-          return true
-        }
-
-        return false
+        return status === 204
       } catch (error) {
         handleError('Deleting task', error)
       } finally {
@@ -169,9 +159,7 @@ export const useTaskStore = defineStore(
         const payload = assignees.map((user_id) => ({ task_id: task, user_id }))
         const { status, error } = await service.addAssignees(payload)
         if (error) throw new Error(error.message)
-        if (status === 204) return true
-
-        return false
+        return status === 204
       } catch (error) {
         handleError('Adding assignee', error)
       } finally {
@@ -198,8 +186,7 @@ export const useTaskStore = defineStore(
         begin(TaskLoading.REMOVING_ASSIGNEE)
         const { status, error } = await service.removeAssignee(task, userId)
         if (error) throw new Error(error.message)
-        if (status === 204) return true
-        return false
+        return status === 204
       } catch (error) {
         handleError('Removing assignee', error)
       } finally {

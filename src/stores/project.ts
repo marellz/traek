@@ -55,7 +55,7 @@ export const useProjectStore = defineStore(
     const service = useProjectService()
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
-    const { begin, finish } = useLoadingState()
+    const { begin, finish, isLoading } = useLoadingState()
 
     const ensureAuth = (user_id?: string) => {
       if (!(auth.user && (user_id ? auth.user.id !== user_id : true))) {
@@ -93,8 +93,7 @@ export const useProjectStore = defineStore(
         begin(ProjectLoading.GETTING_ONE)
         const { data, error } = await service.get(id)
         if (error) throw new Error(error.message)
-        if (data) return data[0]
-        return null
+        return data[0]
       } catch (error) {
         handleError('Getting project', error)
       } finally {
@@ -107,10 +106,7 @@ export const useProjectStore = defineStore(
         begin(ProjectLoading.GETTING_INFO)
         const { error, data } = await service.getStats(project)
         if (error) throw new Error(error.message)
-
-        if (data) return data[0]
-
-        return null
+        return data[0]
       } catch (error) {
         handleError('Getting project stats', error)
       } finally {
@@ -153,11 +149,7 @@ export const useProjectStore = defineStore(
         const { status, error } = await service.update(id, form)
         if (error) throw new Error(error.message)
 
-        if (status === 204) {
-          return true
-        }
-
-        return false
+        return status === 204
       } catch (error) {
         handleError('Updating project', error)
       } finally {
@@ -206,11 +198,7 @@ export const useProjectStore = defineStore(
         const payload = members.map((user_id) => ({ user_id, project_id: project }))
         const { status, error } = await service.addMembers(payload)
         if (error) throw new Error(error.message)
-        if (status === 204) {
-          return true
-        }
-
-        return false
+        return status === 204
       } catch (error) {
         handleError('Adding member to project', error)
       } finally {
@@ -223,9 +211,7 @@ export const useProjectStore = defineStore(
         begin(ProjectLoading.GETTING_MEMBERS)
         const { error, data } = await service.getMembers(project)
         if (error) throw new Error(error.message)
-        if (data) return data
-
-        return null
+        return data
       } catch (error) {
         handleError('Getting project members', error)
       } finally {
@@ -238,9 +224,7 @@ export const useProjectStore = defineStore(
         begin(ProjectLoading.REMOVING_MEMBER)
         const { status, error } = await service.removeMember(user_id, project_id)
         if (error) throw new Error(error.message)
-        if (status === 204) return true
-
-        return false
+        return status === 204
       } catch (error) {
         handleError('Removing member from project', error)
       } finally {
@@ -260,6 +244,7 @@ export const useProjectStore = defineStore(
 
       getMembers,
       removeMember,
+      isLoading,
     }
   },
   {

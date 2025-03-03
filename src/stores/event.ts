@@ -21,7 +21,7 @@ export const useEventStore = defineStore(
     const service = useEventService()
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
-    const { begin, finish } = useLoadingState()
+    const { begin, finish, isLoading } = useLoadingState()
 
     const ensureAuth = () => {
       if (!auth.isAuthenticated) {
@@ -38,11 +38,7 @@ export const useEventStore = defineStore(
         const { error, data } = await service.list(project)
         if (error) throw new Error(error.message)
 
-        if (data) {
-          return data[0]
-        }
-
-        return null
+        return data[0]
       } catch (error) {
         handleError('Fetching events', error)
       } finally {
@@ -57,11 +53,7 @@ export const useEventStore = defineStore(
         const { data, error } = await service.getEvent(id)
         if (error) throw new Error(error.message)
 
-        if (data) {
-          return data[0]
-        }
-
-        return null
+        return data[0]
       } catch (error) {
         handleError('Fetching event', error)
       } finally {
@@ -99,11 +91,7 @@ export const useEventStore = defineStore(
         const { status, error } = await service.update(id, form)
         if (error) throw new Error(error.message)
 
-        if (status === 204) {
-          return true
-        }
-
-        return false
+        return status === 204
       } catch (error) {
         handleError('Updating event', error)
       } finally {
@@ -118,11 +106,7 @@ export const useEventStore = defineStore(
         const { status, error } = await service.destroy(id)
         if (error) throw new Error(error.message)
 
-        if (status === 204) {
-          return true
-        }
-
-        return false
+        return status === 204
       } catch (error) {
         handleError('Deleting event', error)
       } finally {
@@ -139,11 +123,7 @@ export const useEventStore = defineStore(
         begin(EventLoading.GETTING_USER)
         const { error, data } = await service.getUserEvents(user_id)
         if (error) throw new Error(error.message)
-        if (data) {
-          return data
-        }
-
-        return null
+        return data
       } catch (error) {
         handleError('Fetching user events', error)
       } finally {
@@ -167,9 +147,7 @@ export const useEventStore = defineStore(
         const { error, status } = await service.addInvitees(payload)
 
         if (error) throw new Error(error.message)
-        if (status === 204) return true
-
-        return false
+        return status === 204
       } catch (error) {
         handleError('Adding invitees', error)
       }finally {
@@ -183,8 +161,7 @@ export const useEventStore = defineStore(
         begin(EventLoading.DELETING_INVITEE)
         const { error, status } = await service.deleteInvitee(event_id, user_id)
         if (error) throw new Error(error.message)
-        if (status === 204) return true
-        return false
+        return status===204
       } catch (error) {
         handleError('Deleting invitee', error)
       }
@@ -205,6 +182,8 @@ export const useEventStore = defineStore(
       // invitees
       addInvitees,
       deleteInvitee,
+
+      isLoading,
     }
   },
   {
