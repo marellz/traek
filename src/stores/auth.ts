@@ -1,138 +1,291 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import AuthService, { type AuthPayload } from '@/services/auth'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useErrorStore } from './errors'
-import type { Models } from 'appwrite'
-
-export interface User extends Models.User<Models.Preferences> {
-  name: string;
-}
-
-export type UserProfile = {
-  $id: string
-  email: string
-  username: string
-  name: string | null
-  phone: string | null
-  avatar: string | null
-}
+import type { User } from '@supabase/supabase-js'
 
 export const useAuthStore = defineStore(
   'auth',
   () => {
-    const user = ref<User | null>(null)
-    const profile = ref<UserProfile | null>(null)
-    const loading = ref(false)
-    const errors = ref<any[]>([])
-    const errorStore = useErrorStore()
+    const { handleError } = useErrorStore()
 
+    const user = ref<User | null>(null)
+    const loading = ref(false)
+    const errors = ref<Record<string, string> | null>(null)
     const isAuthenticated = computed(() => user.value !== null)
+    const userId = computed(() => (user.value ? user.value.id : null))
 
     const init = async () => {
       try {
-        const response = await AuthService.init()
-        if (response) {
-          user.value = response
+        const {
+          data: { user: sessionUser },
+        } = await AuthService.getUser()
+
+        if (sessionUser) {
+          user.value = sessionUser
         } else {
           user.value = null
         }
       } catch {
-        user.value = null
+        handleError('Auth initialization', 'Error occurred initializing user')
       }
     }
 
     const login = async (payload: AuthPayload) => {
+      loading.value = true
+      resetErrors()
       try {
-        const response = await AuthService.login(payload)
-        if (response) {
-          await getUser()
-          return true
+        const {
+          data: { user: _user },
+          error,
+        } = await AuthService.login(payload)
+        if (error) {
+          errors.value = {
+            Login: error.message,
+          }
         }
-        return false
+
+        if (_user) {
+          user.value = _user
+          return user
+        }
+
+        return null
       } catch (error) {
-        errorStore.handleError('Login error', error)
+        handleError('Login error', error)
         return false
+      } finally {
+        loading.value = false
       }
     }
 
     const getUser = async () => {
       try {
-        const response = await AuthService.getUser()
-        if (response) {
-          user.value = response
+        const { data, error } = await AuthService.getUser()
+        if (error) {
+          handleError('Getting user', error.message)
         }
+        if (data.user) {
+          user.value = data.user
+          return data.user
+        }
+
+        return null
       } catch (error) {
-        errorStore.handleError('Getting user error', error)
+        handleError('Getting user error', error)
       }
     }
 
     const register = async (payload: AuthPayload) => {
+      resetErrors()
+      loading.value = true
       try {
-        const response = await AuthService.register(payload)
-        if (response) {
-          await login(payload)
+        const { data, error } = await AuthService.register(payload)
+        if (error) {
+          handleError('Registering user', error.message)
         }
+
+        if (data.user) {
+          user.value = data.user
+
+          return data.user
+        }
+
+        return null
       } catch (error) {
-        errorStore.handleError('Registration error', error)
+        handleError('Registration error', error)
+      } finally {
+        loading.value = false
       }
     }
 
     const logout = async () => {
+      loading.value = true
       try {
-        await AuthService.logout()
+        const { error } = await AuthService.logout()
+        if (error) {
+          handleError('Logging out', error.message)
+          return false
+        }
+
+        return true
       } catch (error) {
-        errorStore.handleError('Logout error', error)
+        handleError('Logout error', error)
       } finally {
         user.value = null
+        loading.value = false
       }
     }
 
     const resetPassword = async (email: string) => {
-      const token = await AuthService.resetPassword(email)
-      if (token) {
-        return true
+      loading.value = true
+      try {
+        const { data, error } = await AuthService.resetPassword(email)
+        if (error) {
+          handleError('Resetting password', error.message)
+        }
+        if (data) {
+          return true
+        }
+
+        return false
+      } catch (err) {
+        handleError('Resetting password', err)
+      } finally {
+        loading.value = false
       }
 
       return false
     }
 
-    const updatePassword = async (userId: string, secret: string, password: string) => {
-      const token = await AuthService.updatePassword(userId, secret, password)
-      if (token) {
-        return true
+    const updatePassword = async (password: string) => {
+      loading.value = true
+      try {
+        const token = await AuthService.updatePassword(password)
+        if (token) {
+          return true
+        }
+        return false
+      } catch (error) {
+        handleError('Updating password', error)
+      } finally {
+        loading.value = false
+      }
+    }
+
+    watch(user, async (v) => {
+      if (!v) {
+        profile.value = null
+        return
       }
 
-      return false
-    }
+      getProfile()
+    })
 
     /**
      * PROFILE
      */
 
-    const getProfiles = async (params: { name?: string; email?: string } = {}) => {
-      console.log(params)
+    const profile = ref<UserProfile | null>(null)
+    const hasProfile = computed(
+      () => profile.value !== null && profile.value.name && profile.value.username,
+    )
+
+    const getProfile = async () => {
+      if (!userId.value) {
+        return null
+      }
+      try {
+        const { data, error } = await AuthService.getProfile(userId.value)
+        if (error) {
+          handleError('Getting profile', error)
+          return false
+        }
+
+        if (data) {
+          profile.value = data[0]
+          return data[0]
+        }
+
+        return false
+      } catch (error) {
+        handleError('Getting profile', error)
+      }
     }
 
-    const getProfile = async (id: string) => {
-      console.log(id)
+    const updateProfile = async (form: UserProfileForm) => {
+      if (!userId.value) {
+        return
+      }
+      // update
+      try {
+        const { status } = await AuthService.updateProfile(userId.value, form)
+        if (status === 204) {
+          profile.value = { ...profile.value, ...form }
+
+          return true
+        }
+
+        return false
+      } catch (error) {
+        handleError('Updating profile', error)
+      }
     }
 
-    const updateProfile = async (form: UserProfile) => {
-      if (!(user.value !== null && form.$id === user.value?.$id)) {
-        return null // todo: forbidden
+    const checkUsername = async (username: string) => {
+      try {
+        const { count, status } = await AuthService.checkUsername(username)
+        if (status !== 200) {
+          handleError('Checking username', 'Unknown error')
+        }
+
+        if (count && count === 0) {
+          return true
+        }
+
+        return false
+      } catch (error) {
+        handleError('Checking username', error)
+      } finally {
+      }
+    }
+
+    /**
+     *
+     * USERS SERVICES
+     *
+     */
+
+    const queryUsers = async (query: string) => {
+      if (!userId.value) {
+        return
       }
 
-      // update
+      try {
+        const { data, error } = await AuthService.queryUsers({ query })
+        if (error) {
+          handleError('Querying users', error.message)
+        }
+
+        if (data) {
+          return data.filter((u) => u.id !== userId.value && u.username !== null)
+        }
+
+        return null
+      } catch (error) {
+        handleError('Querying users', error)
+      }
+    }
+
+    const getProfiles = async (list: string[], column: 'id' | 'username' = 'id') => {
+      if (!userId.value) {
+        return
+      }
+
+      try {
+        const { error, data } = await AuthService.getProfiles(list, column)
+        if (error) {
+          handleError('Getting profiles', error.message)
+        }
+
+        if (data) {
+          return data
+        }
+
+        return null
+      } catch (error) {
+        handleError('Getting profiles', error)
+      }
     }
 
     const resetErrors = () => {
-      errors.value = []
+      errors.value = null
     }
 
     return {
       isAuthenticated,
       user,
-      profile,
+      userId,
       loading,
       errors,
       init,
@@ -142,18 +295,50 @@ export const useAuthStore = defineStore(
       resetErrors,
       resetPassword,
       updatePassword,
+      getUser,
 
       // profile
+      profile,
+      hasProfile,
       getProfile,
       getProfiles,
       updateProfile,
+      checkUsername,
+
+      //user
+      queryUsers,
     }
   },
   {
-    persist: true,
+    persist: {
+      storage: localStorage,
+      pick: ['user', 'profile'],
+    },
   },
 )
 
 if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useAuthStore, import.meta.hot))
+}
+
+export type UserProfile = {
+  id: string
+  email?: string
+  username: string
+  name: string | null
+  phone?: string | null
+  avatar?: string | null
+  avatar_url?: string | null
+  created_at: string
+}
+
+export type UserProfileForm = {
+  id: string
+  name: string
+  email?: string
+  username: string
+  phone?: string | null
+  avatar?: string | null
+  avatar_url?: string | null
+  created_at: string
 }

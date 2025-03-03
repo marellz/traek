@@ -5,11 +5,8 @@
         <p class="font-bold text-slate-300 uppercase">{{ item.title }}</p>
       </li>
       <li v-for="(link, index) in item.links" :key="index">
-        <router-link
-          class="block rounded px-2 py-1.5 font-medium hover:bg-slate-200"
-          active-class="bg-primary text-white hover:!bg-primary"
-          :to="link.path"
-        >
+        <router-link class="block rounded px-2 py-1.5 font-medium hover:bg-slate-200"
+          active-class="bg-primary text-white hover:!bg-primary" :to="link.path">
           {{ link.label }}
         </router-link>
       </li>
@@ -17,6 +14,7 @@
   </nav>
 </template>
 <script lang="ts" setup>
+import { useAuthStore } from '@/stores/auth'
 import { useProjectStore } from '@/stores/project'
 import { onMounted, ref, watch } from 'vue'
 type NavSection = 'home' | 'projects'
@@ -50,6 +48,7 @@ const menu = ref<Nav>({
   },
 })
 
+const auth = useAuthStore()
 const projectStore = useProjectStore()
 
 watch(
@@ -60,13 +59,15 @@ watch(
         label: item.name,
         path: {
           name: 'project',
-          params: { id: item.$id },
+          params: { id: item.id },
         },
       }))
     }
   },
 )
 onMounted(async () => {
-  await projectStore.getUserProjects()
+  if (auth.user) {
+    await projectStore.getUserProjects()
+  }
 })
 </script>

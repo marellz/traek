@@ -1,5 +1,5 @@
-import { account } from '@/database/appwrite'
-import { ID } from 'appwrite'
+import { supabase } from '@/database/supabase'
+import type { UserProfile } from '@/stores/auth'
 
 export interface AuthPayload {
   email: string
@@ -7,49 +7,72 @@ export interface AuthPayload {
 }
 
 const getUser = async () => {
-  return await account.get()
+  return await supabase.auth.getUser()
 }
 
-const init = async () => {
-  const session = await account.getSession('current')
-  if (session) {
-    return await getUser()
-  } else {
-    return null
-  }
+const getProfile = async (id: string) => {
+  // profile
+  return await supabase.from('users').select('*').eq('id', id)
 }
 
-const login = async ({ email, password }: AuthPayload) => {
-  return await account.createEmailPasswordSession(email, password)
+const login = async (credentials: AuthPayload) => {
+  return await supabase.auth.signInWithPassword(credentials)
 }
 
-const register = async ({ email, password }: AuthPayload) => {
-  return account.create(ID.unique(), email, password)
+const register = async (credentials: AuthPayload) => {
+  return await supabase.auth.signUp(credentials)
 }
 
 const logout = async () => {
-  await account.deleteSession('current')
+  return await supabase.auth.signOut()
 }
 
 const resetPassword = async (email: string) => {
   const url = import.meta.env.VITE_APP_URL
-  return await account.createRecovery(email, url)
+  return await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${url}/update-password`,
+  })
 }
 
-const updatePassword = async (id: string, secret: string, password: string) => {
-  return await account.updateRecovery(
-    id, // userId
-    secret,
+const updatePassword = async (password: string) => {
+  return await supabase.auth.updateUser({
     password,
-  )
+  })
+}
+
+const updateProfile = async (id: string, form: UserProfile) => {
+  return await supabase.from('users').update(form).eq('id', id)
+}
+
+const checkUsername = async (username: string) => {
+  return await supabase
+    .from('users')
+    .select('*', { count: 'exact', head: true })
+    .eq('username', username)
+}
+
+const queryUsers = async (params: { query: string }) => {
+  const { query } = params
+
+  const matchesQuery = ['name', 'email', 'username'].map((c) => `${c}.ilike.%${query}%`).join(',')
+  console.log(matchesQuery)
+  return await supabase.from('users').select().or(matchesQuery)
+}
+
+const getProfiles = async (list: string[], column: string = 'id') => {
+  return await supabase.from('users').select().in(column, list)
 }
 
 export default {
-  init,
   getUser,
+  getProfile,
   login,
   logout,
   register,
   resetPassword,
   updatePassword,
+  updateProfile,
+  checkUsername,
+  queryUsers,
+  getProfiles,
 }

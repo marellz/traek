@@ -6,7 +6,7 @@
     </form-label>
     <div>
       <textarea
-        class="form-input"
+        class="form-input min-h-16"
         :class="[{ 'is-invalid': error }, inputClass]"
         v-model="model"
         :id
@@ -22,12 +22,12 @@
   </div>
 </template>
 <script setup lang="ts">
-import FormLabel from "@/components/form/label.vue"
-import FormError from "@/components/form/error.vue"
-import useCustomId from "@/composables/useCustomId"
-import { onMounted, ref } from "vue"
+import FormLabel from '@/components/form/label.vue'
+import FormError from '@/components/form/error.vue'
+import useCustomId from '@/composables/useCustomId'
+import { onMounted, ref, watch } from 'vue'
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     label?: string | undefined
     error?: string | undefined
@@ -38,9 +38,10 @@ withDefaults(
     disabled?: boolean
     rows?: number | string
     inputClass?: string
+    noAutoResize?: boolean
   }>(),
   {
-    type: "text",
+    type: 'text',
   },
 )
 
@@ -50,8 +51,23 @@ const model = defineModel<SelectInput | undefined>()
 
 const input = ref()
 
+const setHeight = () => {
+  if(props.noAutoResize){
+    return
+  }
+  if (input.value) {
+    input.value.style = `height: ${input.value.scrollHeight}px`
+  } else {
+    setTimeout(setHeight, 250)
+  }
+}
+
+watch(model, setHeight, {
+  immediate: true
+})
+
 onMounted(() => {
-  if (input.value?.hasAttribute("autofocus")) {
+  if (input.value?.hasAttribute('autofocus')) {
     input.value?.focus()
   }
 

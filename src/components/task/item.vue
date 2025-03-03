@@ -6,16 +6,18 @@
       </h1>
       <p v-if="task.description">{{ task.description }}</p>
     </div>
-    <div class="ml-auto flex space-x-2 items-center">
+    <div class="ml-auto flex items-center space-x-2">
       <button
         type="button"
         class="rounded border border-slate-300 px-4 py-1 font-medium hover:border-black"
+        @click="editTask"
       >
         <span>Edit</span>
       </button>
       <button
         type="button"
         class="rounded border border-slate-300 px-4 py-1 font-medium hover:border-black"
+        @click="deleteTask"
       >
         <span>Delete</span>
       </button>
@@ -25,7 +27,14 @@
 <script lang="ts" setup>
 import type { Task } from '@/stores/task'
 
-defineProps<{
+const props = defineProps<{
   task: Task
 }>()
+const emit = defineEmits(['delete-task', 'edit-task'])
+const deleteTask = () => {
+  emit('delete-task', props.task.id)
+}
+const editTask = () => {
+  emit('edit-task', props.task.id)
+}
 </script>

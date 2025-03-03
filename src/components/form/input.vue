@@ -14,6 +14,7 @@
         :id
         :placeholder
         :disabled
+        :readonly
         :required
         :autocomplete
         ref="input"
@@ -48,6 +49,7 @@ const props = withDefaults(
     name?: string | undefined
     placeholder?: string | undefined
     disabled?: boolean
+    readonly?: boolean
     required?: boolean
     autocomplete?: string
     novalidate?: boolean

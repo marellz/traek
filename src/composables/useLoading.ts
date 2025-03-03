@@ -1,24 +1,24 @@
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 export const useLoadingState = () => {
   const loading = ref<string[]>([])
 
   const begin = (key: string) => {
-    loading.value.push(key)
+    if (!loading.value.includes(key)) loading.value = [...loading.value, key]
   }
 
   const finish = (key: string) => {
-    const i = loading.value.indexOf(key)
+    const _loading = [...loading.value]
+    const i = _loading.indexOf(key)
     if (i !== -1) {
-      loading.value.splice(i, 1)
+      _loading.splice(i, 1)
+      loading.value = _loading
     }
   }
 
   const isLoading = (key: string) => {
     return loading.value.includes(key)
   }
-
-  watch(loading,(v)=>console.log(v))
 
   return {
     loading,
