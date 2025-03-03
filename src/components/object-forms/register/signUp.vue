@@ -13,6 +13,7 @@
         v-model="email"
         type="email"
         required
+        test-id="email"
       ></form-input>
 
       <form-input
@@ -21,6 +22,7 @@
         type="password"
         required
         :error="errors.password"
+        test-id="password"
         allow-password-toggle
       ></form-input>
 
@@ -29,6 +31,7 @@
         v-model="confirmPassword"
         type="password"
         required
+        testid="password_confirmation"
         :error="errors.password_confirmation"
       ></form-input>
       <div v-if="error">
@@ -37,7 +40,7 @@
         </p>
       </div>
       <div>
-        <base-button class="w-full" :loading>
+        <base-button class="w-full" :loading test-id="submit_button">
           <span>Register</span>
         </base-button>
       </div>
