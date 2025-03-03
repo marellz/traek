@@ -27,6 +27,7 @@
 <script lang="ts" setup>
 import FormStepper, { type Step } from '@/components/form/stepper.vue'
 import AuthTitle from '@/components/auth/title.vue'
+import BaseButton from '@/components/base/button.vue'
 import AuthSubtitle from '@/components/auth/subtitle.vue'
 import SignUp from '@/components/object-forms/register/signUp.vue'
 import ProfileInfo from '@/components/object-forms/register/profileInfo.vue'
