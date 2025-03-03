@@ -22,7 +22,7 @@
   </ul>
   <div class="mt-10">
     <template v-for="{ key } in steps" :key>
-      <div v-show="active === key">
+      <div v-if="active === key">
         <slot :name="key"></slot>
       </div>
     </template>
