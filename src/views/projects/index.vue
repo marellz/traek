@@ -42,14 +42,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { useProjectStore } from '@/stores/project'
+import { ProjectLoading, useProjectStore } from '@/stores/project'
 import { computed, onMounted } from 'vue'
 import moment from 'moment'
 
 const projectStore = useProjectStore()
 
 const projects = computed(() => projectStore.projects)
-const fetching = computed(() => projectStore.fetching)
+const fetching = computed(() => projectStore.isLoading(ProjectLoading.GETTING_ALL))
 const parseDate = (str: string) => {
   return moment(str).format('d/m/Y')
 }

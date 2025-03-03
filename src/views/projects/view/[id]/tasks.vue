@@ -1,32 +1,30 @@
 <template>
   <div>
-    <div class="mt-10">
-      <div class="flex items-center space-x-2">
-        <h1 class="text-4xl font-light">Project tasks</h1>
-        <base-button class="!ml-auto" @click="showCreateTaskModal = true">
-          <span>Create task</span>
-        </base-button>
-        <base-button variant="secondary-outline" @click="getTasks" :disabled="loading.gettingTasks">
-          <span>Refresh</span></base-button
-        >
-      </div>
-      <base-loader class="py-20" v-if="loading.gettingTasks"></base-loader>
-      <template v-else>
-        <div></div>
-        <ul class="mt-10 space-y-2">
-          <li v-for="task in tasks" :key="task.id">
-            <task-item :task @delete-task="deleteTask" @edit-task="editTask" />
-          </li>
-        </ul>
-      </template>
-      <base-modal
-        :title="edit ? `Edit task` : `Create new task`"
-        v-model:show="showCreateTaskModal"
-        @close="cancelTaskForm"
+    <div class="flex items-center space-x-2">
+      <h1 class="text-4xl font-light">Project tasks</h1>
+      <base-button class="!ml-auto" @click="showCreateTaskModal = true">
+        <span>Create task</span>
+      </base-button>
+      <base-button variant="secondary-outline" @click="getTasks" :disabled="loading.gettingTasks">
+        <span>Refresh</span></base-button
       >
-        <task-form :edit :active="showCreateTaskModal" @submit="createTask"></task-form>
-      </base-modal>
     </div>
+    <base-loader class="py-20" v-if="loading.gettingTasks"></base-loader>
+    <template v-else>
+      <div></div>
+      <ul class="mt-10 space-y-2">
+        <li v-for="task in tasks" :key="task.id">
+          <task-item :task @delete-task="deleteTask" @edit-task="editTask" />
+        </li>
+      </ul>
+    </template>
+    <base-modal
+      :title="edit ? `Edit task` : `Create new task`"
+      v-model:show="showCreateTaskModal"
+      @close="cancelTaskForm"
+    >
+      <task-form :edit :active="showCreateTaskModal" @submit="createTask"></task-form>
+    </base-modal>
   </div>
 </template>
 <script lang="ts" setup>
@@ -54,14 +52,15 @@ const getTasks = async () => {
   }
 }
 
-const createTask = async (form: TaskFormType) => {
+
+const createTask = async (form: TaskFormType, assignees: string[] = []) => {
   if (edit.value) {
     updateTask(edit.value, form)
     return
   }
 
   form.project_id = id.value
-  const _task = await tasksStore.create(form)
+  const _task = await tasksStore.create(form, assignees)
   if (_task) {
     showCreateTaskModal.value = false
     tasks.value = [...tasks.value, _task]

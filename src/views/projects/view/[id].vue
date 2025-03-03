@@ -44,10 +44,7 @@ const links = ref([
     label: 'Members',
     name: 'project-members',
   },
-  {
-    label: 'About',
-    name: 'project-about',
-  },
+
 ])
 
 const route = useRoute()
