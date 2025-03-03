@@ -1,9 +1,4 @@
 <template>
-  <div class="mb-10">
-    <base-button @click="byPass">
-      <span>Generate user</span>
-    </base-button>
-  </div>
   <Form @submit="register()">
     <div class="space-y-4">
       <!-- <form-input label="Name" v-model="name" required :error="errors.name" v-bind="nameAttrs"></form-input> -->
@@ -69,7 +64,6 @@ import * as yup from 'yup'
 import { Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { faker } from '@faker-js/faker'
 
 const loading = computed(() => auth.loading)
 
@@ -84,7 +78,7 @@ const schema = yup.object({
     .oneOf([yup.ref('password')], 'Passwords do not match'),
 })
 
-const { errors, defineField, handleSubmit, resetForm } = useForm({
+const { errors, defineField, handleSubmit } = useForm({
   validationSchema: schema,
 })
 
@@ -93,16 +87,6 @@ const [password] = defineField('password')
 const [confirmPassword] = defineField('password_confirmation')
 const emit = defineEmits(['complete'])
 const error = ref('')
-
-const byPass = () => {
-  resetForm({
-    values: {
-      email: faker.internet.email({ provider: 'traek.com' }).toLowerCase(),
-      password: 'secret22',
-      password_confirmation: 'secret22',
-    },
-  })
-}
 
 const register = handleSubmit(async (values) => {
   error.value = ''
