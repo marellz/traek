@@ -13,10 +13,10 @@
           <form-group label="Status" :error="errors.priority">
             <div class="mt-4 flex flex-col gap-4">
               <form-radio
-                v-for="{ value, label } in statuses"
-                :key="value"
+                v-for="(label, key) in TaskStatusLabels"
+                :key
                 v-model="status"
-                :value
+                :value="key"
                 :label
                 name="status"
               >
@@ -26,10 +26,10 @@
           <form-group label="Priority" :error="errors.priority">
             <div class="mt-4 flex flex-col gap-4">
               <form-radio
-                v-for="{ value, label } in priorities"
-                :key="value"
+                v-for="(label, key) in TaskPriorityLabels"
+                :key
                 v-model="priority"
-                :value
+                :value="key"
                 :label
                 name="priority"
               >
@@ -38,6 +38,14 @@
           </form-group>
         </div>
         <form-datepicker label="Due date" v-model="due_date"></form-datepicker>
+        <user-selector
+        v-model="assignees"
+          label="Assignees"
+          :queriedUsers
+          @search-users="searchUsers"
+          @add-user="addAssignee"
+          @remove-user="removeAssignee"
+        ></user-selector>
         <div>
           <base-button type="submit" :loading="loading.updating || loading.creating">
             <span>Save changes</span></base-button
@@ -54,52 +62,23 @@ import FormText from '@/components/form/text.vue'
 import FormGroup from '@/components/form/group.vue'
 import FormRadio from '@/components/form/radio.vue'
 import FormDatepicker from '@/components/form/datepicker.vue'
-import * as yup from 'yup'
+import UserSelector from '@/components/form/user-selector.vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { TaskPriorityLabels, TaskStatusLabels } from '@/data/task-data'
+import { useTaskStore, TaskLoading, type TaskForm } from '@/stores/task'
+import { useProjectStore } from '@/stores/project'
+import { type UserProfile } from '@/stores/auth'
 import { Form, useForm } from 'vee-validate'
-import { computed, ref, watch } from 'vue'
-import {
-  useTaskStore,
-  TaskLoading,
-  type TaskForm,
-  type TaskPriority,
-  type TaskStatus,
-} from '@/stores/task'
+import * as yup from 'yup'
+
+const projectStore = useProjectStore()
 
 const props = defineProps<{
   edit?: string | null
   active: boolean
+  projectId: string
 }>()
-
 const emit = defineEmits(['submit'])
-
-const priorities: {
-  label: string
-  value: TaskPriority
-}[] = [
-  {
-    label: 'High priority',
-    value: 'high',
-  },
-  {
-    label: 'Medium priority',
-    value: 'medium',
-  },
-  {
-    label: 'Low priority',
-    value: 'low',
-  },
-]
-
-const statuses: { label: string; value: TaskStatus }[] = [
-  {
-    label: 'Pending',
-    value: 'pending',
-  },
-  {
-    label: 'In progress',
-    value: 'in_progress',
-  },
-]
 
 const validationSchema = yup.object({
   title: yup.string().required('Task title is required'),
@@ -109,11 +88,8 @@ const validationSchema = yup.object({
   priority: yup
     .string()
     .required('Task priority is required')
-    .oneOf(priorities.map((p) => p.value)),
-  status: yup
-    .string()
-    .required('Task priority is status')
-    .oneOf(statuses.map((s) => s.value)),
+    .oneOf(Object.keys(TaskPriorityLabels)),
+  status: yup.string().required('Task status is required').oneOf(Object.keys(TaskStatusLabels)),
 })
 
 const { errors, defineField, resetForm, handleSubmit } = useForm({
@@ -128,7 +104,7 @@ const [priority] = defineField('priority')
 const assignees = ref<string[]>([])
 
 const submitForm = handleSubmit(async (values) => {
-  emit('submit', values as TaskForm, assignees)
+  emit('submit', values as TaskForm, assignees.value)
 })
 
 const tasksStore = useTaskStore()
@@ -181,7 +157,94 @@ watch(
   (v) => {
     if (v) {
       getForm()
+      getAssignees()
     }
   },
 )
+
+const getMembers = async () => {
+  const _users = await projectStore.getMembers(props.projectId)
+  if (_users) {
+    projectMembers.value = _users
+  }
+}
+
+const getAssignees = async () => {
+  if (!props.edit) {
+    return
+  }
+
+  const _users = await tasksStore.getAssignees(props.edit)
+  if (_users) {
+    assignees.value = _users.map((u) => u.user_id)
+  }
+}
+
+/**
+ * REFACTOR:
+ *
+ * current:
+ * add/remove assignee if user-selector changes
+ *
+ *
+ * ideal:
+ * add-remove assignee by comparison every time there is a change?
+ */
+
+const addAssignee = async (userId: string) => {
+  if(!props.edit){
+    return
+  }
+
+  const success = await tasksStore.addAssignees(props.edit, [userId])
+  if(success){
+    // todo: toast
+  }
+}
+
+const removeAssignee = async (id: string) => {
+  if(!props.edit){
+    return
+  }
+  const success = await tasksStore.removeAssignee(props.edit, id)
+  if(success){
+    // todo: toast
+    console.log('Removed user ', id)
+    assignees.value.splice(assignees.value.findIndex(a=>a==id), 1)
+  }
+}
+
+onMounted(() => {
+  getMembers()
+  if(props.edit){
+    getForm()
+  }
+})
+
+const projectMembers = ref<UserProfile[]>([])
+const queriedUsers = ref<UserProfile[]>([])
+const queryDebounce = ref()
+const filterMembers = (q: string) => {
+  console.log('filter')
+  queriedUsers.value = projectMembers.value.filter((m) => {
+    return (
+      m.name?.toLocaleLowerCase().includes(q.toLocaleLowerCase()) ||
+      m.username?.toLocaleLowerCase().includes(q.toLocaleLowerCase()) ||
+      m.email?.toLocaleLowerCase().includes(q.toLocaleLowerCase())
+    )
+  })
+}
+
+const searchUsers = async (q: string) => {
+  if (!q) {
+    queriedUsers.value = projectMembers.value
+    return
+  }
+
+  if (queryDebounce.value) {
+    queryDebounce.value = null
+  } else {
+    queryDebounce.value = setTimeout(() => filterMembers(q), 500)
+  }
+}
 </script>

@@ -32,8 +32,17 @@ export const useTaskService = () => {
   }
 
   /**
-   * USER
+   * INFO
    */
+  const getTaskInfo = async (id: string) => {
+    return await supabase
+      .from('tasks')
+      .select(
+        `created_by: users (id, name, email, username, avatar_url),
+        task_assignees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('id', id)
+  }
 
   /**
    * ASSIGNEES
@@ -43,7 +52,7 @@ export const useTaskService = () => {
     return await supabase.from('task_assignees').select('*').eq('task_id', task)
   }
 
-  const addAssignees = async (payload: {user_id: string, task_id: string}[]) => {
+  const addAssignees = async (payload: { user_id: string; task_id: string }[]) => {
     return await supabase.from('task_assignees').insert(payload).select()
   }
 
@@ -65,6 +74,9 @@ export const useTaskService = () => {
     //
     getAssignees,
     addAssignees,
-    removeAssignee
+    removeAssignee,
+
+    //
+    getTaskInfo,
   }
 }

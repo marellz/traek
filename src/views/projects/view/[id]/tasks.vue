@@ -23,13 +23,18 @@
       v-model:show="showCreateTaskModal"
       @close="cancelTaskForm"
     >
-      <task-form :edit :active="showCreateTaskModal" @submit="createTask"></task-form>
+      <task-form
+        :edit
+        :active="showCreateTaskModal"
+        @submit="createTask"
+        :project-id="id"
+      ></task-form>
     </base-modal>
   </div>
 </template>
 <script lang="ts" setup>
 import TaskItem from '@/components/task/item.vue'
-import TaskForm from '@/components/object-forms/task.vue'
+import TaskForm from '@/components/object-forms/task-form.vue'
 import { useTaskStore, type Task, type TaskForm as TaskFormType } from '@/stores/task'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -51,7 +56,6 @@ const getTasks = async () => {
     tasks.value = _tasks
   }
 }
-
 
 const createTask = async (form: TaskFormType, assignees: string[] = []) => {
   if (edit.value) {

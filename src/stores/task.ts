@@ -2,7 +2,7 @@ import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import { useTaskService } from '@/services/tasks'
 import { useLoadingState } from '@/composables/useLoading'
-import { useAuthStore } from './auth'
+import { useAuthStore, type UserProfile } from './auth'
 
 export enum TaskLoading {
   CREATING = 'creating-task',
@@ -10,6 +10,7 @@ export enum TaskLoading {
   DELETING = 'deleting-task',
   GETTING_ONE = 'getting-task',
   GETTING_ALL = 'getting-tasks',
+  GETTING_INFO = 'getting-task-info',
   ADDING_ASSIGNEES = 'adding-assignees',
   REMOVING_ASSIGNEE = 'removing assignee',
   GETTING_ASSIGNEES = 'getting-assignees',
@@ -49,6 +50,13 @@ export interface TaskForm {
   end_date?: string
   updated_at?: string
   closed_at?: string
+}
+
+export type TaskUser = Pick<UserProfile, 'id' | 'name' | 'username' | 'email' | 'avatar_url'>
+
+export interface TaskInfo {
+  created_by: TaskUser
+  task_assignees: TaskUser[]
 }
 
 export const useTaskStore = defineStore(
@@ -186,6 +194,24 @@ export const useTaskStore = defineStore(
       }
     }
 
+    /**
+     * INFO
+     */
+
+    const getTaskInfo = async (task: string) => {
+      try {
+        begin(TaskLoading.GETTING_INFO)
+        const { data, error } = await service.getTaskInfo(task)
+        if (error) throw new Error(error.message)
+        if (data) return data[0]
+        return null
+      } catch (error) {
+        handleError('Getting task info', error)
+      } finally {
+        finish(TaskLoading.GETTING_INFO)
+      }
+    }
+
     return {
       // tasks,
       list,
@@ -199,6 +225,9 @@ export const useTaskStore = defineStore(
       addAssignees,
       getAssignees,
       removeAssignee,
+
+      //info
+      getTaskInfo,
     }
   },
   {
