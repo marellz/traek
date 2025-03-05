@@ -24,7 +24,7 @@ export const useProjectService = () => {
   }
 
   const update = async (id: string, form: ProjectForm) => {
-    return await supabase.from('projects').insert(form).eq('id', id)
+    return await supabase.from('projects').update(form).eq('id', id)
   }
 
   /**

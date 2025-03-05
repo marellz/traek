@@ -16,7 +16,7 @@ export const useEventService = () => {
   }
 
   const update = async (id: string, form: ProjectEventForm) => {
-    return await supabase.from('events').insert(form).eq('id', id)
+    return await supabase.from('events').update(form).eq('id', id)
   }
 
   const destroy = async (id: string) => {
