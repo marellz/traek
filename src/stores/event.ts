@@ -22,17 +22,9 @@ export const useEventStore = defineStore(
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
     const { begin, finish, isLoading } = useLoadingState()
-
-    const ensureAuth = () => {
-      if (!auth.isAuthenticated) {
-        throw new Error('User is not authenticated')
-      }
-
-      return true
-    }
-
     const getEvents = async (project: string) => {
-      ensureAuth()
+
+      auth.ensureAuth()
       try {
         begin(EventLoading.GETTING)
         const { error, data } = await service.list(project)
@@ -47,7 +39,7 @@ export const useEventStore = defineStore(
     }
 
     const getEvent = async (id: string) => {
-      ensureAuth()
+      auth.ensureAuth()
       try {
         begin(EventLoading.GETTING_ONE)
         const { data, error } = await service.getEvent(id)
@@ -62,7 +54,7 @@ export const useEventStore = defineStore(
     }
 
     const create = async (form: ProjectEventForm, invitees: string[]) => {
-      ensureAuth()
+      auth.ensureAuth()
       try {
         begin(EventLoading.CREATING)
         const { data, error } = await service.create(form)
@@ -85,7 +77,7 @@ export const useEventStore = defineStore(
     }
 
     const update = async (id: string, form: ProjectEventForm) => {
-      ensureAuth()
+      auth.ensureAuth()
       try {
         begin(EventLoading.UPDATING)
         const { status, error } = await service.update(id, form)
@@ -100,7 +92,7 @@ export const useEventStore = defineStore(
     }
 
     const destroy = async (id: string) => {
-      ensureAuth()
+      auth.ensureAuth()
       try {
         begin(EventLoading.DELETING)
         const { status, error } = await service.destroy(id)
@@ -136,7 +128,7 @@ export const useEventStore = defineStore(
      */
 
     const addInvitees = async (event_id: string, invitees: string[]) => {
-      ensureAuth()
+      auth.ensureAuth()
       try {
         begin(EventLoading.ADDING_INVITEES)
         const payload = invitees.map((user_id) => ({
@@ -156,7 +148,7 @@ export const useEventStore = defineStore(
     }
 
     const deleteInvitee = async (event_id: string, user_id: string) => {
-      ensureAuth()
+      auth.ensureAuth()
       try {
         begin(EventLoading.DELETING_INVITEE)
         const { error, status } = await service.deleteInvitee(event_id, user_id)

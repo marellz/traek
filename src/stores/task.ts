@@ -59,14 +59,6 @@ export const useTaskStore = defineStore(
     const { begin, finish, isLoading } = useLoadingState()
     const auth = useAuthStore()
 
-    const ensureAuth = () => {
-      if (!auth.isAuthenticated) {
-        throw new Error('User is not authenticated')
-      }
-
-      return true
-    }
-
     const list = async (project: string) => {
       begin(TaskLoading.GETTING_ALL)
 
@@ -83,7 +75,7 @@ export const useTaskStore = defineStore(
     }
 
     const get = async (id: string) => {
-      ensureAuth()
+      auth.ensureAuth()
       try {
         begin(TaskLoading.GETTING_ONE)
         const { data, error } = await service.get(id)
@@ -100,7 +92,7 @@ export const useTaskStore = defineStore(
     }
 
     const create = async (form: TaskForm, assignees: string[]) => {
-      ensureAuth()
+      auth.ensureAuth()
       try {
         begin(TaskLoading.CREATING)
         const { data, error } = await service.create({ ...form, created_by: auth.userId! })
@@ -119,7 +111,7 @@ export const useTaskStore = defineStore(
     }
 
     const update = async (id: string, form: TaskForm) => {
-      ensureAuth()
+      auth.ensureAuth()
       try {
         begin(TaskLoading.UPDATING)
         const { status, error } = await service.update(id, form)
@@ -135,7 +127,7 @@ export const useTaskStore = defineStore(
     }
 
     const destroy = async (id: string) => {
-      ensureAuth()
+      auth.ensureAuth()
       try {
         begin(TaskLoading.DELETING)
         const { status, error } = await service.destroy(id)

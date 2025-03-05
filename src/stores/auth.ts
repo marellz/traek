@@ -162,6 +162,17 @@ export const useAuthStore = defineStore(
       getProfile()
     })
 
+
+    //
+
+    const ensureAuth = () => {
+      if(isAuthenticated.value){
+        return true
+      }
+
+      throw new Error('User not authenticated')
+    }
+
     /**
      * PROFILE
      */
@@ -307,6 +318,11 @@ export const useAuthStore = defineStore(
 
       //user
       queryUsers,
+
+      //
+      ensureAuth
+
+
     }
   },
   {
