@@ -34,7 +34,9 @@
             <p class="text-2xl font-medium">
               {{ section.label }}
             </p>
-            <div class="mt-4 text-4xl">0</div>
+            <div class="mt-4 text-4xl">
+              {{ project[section.key][0].count }}
+            </div>
           </layout-card>
         </router-link>
       </div>
@@ -43,7 +45,7 @@
 </template>
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/auth'
-import { ProjectLoading, useProjectStore, type Project } from '@/stores/project'
+import { ProjectLoading, useProjectStore, type Project, type ProjectStats } from '@/stores/project'
 import { onMounted, ref } from 'vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -51,18 +53,19 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const auth = useAuthStore()
 const id = computed(() => route.params.id as string)
-const project = ref<Project | null>(null)
-const sections = [
+const project = ref<Project & ProjectStats| null>(null)
+const sections: { key: keyof ProjectStats; label: string }[] = [
   { key: 'tasks', label: 'Tasks' },
   { key: 'events', label: 'Events' },
-  { key: 'users', label: 'Members' },
+  { key: 'project_members', label: 'Members' },
+  { key: 'notes', label: 'Notes' },
 ]
 
 const projectStore = useProjectStore()
 const loading = computed(() => projectStore.isLoading(ProjectLoading.GETTING_ONE))
 const createdByMe = computed(() => project.value?.created_by === auth.userId)
 const getProject = async () => {
-  const _d = await projectStore.getProjectInfo(id.value)
+  const _d = await projectStore.getProjectStats(id.value)
   if (_d) {
     project.value = _d
   }

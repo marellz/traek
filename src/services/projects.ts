@@ -15,10 +15,6 @@ export const useProjectService = () => {
     return await supabase.from('projects').select().eq('id', id)
   }
 
-  const getStats = async(id: string) => {
-    return await supabase.from('projects').select().eq('id', id);
-  }
-
   const create = async (form: ProjectForm) => {
     return await supabase.from('projects').insert(form).select()
   }
@@ -28,10 +24,21 @@ export const useProjectService = () => {
   }
 
   /**
+   * CUSTOM
+   */
+
+  const getStats = async (id: string) => {
+    return await supabase
+      .from('projects')
+      .select(`*, tasks(count), events(count), project_members(count), notes(count)`)
+      .eq('id', id)
+  }
+
+  /**
    * MEMBERS
    */
 
-  const addMembers = async (payload: {user_id: string, project_id: string}[]) => {
+  const addMembers = async (payload: { user_id: string; project_id: string }[]) => {
     return await supabase.from('project_members').insert(payload)
   }
 
@@ -40,9 +47,12 @@ export const useProjectService = () => {
   }
 
   const removeMember = async (user_id: string, project_id: string) => {
-    return await supabase.from('project_members').delete().eq('user_id', user_id).eq('project_id', project_id)
+    return await supabase
+      .from('project_members')
+      .delete()
+      .eq('user_id', user_id)
+      .eq('project_id', project_id)
   }
-
 
   return {
     get,
@@ -54,6 +64,6 @@ export const useProjectService = () => {
     //
     addMembers,
     getMembers,
-    removeMember
+    removeMember,
   }
 }

@@ -15,6 +15,13 @@ export type Project = {
   closed_at?: string | null
 }
 
+export interface ProjectStats {
+  project_members: { count: number }[]
+  tasks: { count: number }[]
+  events: { count: number }[]
+  notes: { count: number }[]
+}
+
 export interface ProjectForm {
   id?: string
   name: string
@@ -101,7 +108,7 @@ export const useProjectStore = defineStore(
       }
     }
 
-    const getProjectInfo = async (project: string) => {
+    const getProjectStats = async (project: string) => {
       try {
         begin(ProjectLoading.GETTING_INFO)
         const { error, data } = await service.getStats(project)
@@ -237,7 +244,7 @@ export const useProjectStore = defineStore(
 
       getUserProjects,
       getProject,
-      getProjectInfo,
+      getProjectStats,
       createProject,
       updateProject,
       closeProject,
