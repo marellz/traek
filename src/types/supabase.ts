@@ -149,6 +149,51 @@ export type Database = {
           },
         ]
       }
+      notes: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          id: string
+          project_id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by: string
+          id?: string
+          project_id: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          project_id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_members: {
         Row: {
           created_at: string
@@ -198,7 +243,7 @@ export type Database = {
         Insert: {
           closed_at?: string | null
           created_at?: string
-          created_by: string
+          created_by?: string
           description: string
           id?: string
           name: string
@@ -244,6 +289,39 @@ export type Database = {
           description?: string | null
           id?: string
           title?: string
+        }
+        Relationships: []
+      }
+      "react-watchlist": {
+        Row: {
+          cover: string
+          created_at: string
+          desc: string
+          id: string
+          release_date: string
+          score: string
+          title: string
+          watched: boolean | null
+        }
+        Insert: {
+          cover: string
+          created_at?: string
+          desc: string
+          id?: string
+          release_date: string
+          score: string
+          title: string
+          watched?: boolean | null
+        }
+        Update: {
+          cover?: string
+          created_at?: string
+          desc?: string
+          id?: string
+          release_date?: string
+          score?: string
+          title?: string
+          watched?: boolean | null
         }
         Relationships: []
       }
@@ -355,7 +433,7 @@ export type Database = {
           id: string
           name: string | null
           phone: string | null
-          username: string
+          username: string | null
         }
         Insert: {
           avatar?: string | null
@@ -365,7 +443,7 @@ export type Database = {
           id?: string
           name?: string | null
           phone?: string | null
-          username?: string
+          username?: string | null
         }
         Update: {
           avatar?: string | null
@@ -375,7 +453,7 @@ export type Database = {
           id?: string
           name?: string | null
           phone?: string | null
-          username?: string
+          username?: string | null
         }
         Relationships: []
       }
