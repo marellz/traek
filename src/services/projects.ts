@@ -30,7 +30,7 @@ export const useProjectService = () => {
   const getStats = async (id: string) => {
     return await supabase
       .from('projects')
-      .select(`*, tasks(count), events(count), project_members(count), notes(count)`)
+      .select(`*, created_by(*), tasks(count), events(count), project_members(count), notes(count)`)
       .eq('id', id)
   }
 
@@ -43,7 +43,7 @@ export const useProjectService = () => {
   }
 
   const getMembers = async (project: string) => {
-    return await supabase.from('project_members').select('...users(*) ').eq('project_id', project)
+    return await supabase.from('project_members').select('joined_at: created_at, ...users(*) ').eq('project_id', project)
   }
 
   const removeMember = async (user_id: string, project_id: string) => {

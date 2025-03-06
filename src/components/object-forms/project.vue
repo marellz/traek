@@ -44,7 +44,9 @@
           </form-dropdown>
         </form-group>
         <div>
-          <base-button type="submit" :loading="loading.creating || loading.updating"> <span>Save changes</span></base-button>
+          <base-button type="submit" :loading="loading.creating || loading.updating">
+            <span>Save changes</span></base-button
+          >
         </div>
       </div>
     </Form>
@@ -71,7 +73,7 @@ const emit = defineEmits(['submit'])
 const projectStore = useProjectStore()
 const auth = useAuthStore()
 
-const loading = computed(()=> {
+const loading = computed(() => {
   return {
     updating: projectStore.isLoading(ProjectLoading.UPDATING),
     creating: projectStore.isLoading(ProjectLoading.CREATING),
@@ -137,8 +139,8 @@ const init = async () => {
       })
     }
 
-    if(_members){
-      members.value = _members
+    if (_members) {
+      members.value = _members.map((m) => m.id)
     }
   }
   resetForm({

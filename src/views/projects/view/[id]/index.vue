@@ -22,7 +22,11 @@
         <p class="mt-1 text-sm">
           Created by
           <strong>
-            {{ project.created_by }}
+            {{ project.created_by.name }} (@{{ project.created_by.username }})
+          </strong>
+          on
+          <strong>
+            {{ moment(project.created_at).format('Mo MMM YYYY') }}
           </strong>
         </p>
 
@@ -45,7 +49,8 @@
 </template>
 <script lang="ts" setup>
 import { useAuthStore } from '@/stores/auth'
-import { ProjectLoading, useProjectStore, type Project, type ProjectStats } from '@/stores/project'
+import { ProjectLoading, useProjectStore, type ProjectInfo, type ProjectStats } from '@/stores/project'
+import moment from 'moment'
 import { onMounted, ref } from 'vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -53,7 +58,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const auth = useAuthStore()
 const id = computed(() => route.params.id as string)
-const project = ref<Project & ProjectStats| null>(null)
+const project = ref<ProjectInfo | null>(null)
 const sections: { key: keyof ProjectStats; label: string }[] = [
   { key: 'tasks', label: 'Tasks' },
   { key: 'events', label: 'Events' },
@@ -63,7 +68,7 @@ const sections: { key: keyof ProjectStats; label: string }[] = [
 
 const projectStore = useProjectStore()
 const loading = computed(() => projectStore.isLoading(ProjectLoading.GETTING_ONE))
-const createdByMe = computed(() => project.value?.created_by === auth.userId)
+const createdByMe = computed(() => project.value?.created_by.id === auth.userId)
 const getProject = async () => {
   const _d = await projectStore.getProjectStats(id.value)
   if (_d) {

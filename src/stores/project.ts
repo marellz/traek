@@ -2,7 +2,7 @@ import { useProjectService } from '@/services/projects'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import { ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { useAuthStore, type UserProfile } from '@/stores/auth'
 import { useLoadingState } from '@/composables/useLoading'
 
 export type Project = {
@@ -22,6 +22,11 @@ export interface ProjectStats {
   notes: { count: number }[]
 }
 
+export type ProjectInfo = Omit<Project, 'created_by'> &
+  ProjectStats & {
+    created_by: UserProfile
+  }
+
 export interface ProjectForm {
   id?: string
   name: string
@@ -32,10 +37,8 @@ export interface ProjectForm {
   closed_at?: string | null
 }
 
-export interface ProjectMember {
-  id: number
-  project_id: string
-  user_id: string
+export interface ProjectMember extends UserProfile {
+  joined_at: string
 }
 
 export type PartialProjectForm = Partial<Record<keyof ProjectForm, any>>
@@ -205,7 +208,7 @@ export const useProjectStore = defineStore(
         const payload = members.map((user_id) => ({ user_id, project_id: project }))
         const { status, error } = await service.addMembers(payload)
         if (error) throw new Error(error.message)
-        return status === 204
+        return status === 201
       } catch (error) {
         handleError('Adding member to project', error)
       } finally {
@@ -249,6 +252,7 @@ export const useProjectStore = defineStore(
       updateProject,
       closeProject,
 
+      addMembers,
       getMembers,
       removeMember,
       isLoading,
