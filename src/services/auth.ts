@@ -11,7 +11,6 @@ const getUser = async () => {
 }
 
 const getProfile = async (id: string) => {
-  // profile
   return await supabase.from('users').select('*').eq('id', id)
 }
 
@@ -53,9 +52,7 @@ const checkUsername = async (username: string) => {
 
 const queryUsers = async (params: { query: string }) => {
   const { query } = params
-
   const matchesQuery = ['name', 'email', 'username'].map((c) => `${c}.ilike.%${query}%`).join(',')
-  console.log(matchesQuery)
   return await supabase.from('users').select().or(matchesQuery)
 }
 

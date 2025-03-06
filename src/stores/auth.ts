@@ -158,8 +158,6 @@ export const useAuthStore = defineStore(
         profile.value = null
         return
       }
-
-      getProfile()
     })
 
 
@@ -340,7 +338,7 @@ if (import.meta.hot) {
 export type UserProfile = {
   id: string
   email?: string
-  username: string
+  username: string | null
   name: string | null
   phone?: string | null
   avatar?: string | null
