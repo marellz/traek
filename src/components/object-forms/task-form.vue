@@ -70,6 +70,7 @@ import { useProjectStore } from '@/stores/project'
 import { type UserProfile } from '@/stores/auth'
 import { Form, useForm } from 'vee-validate'
 import * as yup from 'yup'
+import { useDebounceFn } from '@vueuse/core'
 
 const projectStore = useProjectStore()
 
@@ -209,7 +210,6 @@ const removeAssignee = async (id: string) => {
   const success = await tasksStore.removeAssignee(props.edit, id)
   if(success){
     // todo: toast
-    console.log('Removed user ', id)
     assignees.value.splice(assignees.value.findIndex(a=>a==id), 1)
   }
 }
@@ -223,9 +223,12 @@ onMounted(() => {
 
 const projectMembers = ref<UserProfile[]>([])
 const queriedUsers = ref<UserProfile[]>([])
-const queryDebounce = ref()
+
 const filterMembers = (q: string) => {
-  console.log('filter')
+  if (!q) {
+    queriedUsers.value = projectMembers.value
+    return
+  }
   queriedUsers.value = projectMembers.value.filter((m) => {
     return (
       m.name?.toLocaleLowerCase().includes(q.toLocaleLowerCase()) ||
@@ -235,16 +238,5 @@ const filterMembers = (q: string) => {
   })
 }
 
-const searchUsers = async (q: string) => {
-  if (!q) {
-    queriedUsers.value = projectMembers.value
-    return
-  }
-
-  if (queryDebounce.value) {
-    queryDebounce.value = null
-  } else {
-    queryDebounce.value = setTimeout(() => filterMembers(q), 500)
-  }
-}
+const searchUsers = useDebounceFn(filterMembers, 1000)
 </script>
