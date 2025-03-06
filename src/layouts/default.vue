@@ -22,11 +22,4 @@
 <script lang="ts" setup>
 import PartialsNav from '@/components/partials/default-layout/nav.vue'
 import PartialsHeader from '@/components/partials/default-layout/header.vue'
-import { onMounted } from 'vue';
-import { useProjectStore } from '@/stores/project';
-
-const projectStore = useProjectStore()
-onMounted(async () => {
-  await projectStore.getUserProjects()
-})
 </script>
