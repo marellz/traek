@@ -51,10 +51,7 @@
           @remove-user="removeUser"
         ></user-selector>
         <div>
-          {{ errors }}
-        </div>
-        <div>
-          <base-button type="submit" :loading="loading.creating || loading.updating" :disabled="eventData?.cancelled_at !== null">
+          <base-button type="submit" :loading="loading.creating || loading.updating" :disabled="eventData && eventData?.cancelled_at !== null">
             <span v-if="editMode">Update event</span>
             <span v-else>Save event</span>
           </base-button>
@@ -212,7 +209,7 @@ const getInvitees = async () => {
 
   const _users = await eventStore.getInvitees(props.edit)
   if (_users) {
-    invitees.value = _users.map((u) => u.user_id)
+    invitees.value = _users.map((u) => u.id)
   }
 }
 

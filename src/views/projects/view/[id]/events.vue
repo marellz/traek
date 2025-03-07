@@ -7,7 +7,7 @@
       </base-button>
     </div>
     <base-loader class="py-20" v-if="loading.gettingEvents"></base-loader>
-    <div v-else class="mt-10 space-y-4">
+    <div v-else-if="filteredEvents.length" class="mt-10 space-y-4">
       <div class="mb-4">
         <form-checkbox v-model="showCancelled" label="Show cancelled"></form-checkbox>
       </div>
@@ -20,6 +20,7 @@
         :cancelling="loading.cancelling && cancelId === item.id"
       ></event-item>
     </div>
+    <Empty class="mt-10" text="No events created in the project" v-else/>
     <base-modal :title="edit ? 'Update event' : 'Create event'" v-model:show="showEventFormModal">
       <event-form :project-id="id" :edit @submit="handleSubmit"></event-form>
     </base-modal>
@@ -37,6 +38,7 @@ import {
 } from '@/stores/event'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import Empty from '@/components/common/empty.vue'
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)
