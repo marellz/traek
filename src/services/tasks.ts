@@ -3,12 +3,11 @@ import type { TaskForm } from '@/stores/task'
 export type TasksListCriteria = 'project_id' | 'creator' | 'assigned'
 
 export const useTaskService = () => {
-
   const getMyTasks = async (user: string) => {
     return await supabase.from('tasks').select('*').eq('created_by', user)
   }
 
-  const getAssignedTasks = async (user: string) => {
+  const getUserTasks = async (user: string) => {
     return await supabase.from('task_assignees').select('*').eq('user_id', user)
   }
 
@@ -32,13 +31,52 @@ export const useTaskService = () => {
     return await supabase.from('tasks').delete().eq('id', id)
   }
 
+  /**
+   * INFO
+   */
+  const getTaskInfo = async (id: string) => {
+    return await supabase
+      .from('tasks')
+      .select(
+        `created_by: users (id, name, email, username, avatar_url),
+        task_assignees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('id', id)
+  }
+
+  /**
+   * ASSIGNEES
+   */
+
+  const getAssignees = async (task: string) => {
+    return await supabase.from('task_assignees').select('*').eq('task_id', task)
+  }
+
+  const addAssignees = async (payload: { user_id: string; task_id: string }[]) => {
+    return await supabase.from('task_assignees').insert(payload).select()
+  }
+
+  const removeAssignee = async (task: string, user_id: string) => {
+    return await supabase.from('task_assignees').delete().eq('task_id', task).eq('user_id', user_id)
+  }
+
   return {
     create,
     getMyTasks,
-    getAssignedTasks,
     getProjectTasks,
     get,
     update,
     destroy,
+
+    //
+    getUserTasks,
+
+    //
+    getAssignees,
+    addAssignees,
+    removeAssignee,
+
+    //
+    getTaskInfo,
   }
 }

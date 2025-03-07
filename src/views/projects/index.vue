@@ -15,44 +15,28 @@
         </div>
       </div>
       <div class="mt-10">
-        <base-loader v-if="fetching"></base-loader>
-        <div v-else-if="projects.length" class="grid grid-cols-2 gap-10">
-          <router-link
-            v-for="project in projects"
-            :key="project.id"
-            :to="{ name: 'project', params: { id: project.id } }"
-          >
-            <div class="space-y-2 rounded-xl border border-slate-300 p-4">
-              <h1 class="text-2xl font-light">
-                {{ project.name }}
-              </h1>
-              <p v-if="project.description">{{ project.description }}</p>
-              <p class="text-sm text-slate-600">
-                Created on {{ parseDate(project.created_at) }}
-                <span v-if="project.created_by">by {{ project.created_by }}</span>
-              </p>
-            </div>
-          </router-link>
+        <base-loader v-if="loading.getting"></base-loader>
+        <div v-else-if="projects.length" class="grid grid-cols-3 gap-4">
+          <project-item v-for="item in projects" :key="item.id" :item></project-item>
         </div>
-        <div v-else class="mt-10">
-          <base-alert title="Empty">You have no projects</base-alert>
-        </div>
+        <Empty v-else />
       </div>
     </layout-container>
   </div>
 </template>
 <script lang="ts" setup>
-import { useProjectStore } from '@/stores/project'
+import ProjectItem from '@/components/project/item.vue'
+import { ProjectLoading, useProjectStore } from '@/stores/project'
 import { computed, onMounted } from 'vue'
-import moment from 'moment'
+import Empty from '@/components/common/empty.vue'
 
 const projectStore = useProjectStore()
 
 const projects = computed(() => projectStore.projects)
-const fetching = computed(() => projectStore.fetching)
-const parseDate = (str: string) => {
-  return moment(str).format('d/m/Y')
-}
+
+const loading = computed(() => ({
+  getting: projectStore.isLoading(ProjectLoading.GETTING_USER),
+}))
 
 onMounted(async () => {
   await projectStore.getUserProjects()

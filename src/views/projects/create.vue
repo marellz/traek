@@ -18,8 +18,8 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const projects = useProjectStore()
 
-const submit = async (form: ProjectFormType) => {
-  const success = await projects.createProject(form)
+const submit = async ({ form, assignees = [] }: { form: ProjectFormType; assignees: string[] }) => {
+  const success = await projects.createProject(form, assignees)
   if (success) {
     router.push({ name: 'projects' })
   }

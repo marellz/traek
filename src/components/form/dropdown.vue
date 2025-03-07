@@ -22,7 +22,7 @@
         <li v-for="(option, index) in options" :key="index">
           <div class="flex items-center" :class="{ 'space-x-2': !hideInput }">
             <input class="flex-none" :class="{ 'absolute h-0 w-0 -z-20': hideInput }" type="checkbox"
-              :name="`dropdown-${id}`" :id="`${id}-${index}`" :value="option[valueKey] || ''" v-model="model" />
+              :name="`dropdown-${id}`" :id="`${id}-${index}`" :value="option[valueKey] || ''" v-model="model" @change="onChange(option[valueKey])" />
             <label class="flex-auto flex items-center space-x-2 rounded-lg hover:bg-primary-lighter/25 p-2" :class="[
               {
                 'bg-primary-lighter/50 text-primary': model.includes(
@@ -82,7 +82,7 @@ const id = ref()
 const query = ref("")
 const dropdown = ref()
 const active = ref(false)
-const emit = defineEmits(["query"])
+const emit = defineEmits(["query", 'change'])
 const model = defineModel<any[]>({ default: [] })
 
 const hasValues = computed(() => model.value.length > 0)
@@ -90,6 +90,11 @@ const hasValues = computed(() => model.value.length > 0)
 watch(query, () => {
   emit("query", query.value)
 })
+
+const onChange = (value: string) => {
+  const isAdded = model.value.includes(value)
+  emit('change', value, isAdded)
+}
 
 onMounted(() => {
   id.value = useCustomId()
