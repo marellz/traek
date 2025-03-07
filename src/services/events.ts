@@ -23,6 +23,10 @@ export const useEventService = () => {
     return await supabase.from('events').delete().eq('id', id)
   }
 
+  const cancelEvent = async (event: ProjectEventForm) => {
+    return await supabase.from('events').upsert(event)
+  }
+
   /**
    * USER
    */
@@ -51,13 +55,13 @@ export const useEventService = () => {
       .eq('user_id', user_id)
   }
 
-
   return {
     list,
     getEvent,
     create,
     update,
     destroy,
+    cancelEvent,
 
     getUserEvents,
 

@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useAuthStore } from './auth'
+import { useAuthStore, type UserProfile } from './auth'
 import { useErrorStore } from './errors'
 import { useEventService } from '@/services/events'
 import { useLoadingState } from '@/composables/useLoading'
@@ -10,7 +10,9 @@ export enum EventLoading {
   CREATING = 'creating-event',
   UPDATING = 'updating-event',
   DELETING = 'deleting-event',
-  ADDING_INVITEES ='adding-invitees',
+  CANCELLING = 'cancelling-event',
+  GETTING_INVITEES = 'getting-invitees',
+  ADDING_INVITEES = 'adding-invitees',
   DELETING_INVITEE = 'deleting-invitee',
   GETTING_USER = 'getting-user-events',
 }
@@ -22,15 +24,14 @@ export const useEventStore = defineStore(
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
     const { begin, finish, isLoading } = useLoadingState()
-    const getEvents = async (project: string) => {
 
+    const getEvents = async (project: string) => {
       auth.ensureAuth()
       try {
         begin(EventLoading.GETTING)
         const { error, data } = await service.list(project)
         if (error) throw new Error(error.message)
-
-        return data[0]
+        return data
       } catch (error) {
         handleError('Fetching events', error)
       } finally {
@@ -44,7 +45,6 @@ export const useEventStore = defineStore(
         begin(EventLoading.GETTING_ONE)
         const { data, error } = await service.getEvent(id)
         if (error) throw new Error(error.message)
-
         return data[0]
       } catch (error) {
         handleError('Fetching event', error)
@@ -57,12 +57,16 @@ export const useEventStore = defineStore(
       auth.ensureAuth()
       try {
         begin(EventLoading.CREATING)
-        const { data, error } = await service.create(form)
+        const payload = {
+          ...form,
+          created_by: auth.userId!,
+          created_at: new Date().toISOString(),
+        }
+        const { data, error } = await service.create(payload)
         if (error) throw new Error(error.message)
 
         if (data) {
-          // add creator to invitees
-          invitees.push(form.created_by)
+          // fix: add creator to invitees?
 
           await addInvitees(data[0].id, invitees)
           return data[0]
@@ -88,6 +92,25 @@ export const useEventStore = defineStore(
         handleError('Updating event', error)
       } finally {
         finish(EventLoading.UPDATING)
+      }
+    }
+
+    const cancelEvent = async (_event: ProjectEventForm) => {
+      try {
+        begin(EventLoading.CANCELLING)
+        const payload = {
+          ..._event,
+          cancelled_at: new Date().toISOString(),
+          status: 'cancelled'
+        }
+
+        const { status, error } = await service.cancelEvent(payload)
+        if (error) throw new Error(error.message)
+        return status === 200 // upsert
+      } catch (error) {
+        handleError('Cancelling event', error)
+      } finally {
+        finish(EventLoading.CANCELLING)
       }
     }
 
@@ -127,6 +150,22 @@ export const useEventStore = defineStore(
      * INVITEES
      */
 
+    const getInvitees = async (id: string) => {
+      auth.ensureAuth()
+      try {
+        begin(EventLoading.GETTING_INVITEES)
+
+        const { error, data } = await service.getInvitees(id)
+
+        if (error) throw new Error(error.message)
+        return data
+      } catch (error) {
+        handleError('Getting invitees', error)
+      } finally {
+        finish(EventLoading.GETTING_INVITEES)
+      }
+    }
+
     const addInvitees = async (event_id: string, invitees: string[]) => {
       auth.ensureAuth()
       try {
@@ -142,7 +181,7 @@ export const useEventStore = defineStore(
         return status === 204
       } catch (error) {
         handleError('Adding invitees', error)
-      }finally {
+      } finally {
         finish(EventLoading.ADDING_INVITEES)
       }
     }
@@ -153,11 +192,10 @@ export const useEventStore = defineStore(
         begin(EventLoading.DELETING_INVITEE)
         const { error, status } = await service.deleteInvitee(event_id, user_id)
         if (error) throw new Error(error.message)
-        return status===204
+        return status === 204
       } catch (error) {
         handleError('Deleting invitee', error)
-      }
-      finally {
+      } finally {
         finish(EventLoading.DELETING_INVITEE)
       }
     }
@@ -168,10 +206,12 @@ export const useEventStore = defineStore(
       getEvents,
       update,
       destroy,
+      cancelEvent,
 
       getUserEvents,
 
       // invitees
+      getInvitees,
       addInvitees,
       deleteInvitee,
 
@@ -218,5 +258,5 @@ export interface ProjectEventForm {
   datetime: string
   duration_hours?: number | null
   updated_at?: string | null
-  closed_at?: string | null
+  cancelled_at?: string | null
 }
