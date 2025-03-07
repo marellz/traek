@@ -2,7 +2,7 @@ import { useNotesService } from '@/services/notes'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import { useLoadingState } from '@/composables/useLoading'
-import { useAuthStore } from './auth'
+import { useAuthStore, type UserProfile } from './auth'
 export enum NotesLoading {
   GETTING = 'getting-notes',
   GETTING_ONE = 'getting-note',
@@ -62,7 +62,7 @@ export const useNotesStore = defineStore(
       }
     }
 
-    const update = async (id: string, form: ProjectNote) => {
+    const update = async (id: string, form: ProjectNoteForm) => {
       try {
         begin(NotesLoading.UPDATING)
         const payload = { ...form, updated_at: new Date().toISOString() }
@@ -113,7 +113,7 @@ export interface ProjectNote {
   content: string
   project_id: string
   created_at: string
-  created_by: string
+  created_by: UserProfile,
   updated_at: string | null
 }
 
