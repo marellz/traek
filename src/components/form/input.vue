@@ -17,6 +17,7 @@
         :readonly
         :required
         :autocomplete
+        :data-testid="testId"
         ref="input"
       />
       <button
@@ -55,6 +56,7 @@ const props = withDefaults(
     novalidate?: boolean
     inputClass?: string
     allowPasswordToggle?: boolean
+    testId?: string
   }>(),
   {
     type: "text",
