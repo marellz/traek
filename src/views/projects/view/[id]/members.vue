@@ -31,7 +31,7 @@
             {{ parseDate(user.joined_at) }}
           </td>
           <td class="py-4">
-            <base-action @click="removeMember(user.id)" :disabled="project?.created_by === user.id">
+            <base-action @click="removeMember(user.id)" :disabled="project?.created_by.id === user.id">
               <span>Remove</span>
             </base-action>
           </td>

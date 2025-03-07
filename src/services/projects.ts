@@ -4,9 +4,13 @@ import { supabase } from '@/database/supabase'
 export const useProjectService = () => {
   const list = async (user: string) => {
     return await supabase
-      .from('project_members')
-      .select('...project_id(*), created_by: users(*)')
-      .eq('user_id', user)
+      .from('projects')
+      .select(
+        `*,
+        created_by: users(*),
+        project_members!inner(user_id)`,
+      )
+      .eq('project_members.user_id', user)
   }
 
   const get = async (id: string) => {
