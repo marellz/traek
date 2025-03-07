@@ -118,6 +118,11 @@ const router = createRouter({
           name: 'project-events',
           component: () => import('@/views/projects/view/[id]/events.vue'),
         },
+        {
+          path: 'notes',
+          name: 'project-notes',
+          component: () => import('@/views/projects/view/[id]/notes.vue'),
+        },
       ],
     },
 

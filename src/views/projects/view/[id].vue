@@ -44,6 +44,10 @@ const links = ref([
     label: 'Members',
     name: 'project-members',
   },
+  {
+    label: 'Notes',
+    name: 'project-notes',
+  },
 
 ])
 
