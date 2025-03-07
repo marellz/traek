@@ -8,7 +8,7 @@ import { useLoadingState } from '@/composables/useLoading'
 export type Project = {
   id: string
   name: string
-  created_by: string
+  created_by: UserProfile
   created_at: string
   updated_at: string | null
   description: string
@@ -133,9 +133,11 @@ export const useProjectStore = defineStore(
         form.created_at = new Date().toISOString()
         const { data, error } = await service.create(form)
         if (error) throw new Error(error.message)
-        if (data && data.length) {
+        if (data) {
           // todo: know what to do depending on origin/purpose
-          projects.value = [...projects.value, data[0]]
+          const _projects = [...projects.value]
+          _projects.push(data[0])
+          projects.value = _projects
 
           await addMembers(data[0].id, [...members, auth.userId!])
 
@@ -176,10 +178,11 @@ export const useProjectStore = defineStore(
           throw new Error('Project not found')
         }
 
-        ensureAuth(form.created_by)
+        ensureAuth(form.created_by.id)
         const closed_at = new Date().toISOString()
         const { error, status } = await service.update(id, {
           ...form,
+          created_by: form.created_by.id,
           closed_at,
           updated_at: closed_at,
         })

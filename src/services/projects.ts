@@ -3,20 +3,18 @@ import { supabase } from '@/database/supabase'
 
 export const useProjectService = () => {
   const list = async (user: string) => {
-    const { data, error } = await supabase.from('project_members').select('*').eq('user_id', user)
-    if (error) {
-      throw 'Error on fetching projects'
-    }
-    const ids = data.map((d) => d.project_id)
-    return await supabase.from('projects').select().in('id', ids)
+    return await supabase
+      .from('project_members')
+      .select('...project_id(*), created_by: users(*)')
+      .eq('user_id', user)
   }
 
   const get = async (id: string) => {
-    return await supabase.from('projects').select().eq('id', id)
+    return await supabase.from('projects').select('*, created_by(*)').eq('id', id)
   }
 
   const create = async (form: ProjectForm) => {
-    return await supabase.from('projects').insert(form).select()
+    return await supabase.from('projects').insert(form).select('*, created_by(*)')
   }
 
   const update = async (id: string, form: ProjectForm) => {
@@ -43,7 +41,10 @@ export const useProjectService = () => {
   }
 
   const getMembers = async (project: string) => {
-    return await supabase.from('project_members').select('joined_at: created_at, ...users(*) ').eq('project_id', project)
+    return await supabase
+      .from('project_members')
+      .select('joined_at: created_at, ...users(*) ')
+      .eq('project_id', project)
   }
 
   const removeMember = async (user_id: string, project_id: string) => {
