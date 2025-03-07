@@ -45,6 +45,7 @@ const loading = computed(() => {
     creating: projectStore.isLoading(ProjectLoading.CREATING),
   }
 })
+
 const validationSchema = yup.object({
   name: yup.string().required('Project name is required'),
   description: yup.string().nullable(),
