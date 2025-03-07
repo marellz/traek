@@ -193,16 +193,15 @@ export interface ProjectEvent {
   title: string
   description: string | null
   created_at: string
-  created_by: string
+  created_by: UserProfile
   url: string | null
   venue: string | null
   event_type: string
   status: string
-  date: string
-  time: string | null
+  datetime: string
   duration_hours: number | null
   updated_at: string | null
-  closed_at: string | null
+  cancelled_at: string | null
 }
 
 export interface ProjectEventForm {
@@ -216,8 +215,7 @@ export interface ProjectEventForm {
   venue?: string | null
   event_type: string
   status: string
-  date: string
-  time?: string | null
+  datetime: string
   duration_hours?: number | null
   updated_at?: string | null
   closed_at?: string | null

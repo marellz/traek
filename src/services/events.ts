@@ -4,11 +4,11 @@ import type { ProjectEventForm } from '@/stores/event'
 export const useEventService = () => {
   const list = async (project: string) => {
     // event
-    return await supabase.from('events').select().eq('project_id', project)
+    return await supabase.from('events').select('*, created_by(*)').eq('project_id', project).order('datetime', {ascending: true})
   }
 
   const getEvent = async (id: string) => {
-    return await supabase.from('events').select().eq('id', id)
+    return await supabase.from('events').select('*, created_by(*)').eq('id', id)
   }
 
   const create = async (form: ProjectEventForm) => {
@@ -40,7 +40,7 @@ export const useEventService = () => {
   }
 
   const getInvitees = async (event_id: string) => {
-    return await supabase.from('event_invitees').select().eq('event_id', event_id)
+    return await supabase.from('event_invitees').select('...users(*)').eq('event_id', event_id)
   }
 
   const deleteInvitee = async (event_id: string, user_id: string) => {

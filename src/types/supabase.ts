@@ -82,51 +82,48 @@ export type Database = {
       }
       events: {
         Row: {
-          closed_at: string | null
+          cancelled_at: string | null
           created_at: string
           created_by: string
-          date: string
+          datetime: string
           description: string | null
           duration_hours: number | null
           event_type: string
           id: string
           project_id: string
           status: string
-          time: string | null
           title: string
           updated_at: string | null
           url: string | null
           venue: string | null
         }
         Insert: {
-          closed_at?: string | null
+          cancelled_at?: string | null
           created_at?: string
           created_by?: string
-          date: string
+          datetime: string
           description?: string | null
           duration_hours?: number | null
           event_type?: string
           id?: string
           project_id?: string
           status?: string
-          time?: string | null
           title: string
           updated_at?: string | null
           url?: string | null
           venue?: string | null
         }
         Update: {
-          closed_at?: string | null
+          cancelled_at?: string | null
           created_at?: string
           created_by?: string
-          date?: string
+          datetime?: string
           description?: string | null
           duration_hours?: number | null
           event_type?: string
           id?: string
           project_id?: string
           status?: string
-          time?: string | null
           title?: string
           updated_at?: string | null
           url?: string | null
