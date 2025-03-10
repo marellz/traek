@@ -33,7 +33,7 @@ defineProps<{
 
 const emit = defineEmits(['change'])
 
-const model = defineModel()
+const model = defineModel<string|number|boolean>()
 const id = ref()
 
 watch(model, (v) => {

@@ -23,5 +23,5 @@ withDefaults(
     placeholder: 'Search documents',
   },
 )
-const model = defineModel()
+const model = defineModel<string|number>()
 </script>

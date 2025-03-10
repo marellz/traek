@@ -30,7 +30,7 @@ const props = defineProps<{
 
 const id = ref()
 
-const model = defineModel()
+const model = defineModel<boolean|string|number|object>()
 
 onMounted(() => {
   id.value = useCustomId()

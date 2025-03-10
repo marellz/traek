@@ -52,7 +52,7 @@ withDefaults(
 )
 
 const id = ref()
-const model = defineModel()
+const model = defineModel<boolean|string|number>()
 const checked = computed(() => model.value)
 onMounted(() => {
   id.value = useCustomId()

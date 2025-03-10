@@ -36,7 +36,7 @@ withDefaults(
   },
 )
 
-const show = defineModel('show', { default: false })
+const show = defineModel<boolean>('show', { default: false })
 const close = () => {
   show.value = false
   emit('close')
