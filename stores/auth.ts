@@ -108,6 +108,9 @@ export const useAuthStore = defineStore(
           return false
         }
 
+        user.value = null
+        profile.value = null
+
         return true
       } catch (error) {
         handleError('Logout error', error)
