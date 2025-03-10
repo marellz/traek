@@ -1,7 +1,7 @@
 <template>
   <div class="relative">
     <Search
-      class="absolute top-1/2 -translate-y-1/2 left-2 pointer-events-none text-gray-300"
+      class="absolute top-1/2 -translate-y-1/2 left-2 pointer-events-none text-gray-300 bg-transparent"
     />
     <input
       type="text"

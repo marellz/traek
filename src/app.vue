@@ -1,6 +1,6 @@
 <template>
   <template v-if="layout">
-    <component :is="layout">
+    <component :is="layout" :class="{ 'dark': isDark }">
       <router-view />
     </component>
   </template>
@@ -19,6 +19,7 @@ import AuthLayout from '@/layouts/auth.vue'
 import HomeLayout from '@/layouts/home.vue'
 import BlankLayout from '@/layouts/blank.vue'
 import { useAuthStore } from './stores/auth';
+import { useDark } from '@vueuse/core';
 
 type LayoutNames = "default" | "auth" | "home" | "blank"
 
@@ -35,6 +36,9 @@ const route = useRoute()
 const preferredLayout = computed(() => route.meta.layout || "default")
 const layout = computed(() => layouts[preferredLayout.value as LayoutNames])
 const auth = useAuthStore()
+
+const isDark = useDark()
+
 onMounted(async () => {
   await auth.init()
 })
