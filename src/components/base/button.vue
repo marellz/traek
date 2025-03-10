@@ -1,6 +1,6 @@
 <template>
   <button
-    class="px-3 py-2 md:px-6 md:py-2.5 text-sm md:text-base font-semibold font-secondary rounded-lg transition-colors border inline-flex items-center space-x-2 justify-center relative focus:ring disabled:cursor-not-allowed focus:ring-offset-2 focus:outline-none disabled:pointer-events-none"
+    class="px-3 py-1.5 md:px-4 text-sm md:text-base font-semibold font-secondary rounded-lg transition-colors border inline-flex items-center space-x-2 justify-center relative focus:ring disabled:cursor-not-allowed focus:ring-offset-2 focus:outline-none disabled:pointer-events-none"
     :type :class="themes[variant]" :disabled="loading || disabled">
     <slot />
     <base-loader class="absolute right-0" loader-class="h-4" v-if="loading" />

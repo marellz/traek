@@ -1,21 +1,15 @@
 <template>
   <!-- dashboard -->
-  <div class="flex h-full min-h-screen bg-sd">
-    <partials-nav />
-    <div class="flex-auto flex flex-col">
-      <partials-header />
-      <main class="flex-auto">
-        <slot />
-      </main>
-      <footer class="border-t border-t-slate-300 py-4">
-        <layout-container>
-          <ul class="flex space-x-2">
-            <li>
-              <router-link :to="{ 'name': 'home' }">Go to homepage</router-link>
-            </li>
-          </ul>
-        </layout-container>
-      </footer>
+  <div class="h-full flex flex-col min-h-screen">
+  <div class="bg-sidebar-bg fixed h-full left-0 w-1/5"></div>
+    <div class="container flex-auto mx-auto flex space-x-2">
+      <partials-nav />
+      <div class="flex-auto flex flex-col">
+        <partials-header />
+        <main class="flex-auto">
+          <slot />
+        </main>
+      </div>
     </div>
   </div>
 </template>

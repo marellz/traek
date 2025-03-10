@@ -2,7 +2,7 @@
   <div>
     <layout-banner class="!py-0">
       <!-- <h1 class="font-bold text-2xl px-4 mt-4">-p</h1> -->
-      <ul class="mt-4 flex">
+      <ul class="mt-4 flex border-b border-b-slate-200">
         <li v-for="({ name, label }, index) in links" :key="index">
           <router-link
             :to="{ name, params: { id } }"
