@@ -5,22 +5,21 @@
   <div ref="target" class="relative !mx-0">
     <div
       v-show="active"
-      class="absolute right-0 top-full w-auto min-w-40 overflow-hidden rounded-md border border-slate-300 bg-white"
-    >
+      class="absolute right-0 top-full w-auto min-w-40 overflow-hidden rounded-md border border-slate-300 bg-white z-20">
       <div class="flex flex-col">
         <div class="flex items-center space-x-2 bg-slate-100 p-2">
           <user-avatar size="sm" :avatar="auth.profile?.avatar" />
-          <div>
+          <div class="flex-auto text-sm">
             <p class="font-medium">
-              {{ auth.profile?.name || 'User name' }}
+              {{ auth.profile?.name }}
             </p>
           </div>
         </div>
 
-        <router-link to="/profile/user-id" class="block p-2 hover:bg-slate-100">
+        <router-link :to="`/profile/${auth.userId}`" class="block p-2 text-sm hover:bg-slate-100">
           Profile
         </router-link>
-        <a href="#logout" class="block p-2 hover:bg-slate-100" @click.prevent="logout"> Logout </a>
+        <a href="#logout" class="block p-2 hover:bg-slate-100 text-sm" @click.prevent="logout"> Logout </a>
       </div>
     </div>
   </div>
@@ -35,6 +34,7 @@ import { useRouter } from 'vue-router'
 
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 
 const logout = async () => {
   if (confirm('Are you sure you want to log out?')) {
@@ -46,6 +46,10 @@ const logout = async () => {
 const active = ref(false)
 const wrapper = useTemplateRef('target')
 onClickOutside(wrapper, () => {
+  active.value = false
+})
+
+watch(() => route.path, () => {
   active.value = false
 })
 </script>

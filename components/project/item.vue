@@ -1,5 +1,5 @@
 <template>
-  <router-link class="block" :to="{ name: 'project', params: { id: item.id } }">
+  <router-link class="block" :to="`/project/${item.id}`">
     <div class="h-full space-y-2 rounded-xl border border-slate-300 p-4">
       <h1 class="text-2xl font-medium">
         {{ item.name }}

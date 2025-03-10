@@ -5,9 +5,9 @@
         <li>
           <router-link class="inline-block p-2 hover:underline" to="/">Home</router-link>
         </li>
-        <template v-if="auth.isAuthenticated">
+        <template v-if="isAuthenticated">
           <li>
-            <router-link :to="{ name: 'dashboard' }" class="inline-block p-2 hover:underline">
+            <router-link to="/dashboard" class="inline-block p-2 hover:underline">
               Dashboard
             </router-link>
           </li>
@@ -34,11 +34,10 @@
   </header>
 </template>
 <script lang="ts" setup>
-import LayoutContainer from '@/components/layout/container.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
-
 const auth = useAuthStore()
+const isAuthenticated = computed(()=> auth.isAuthenticated ?? false)
 const router = useRouter()
 const onLogout = async () => {
   await auth.logout()

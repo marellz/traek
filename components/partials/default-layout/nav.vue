@@ -5,15 +5,11 @@
         <p class="font-medium uppercase tracking-widest text-slate-400">{{ item.title }}</p>
       </li>
       <li v-for="(link, i) in item.links" :key="`${index}-${i}`">
-        <router-link
-          class="relative block rounded px-2 py-2 before:absolute before:left-0 before:top-1/2 before:block before:h-4 before:w-1 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:bg-transparent hover:bg-slate-200"
-          active-class="before:!bg-primary text-primary bg-primary/10"
-          :to="link.path"
-        >
+        <sidebar-nav-item :to="link.path">
           <span>
             {{ link.label }}
           </span>
-        </router-link>
+        </sidebar-nav-item>
       </li>
     </ul>
   </nav>
@@ -29,10 +25,7 @@ type Nav = Record<
     title: string
     links: Array<{
       label: string
-      path: {
-        name: string
-        params?: Record<string, string>
-      }
+      path: string;
     }>
   }
 >
@@ -41,10 +34,10 @@ const menu = ref<Nav>({
   home: {
     title: 'Menu',
     links: [
-      { label: 'Home', path: { name: 'dashboard' } },
-      { label: 'Tasks', path: { name: 'tasks' } },
-      { label: 'Projects', path: { name: 'projects' } },
-      { label: 'Calendar', path: { name: 'calendar' } },
+      { label: 'Home', path: '/dashboard' },
+      { label: 'Tasks', path: '/tasks' },
+      { label: 'Projects', path: '/projects' },
+      { label: 'Calendar', path: '/calendar' },
     ],
   },
   projects: {
@@ -62,10 +55,7 @@ watch(
     if (v) {
       menu.value.projects.links = v.map((item) => ({
         label: item.name,
-        path: {
-          name: 'project',
-          params: { id: item.id },
-        },
+        path: `/project/${item.id}`
       }))
     }
   },
