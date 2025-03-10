@@ -35,7 +35,7 @@
           <router-link
             v-for="section in sections"
             :key="section.key"
-            :to="{ name: section.pathName, params: { id } }"
+            :to="section.pathName"
           >
             <div class="hover:bg-midnight-green/10 border-r border-r-slate-300 px-4 py-2 pl-4">
               <div class="mt-4 text-4xl font-medium">
@@ -68,10 +68,10 @@ const auth = useAuthStore()
 const id = computed(() => route.params.id as string)
 const project = ref<ProjectInfo | null>(null)
 const sections: { key: keyof ProjectStats; label: string; pathName: string }[] = [
-  { key: 'tasks', label: 'Tasks', pathName: 'project-tasks' },
-  { key: 'events', label: 'Events', pathName: 'project-events' },
-  { key: 'project_members', label: 'Members', pathName: 'project-members' },
-  { key: 'notes', label: 'Notes', pathName: 'project-notes' },
+  { key: 'tasks', label: 'Tasks', pathName: `/project/${id.value}/tasks` },
+  { key: 'events', label: 'Events', pathName: `/project/${id.value}/events` },
+  { key: 'project_members', label: 'Members', pathName: `/project/${id.value}/members` },
+  { key: 'notes', label: 'Notes', pathName: `/project/${id.value}/notes` },
 ]
 
 const projectStore = useProjectStore()

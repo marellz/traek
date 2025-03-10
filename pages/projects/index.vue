@@ -7,7 +7,7 @@
       <div class="flex items-center">
         <h1 class="text-3xl">My projects</h1>
         <div class="ml-auto">
-          <router-link :to="{ name: 'create-project' }">
+          <router-link to="/projects/create">
             <base-button>
               <span>Create project</span>
             </base-button>

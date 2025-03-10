@@ -5,7 +5,7 @@
       <ul class="mt-4 flex border-b border-b-slate-200">
         <li v-for="({ name, label }, index) in links" :key="index">
           <router-link
-            :to="{ name, params: { id } }"
+            :to="`/project/${id}/${name}`"
             class="-mb-px block border-b border-b-transparent px-4 py-2"
             exact-active-class="!border-b-slate-800"
           >
@@ -30,23 +30,23 @@ import { useRoute } from 'vue-router'
 const links = ref([
   {
     label: 'Overview',
-    name: 'project',
+    name: '',
   },
   {
     label: 'Tasks',
-    name: 'project-tasks',
+    name: 'tasks',
   },
   {
     label: 'Events',
-    name: 'project-events',
+    name: 'events',
   },
   {
     label: 'Members',
-    name: 'project-members',
+    name: 'members',
   },
   {
     label: 'Notes',
-    name: 'project-notes',
+    name: 'notes',
   },
 ])
 
