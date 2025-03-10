@@ -1,10 +1,16 @@
 <template>
-  <component :is="layout">
-    <router-view />
-  </component>
+  <template v-if="layout">
+    <component :is="layout">
+      <router-view />
+    </component>
+  </template>
+  <div class="h-screen flex justify-center items-center" v-else>
+    <base-loader></base-loader>
+  </div>
   <toasts-wrapper />
 </template>
 <script lang="ts" setup>
+import BaseLoader from '@/components/base/loader.vue'
 import ToastsWrapper from '@/components/toast/wrapper.vue'
 import { computed, onMounted, type Component } from 'vue';
 import { useRoute } from 'vue-router';
