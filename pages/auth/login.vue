@@ -1,0 +1,132 @@
+<template>
+  <div>
+    <div class="mb-8 space-y-2 text-center">
+      <auth-title>Welcome Back!</auth-title>
+      <auth-subtitle>
+        Log in to access your account and manage your projects effortlessly.
+      </auth-subtitle>
+    </div>
+    <Form @submit="login()">
+      <div class="space-y-4">
+        <form-input
+          v-model="email"
+          label="Email address"
+          :error="errors.email"
+          autocomplete="email"
+          type="email"
+          required
+        />
+        <form-input
+          v-model="password"
+          label="Password"
+          autocomplete="password"
+          :error="errors.password"
+          allow-password-toggle
+          type="password"
+          required
+        />
+        <div
+          class="flex flex-col items-start justify-between space-y-4 md:flex-row md:items-center md:space-y-0"
+        >
+          <form-checkbox v-model="rememberMe" label="Remember me" />
+          <router-link class="text-primary font-medium" to="/auth/forgot-password"
+            >Forgot password?
+          </router-link>
+        </div>
+        <base-button class="w-full" :loading="auth.loading">
+          <span>Login</span>
+        </base-button>
+        <base-alert v-if="auth.errors" variant="error" title="Authentication error">
+          <p v-for="(err, key) in auth.errors" :key>
+            <span>{{ err }}</span>
+          </p>
+        </base-alert>
+        <div class="space-y-2">
+          <p class="text-center text-gray-600">
+            Dont have an account?
+            <router-link class="text-primary font-medium" to="/auth/register">Register</router-link>
+          </p>
+        </div>
+      </div>
+    </Form>
+  </div>
+</template>
+<script lang="ts" setup>
+import AuthTitle from '@/components/auth/title.vue'
+import AuthSubtitle from '@/components/auth/subtitle.vue'
+import FormInput from '@/components/form/input.vue'
+import FormCheckbox from '@/components/form/checkbox.vue'
+import BaseButton from '@/components/base/button.vue'
+import BaseAlert from '@/components/base/alert.vue'
+import { onMounted, ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { Form, useForm } from 'vee-validate'
+import * as yup from 'yup'
+import { useRouter } from 'vue-router'
+
+definePageMeta({
+  layout: 'auth',
+  middleware: 'guest',
+})
+
+const auth = useAuthStore()
+
+const { errors, defineField, handleSubmit, resetForm } = useForm({
+  validationSchema: yup.object({
+    email: yup.string().email().required('Email is required'),
+    password: yup.string().min(6).required('Password is required'),
+  }),
+})
+
+const [email] = defineField('email')
+const [password] = defineField('password')
+
+const rememberMe = ref(false)
+const router = useRouter()
+
+const stack = ref('')
+
+const login = handleSubmit(async (values) => {
+  stack.value = 'Logging you in'
+  const success = await auth.login({
+    email: values.email,
+    password: values.password,
+  })
+
+  if (!success) {
+    return false
+    // show error
+  }
+
+  await getProfile()
+})
+
+const getProfile = async () => {
+  const _profile = await auth.getProfile()
+
+  if (_profile && auth.hasProfile) {
+    router.push('/dashboard')
+  } else {
+    if (auth.user) router.push(`/profile/${auth.userId}`)
+  }
+}
+
+onMounted(() => {
+  auth.resetErrors()
+
+  const email = import.meta.env.VITE_TEST_EMAIL
+  const password = import.meta.env.VITE_TEST_PASSWORD
+
+  if (!(email && password)) {
+    return
+  }
+
+  resetForm({
+    values: {
+      email,
+      password,
+    },
+  })
+})
+</script>
+<style></style>

@@ -1,0 +1,84 @@
+<template>
+  <label class="block" :for="id">
+    <input
+      :id
+      ref="input"
+      class="absolute -z-10 h-0 w-0"
+      type="file"
+      :disabled="disabled || uploading"
+      :required
+      @change="handleChange"
+    >
+
+    <div
+      class="flex min-h-64 flex-wrap items-center justify-center space-y-4 rounded-xl border-2 border-dashed border-slate-400 bg-transparent p-4 transition-all duration-150 ease-in-out md:space-x-10 md:space-y-0"
+      :class="{
+        'border-red-400': error,
+        '!border-primary !bg-primary-lighter/25': !!model,
+        grayscale: disabled || uploading,
+      }"
+    >
+      <div>
+        <img class="max-w-40" src="@/assets/images/undraw_add-files_d04y.svg" alt="" >
+      </div>
+      <div>
+        <template v-if="model">
+          <div class="space-y-2">
+            <h1 class="text-2xl font-medium">Document added!</h1>
+            <div class="flex items-center space-x-2">
+              <FileCheck class="text-primary" />
+              <p class="line-clamp-1 w-full max-w-80">{{ model.name }}</p>
+            </div>
+            <div class="!mt-4">
+              <button
+                type="button"
+                class="inline-flex items-center space-x-1 rounded-lg border border-red-500 p-1 text-sm font-medium leading-normal text-red-500 hover:bg-red-100"
+                @click.prevent="model = undefined"
+              >
+                <span>Remove file</span>
+                <Trash :size="16" :stroke-width="1.5" />
+              </button>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <h1 class="font-secondary text-center text-2xl font-medium md:text-left">Add a file</h1>
+          <p class="text-center md:text-left">Upload a file you wish to upload</p>
+          <ul class="mt-6 list-disc pl-5 text-xs text-gray-700 md:text-sm">
+            <li>Accepted file types: PDF, DOCX, JPG, PNG.</li>
+            <li>Maximum file size: 10MB.</li>
+            <li>Ensure the file name is clear and descriptive.</li>
+          </ul>
+        </template>
+      </div>
+    </div>
+  </label>
+  <form-error v-if="error" class="mt-2">{{ error }}</form-error>
+</template>
+<script lang="ts" setup>
+import useCustomId from '@/composables/useCustomId'
+import { FileCheck, Trash } from 'lucide-vue-next'
+import FormError from '@/components/form/error.vue'
+import { onMounted, ref } from 'vue'
+
+defineProps<{
+  disabled?: boolean
+  required?: boolean
+  error?: any
+}>()
+
+const uploading = ref(false)
+const model = defineModel<File | undefined>()
+const id = ref()
+const input = ref()
+const handleChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files?.length) {
+    model.value = target.files[0]
+  }
+}
+
+onMounted(() => {
+  id.value = useCustomId()
+})
+</script>
