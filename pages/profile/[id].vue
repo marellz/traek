@@ -32,6 +32,10 @@ import { onMounted, ref } from 'vue'
 import { Form, useForm } from 'vee-validate'
 import * as yup from 'yup'
 
+definePageMeta({
+  middleware: 'auth',
+})
+
 const auth = useAuthStore()
 const { errors, defineField, handleSubmit, resetForm } = useForm({
   validationSchema: yup.object({

@@ -15,6 +15,11 @@
 import ProjectForm from '@/components/object-forms/project.vue'
 import { useProjectStore, type ProjectForm as ProjectFormType } from '@/stores/project'
 import { useRouter } from 'vue-router'
+
+definePageMeta({
+  middleware: 'auth',
+})
+
 const router = useRouter()
 const projects = useProjectStore()
 

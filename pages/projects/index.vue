@@ -25,6 +25,10 @@
 import { ProjectLoading, useProjectStore } from '@/stores/project'
 import { computed, onMounted } from 'vue'
 
+definePageMeta({
+  middleware: 'auth',
+})
+
 const projectStore = useProjectStore()
 
 const projects = computed(() => projectStore.projects)

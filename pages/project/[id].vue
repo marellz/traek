@@ -24,6 +24,10 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+definePageMeta({
+  middleware: 'auth',
+})
+
 const links = ref([
   {
     label: 'Overview',

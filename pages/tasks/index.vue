@@ -1,4 +1,8 @@
 <template>
   <div>Tasks</div>
 </template>
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+definePageMeta({
+  middleware: 'auth',
+})
+</script>
