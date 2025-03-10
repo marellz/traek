@@ -3,7 +3,7 @@
     <div class="mb-8 text-center space-y-2">
       <auth-title>Welcome Back!</auth-title>
       <auth-subtitle>
-        Log in to access your account and manage your documents effortlessly.
+        Log in to access your account and manage your projects effortlessly.
       </auth-subtitle>
     </div>
     <Form @submit="login()">
