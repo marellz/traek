@@ -34,9 +34,7 @@
   </FormStepper>
 </template>
 <script lang="ts" setup>
-import FormStepper, { type Step } from '@/components/form/stepper.vue'
-import AuthTitle from '@/components/auth/title.vue'
-import AuthSubtitle from '@/components/auth/subtitle.vue'
+import type { Step } from '@/components/form/stepper.vue'
 import SignUp from '@/components/object-forms/register/signUp.vue'
 import ProfileInfo from '@/components/object-forms/register/profileInfo.vue'
 import { onMounted, ref, useTemplateRef } from 'vue'

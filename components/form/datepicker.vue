@@ -37,10 +37,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import DateTime from '@/components/date/time.vue'
-import DateCalendar from '@/components/date/calendar.vue'
-import FormLabel from '@/components/form/label.vue'
-import FormError from '@/components/form/error.vue'
 import useCustomId from '@/composables/useCustomId'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { onClickOutside } from '@vueuse/core'

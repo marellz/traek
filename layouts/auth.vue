@@ -8,5 +8,4 @@
   </div>
 </template>
 <script lang="ts" setup>
-import LayoutCard from '@/components/layout/card.vue'
 </script>

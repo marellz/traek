@@ -58,7 +58,6 @@
 <script lang="ts" setup>
 import useCustomId from '@/composables/useCustomId'
 import { FileCheck, Trash } from 'lucide-vue-next'
-import FormError from '@/components/form/error.vue'
 import { onMounted, ref } from 'vue'
 
 defineProps<{

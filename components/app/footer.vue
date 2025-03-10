@@ -6,5 +6,4 @@
   </footer>
 </template>
 <script lang="ts" setup>
-import LayoutContainer from '@/components/layout/container.vue'
 </script>

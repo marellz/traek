@@ -36,9 +36,6 @@
 </template>
 <script setup lang="ts">
 import useCustomId from '@/composables/useCustomId'
-import FormLabel from '@/components/form/label.vue'
-import FormError from '@/components/form/error.vue'
-import { computed, onMounted, ref } from 'vue'
 import { Eye, EyeClosed } from 'lucide-vue-next'
 
 const props = withDefaults(
@@ -76,6 +73,10 @@ const toggleInputType = () => {
   inputType.value = inputType.value === 'password' ? 'text' : 'password'
 }
 const showPassword = computed(() => inputType.value === 'text')
+
+onBeforeMount(() => {
+  id.value = useCustomId()
+})
 
 onMounted(() => {
   if (input.value?.hasAttribute('autofocus')) {

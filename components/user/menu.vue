@@ -25,7 +25,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import UserAvatar from '@/components/user/avatar.vue'
 import { useAuthStore } from '@/stores/auth'
 import { onClickOutside } from '@vueuse/core'
 import { User } from 'lucide-vue-next'

@@ -70,12 +70,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import AuthTitle from '@/components/auth/title.vue'
-import AuthSubtitle from '@/components/auth/subtitle.vue'
-import FormInput from '@/components/form/input.vue'
-import BaseButton from '@/components/base/button.vue'
-// import BaseAlert from "@/components/base/alert.vue"
-// import BaseLoader from "@/components/base/loader.vue"
 import { useAuthStore } from '@/stores/auth'
 import { Form, useForm } from 'vee-validate'
 import * as yup from 'yup'

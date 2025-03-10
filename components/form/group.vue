@@ -10,8 +10,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import FormLabel from '@/components/form/label.vue'
-import FormError from '@/components/form/error.vue'
 withDefaults(
   defineProps<{
     label: string

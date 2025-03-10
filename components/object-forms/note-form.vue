@@ -11,8 +11,6 @@
   </Form>
 </template>
 <script lang="ts" setup>
-import FormInput from '@/components/form/input.vue'
-import FormText from '@/components/form/text.vue'
 import { NotesLoading, useNotesStore, type ProjectNote } from '@/stores/notes'
 import { Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'

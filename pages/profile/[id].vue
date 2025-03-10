@@ -25,7 +25,6 @@
   </layout-container>
 </template>
 <script lang="ts" setup>
-import FormInput from '@/components/form/input.vue'
 import { useAuthStore, type UserProfile, type UserProfileForm } from '@/stores/auth'
 import { watchDebounced } from '@vueuse/core'
 import { onMounted, ref } from 'vue'

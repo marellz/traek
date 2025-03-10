@@ -42,12 +42,7 @@
     <base-modal v-model:show="showAddMemberModal" title="Add members">
       <form @submit.prevent="addMembers">
         <div class="space-y-4">
-          <form-user-selector
-            v-model="newMembers"
-            label="Search users"
-            :queried-users
-            @search-users="handleQuery"
-          />
+          <form-user-selector v-model="newMembers" label="Search users" :queried-users @search-users="handleQuery" />
           <base-button> <span> Add Members </span></base-button>
         </div>
       </form>
@@ -55,13 +50,12 @@
   </div>
 </template>
 <script lang="ts" setup>
-import FormUserSelector from '@/components/form/user-selector.vue'
 import { useAuthStore, type UserProfile } from '@/stores/auth'
 import { useProjectStore, type Project, type ProjectMember } from '@/stores/project'
 import { useDebounceFn } from '@vueuse/core'
-import moment from 'moment'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import moment from 'moment'
 
 const route = useRoute()
 const auth = useAuthStore()

@@ -28,7 +28,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import TaskItem from '@/components/task/item.vue'
 import TaskForm from '@/components/object-forms/task-form.vue'
 import { useTaskStore, type Task, type TaskForm as TaskFormType } from '@/stores/task'
 import { computed, onMounted, ref } from 'vue'

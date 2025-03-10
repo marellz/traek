@@ -32,7 +32,6 @@
   </header>
 </template>
 <script lang="ts" setup>
-import UserMenu from '@/components/user/menu.vue'
 import { Bell, Search, Settings } from 'lucide-vue-next'
 import { ref, useTemplateRef } from 'vue'
 import { onClickOutside } from '@vueuse/core'

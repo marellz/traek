@@ -43,8 +43,6 @@
   </form-group>
 </template>
 <script lang="ts" setup>
-import FormGroup from '@/components/form/group.vue'
-import FormDropdown from '@/components/form/dropdown.vue'
 import { watchDebounced } from '@vueuse/core'
 import { onMounted, ref } from 'vue'
 import { useAuthStore, type UserProfile } from '@/stores/auth'

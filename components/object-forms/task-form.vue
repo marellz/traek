@@ -32,7 +32,7 @@
           </form-group>
         </div>
         <form-datepicker v-model="due_date" label="Due date" />
-        <user-selector
+        <form-user-selector
           v-model="assignees"
           label="Assignees"
           :queried-users
@@ -51,12 +51,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import FormInput from '@/components/form/input.vue'
-import FormText from '@/components/form/text.vue'
-import FormGroup from '@/components/form/group.vue'
-import FormRadio from '@/components/form/radio.vue'
-import FormDatepicker from '@/components/form/datepicker.vue'
-import UserSelector from '@/components/form/user-selector.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { TaskPriorityLabels, TaskStatusLabels } from '@/data/task-data'
 import { useTaskStore, TaskLoading, type TaskForm } from '@/stores/task'

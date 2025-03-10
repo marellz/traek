@@ -21,7 +21,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import LayoutCard from '@/components/layout/card.vue'
 import { onClickOutside } from '@vueuse/core'
 import { X } from 'lucide-vue-next'
 import { ref, watch } from 'vue'

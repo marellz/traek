@@ -38,7 +38,7 @@
           </div>
           <form-datepicker v-model="datetime" label="Date/time" />
         </div>
-        <user-selector
+        <form-user-selector
           v-model="invitees"
           label="Invitees"
           :queried-users
@@ -50,7 +50,7 @@
           <base-button
             type="submit"
             :loading="loading.creating || loading.updating"
-            :disabled="eventData && eventData?.cancelled_at !== null"
+            :disabled="(eventData && eventData?.cancelled_at !== null) ?? false"
           >
             <span v-if="editMode">Update event</span>
             <span v-else>Save event</span>
@@ -61,21 +61,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-import FormInput from '@/components/form/input.vue'
-import FormText from '@/components/form/text.vue'
-import FormRadio from '@/components/form/radio.vue'
-import FormGroup from '@/components/form/group.vue'
-import FormSelect from '@/components/form/select.vue'
-import userSelector from '@/components/form/user-selector.vue'
-import FormDatepicker from '@/components/form/datepicker.vue'
 import { eventDurations, eventTypes } from '@/data/event-data'
 import { Form, useForm } from 'vee-validate'
 import { computed, onMounted, watch, ref } from 'vue'
-import * as yup from 'yup'
 import { EventLoading, useEventStore, type ProjectEvent } from '@/stores/event'
 import { useProjectStore } from '@/stores/project'
 import type { UserProfile } from '@/stores/auth'
 import { useDebounceFn } from '@vueuse/core'
+import * as yup from 'yup'
 
 const props = defineProps<{
   projectId: string

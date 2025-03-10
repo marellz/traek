@@ -10,7 +10,6 @@
   </button>
 </template>
 <script lang="ts" setup>
-import BaseLoader from '@/components/base/loader.vue'
 export type BtnVariants =
   | 'primary'
   | 'secondary'

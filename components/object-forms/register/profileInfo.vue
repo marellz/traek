@@ -27,9 +27,6 @@
   </Form>
 </template>
 <script lang="ts" setup>
-import FormInput from '@/components/form/input.vue'
-import BaseAlert from '@/components/base/alert.vue'
-import BaseButton from '@/components/base/button.vue'
 import { useAuthStore } from '@/stores/auth'
 import { computed, onMounted, ref, watch } from 'vue'
 import * as yup from 'yup'

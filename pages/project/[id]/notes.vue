@@ -11,7 +11,7 @@
       v-else-if="notes.length"
       class="mt-10 items-start gap-4 space-y-4 md:columns-2 xl:columns-3"
     >
-      <note-item
+      <notes-item
         v-for="item in notes"
         :key="item.id"
         :item
@@ -27,8 +27,6 @@
 </template>
 <script lang="ts" setup>
 import NoteForm from '@/components/object-forms/note-form.vue'
-import NoteItem from '@/components/notes/item.vue'
-import CommonEmpty from '@/components/common/empty.vue'
 import { NotesLoading, useNotesStore, type ProjectNote, type ProjectNoteForm } from '@/stores/notes'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'

@@ -79,7 +79,6 @@
 </template>
 <script lang="ts" setup>
 import useCustomId from '@/composables/useCustomId'
-import BaseLoader from '@/components/base/loader.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { Check, ChevronDown } from 'lucide-vue-next'
 import { onClickOutside } from '@vueuse/core'

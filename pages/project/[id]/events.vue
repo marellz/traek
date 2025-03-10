@@ -27,9 +27,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import EventItem from '@/components/event/item.vue'
 import EventForm from '@/components/object-forms/event.vue'
-import FormCheckbox from '@/components/form/checkbox.vue'
 import {
   EventLoading,
   useEventStore,

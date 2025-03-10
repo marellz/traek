@@ -13,7 +13,6 @@
   </transition-group>
 </template>
 <script lang="ts" setup>
-import ToastItem from '@/components/toast/item.vue'
 import { useToastsStore } from '@/stores/toasts'
 import { computed } from 'vue'
 
