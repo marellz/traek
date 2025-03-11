@@ -16,24 +16,25 @@
           </form>
         </div>
         <span class="border-l border-slate-200"></span>
-        <user-menu></user-menu>
-        <button type="button" class="p-1">
-          <Bell />
-        </button>
-        <button type="button" class="p-1">
-          <Settings />
-        </button>
-        <button type="button" class="p-1" @click="toggleDarkMode()">
-          <Sun v-if="isDark" />
-          <Moon v-else />
-        </button>
+        <div class="flex items-centers space-x-4">
+          <user-menu></user-menu>
+          <notification-wrapper></notification-wrapper>
+          <button type="button" class="p-1">
+            <Settings />
+          </button>
+          <button type="button" class="p-1" @click="toggleDarkMode()">
+            <Sun v-if="isDark" />
+            <Moon v-else />
+          </button>
+        </div>
       </div>
     </layout-container>
   </header>
 </template>
 <script lang="ts" setup>
+import NotificationWrapper from '@/components/notifications/wrapper.vue'
 import UserMenu from '@/components/user/menu.vue'
-import { Bell, Moon, Search, Settings, Sun } from 'lucide-vue-next'
+import { Moon, Search, Settings, Sun } from 'lucide-vue-next'
 import { ref, useTemplateRef } from 'vue'
 import { onClickOutside, useDark, useToggle } from '@vueuse/core'
 const isDark = useDark()
