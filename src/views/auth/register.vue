@@ -2,8 +2,7 @@
   <div class="mb-8 space-y-2 text-center">
     <auth-title>Join Our Platform</auth-title>
     <auth-subtitle>
-      Create an account to start uploading, organizing, and sharing your documents securely. Forgot
-      Password Page
+      Create an account to start uploading, organizing, and sharing your projects/tasks securely.
     </auth-subtitle>
   </div>
   <FormStepper :name="register_stepper" v-if="steps.length" :steps ref="stepper" @update="updateSteps">

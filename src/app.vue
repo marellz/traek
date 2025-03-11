@@ -1,10 +1,16 @@
 <template>
-  <component :is="layout">
-    <router-view />
-  </component>
+  <template v-if="layout">
+    <component :is="layout" :class="{ 'dark': isDark }">
+      <router-view />
+    </component>
+  </template>
+  <div class="h-screen flex justify-center items-center" v-else>
+    <base-loader></base-loader>
+  </div>
   <toasts-wrapper />
 </template>
 <script lang="ts" setup>
+import BaseLoader from '@/components/base/loader.vue'
 import ToastsWrapper from '@/components/toast/wrapper.vue'
 import { computed, onMounted, type Component } from 'vue';
 import { useRoute } from 'vue-router';
@@ -13,6 +19,7 @@ import AuthLayout from '@/layouts/auth.vue'
 import HomeLayout from '@/layouts/home.vue'
 import BlankLayout from '@/layouts/blank.vue'
 import { useAuthStore } from './stores/auth';
+import { useDark } from '@vueuse/core';
 
 type LayoutNames = "default" | "auth" | "home" | "blank"
 
@@ -29,6 +36,9 @@ const route = useRoute()
 const preferredLayout = computed(() => route.meta.layout || "default")
 const layout = computed(() => layouts[preferredLayout.value as LayoutNames])
 const auth = useAuthStore()
+
+const isDark = useDark()
+
 onMounted(async () => {
   await auth.init()
 })
