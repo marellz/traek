@@ -1,7 +1,7 @@
 <template>
-  <layout-banner>
+  <!-- <layout-banner>
     <layout-banner-title>My projects</layout-banner-title>
-  </layout-banner>
+  </layout-banner> -->
   <div class="mt-10">
     <layout-container>
       <div class="flex items-center">

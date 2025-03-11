@@ -1,7 +1,8 @@
 @import 'tailwindcss';
+@custom-variant dark (&:where(.dark, .dark *));
 
 .form-input {
-  @apply block w-full rounded-lg border border-slate-200 bg-transparent px-4 py-2 focus:ring focus:outline-0 disabled:bg-gray-200 disabled:text-gray-600;
+  @apply block w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-transparent px-4 py-2 focus:ring focus:outline-0 disabled:bg-gray-200 disabled:text-gray-600 dark:disabled:bg-slate-800 dark:disabled:text-slate-500;
 }
 
 /*
@@ -18,9 +19,16 @@ https://coolors.co/0b3c49-731963-fffdfd-cbd2d0-f0e100
   --color-white: #fffdfdff;
   --color-timberwolf: #cbd2d0ff;
   --color-aureolin: #f0e100ff;
-  --color-primary: #731963ff;
-  --color-primary-lighter: #a7258fff;
-  --color-primary-darker: #541248ff;
+  --color-primary: #430dbf;
+  --color-primary-lighter: #5010e5;
+  --color-primary-darker: #21075f;
+  --color-sidebar-bg: #f3f6f7;
+  /* --color-mindaro: #c5d86dff;
+  --color-licorice: #261c15ff;
+  --color-baby-powder: #f7f7f2ff;
+  --color-beige: #e4e6c3ff;
+  --color-beige-light: #f9f9f1ff;
+  --color-giants-orange: #f05d23ff; */
 }
 
 /**

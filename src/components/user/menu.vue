@@ -3,24 +3,23 @@
     <User />
   </button>
   <div ref="target" class="relative !mx-0">
-    <div
-      v-show="active"
-      class="absolute top-full right-0 w-auto min-w-40 overflow-hidden rounded-md border border-slate-300 bg-white"
-    >
+    <div v-show="active"
+      class="absolute top-full right-0 w-auto min-w-40 overflow-hidden rounded-md border border-slate-300 bg-white dark:bg-slate-700 dark:border-slate-600 z-10">
       <div class="flex flex-col">
-        <div class="flex items-center space-x-2 bg-slate-100 p-2">
+        <div class="flex items-center space-x-2 bg-slate-100 dark:bg-slate-700 p-2">
           <user-avatar size="sm" :avatar="auth.profile?.avatar"></user-avatar>
           <div>
-            <p class="font-medium">
+            <p class="font-medium text-sm">
               {{ auth.profile?.name || 'User name' }}
             </p>
           </div>
         </div>
 
-        <router-link to="/profile/user-id" class="block p-2 hover:bg-slate-100">
+        <router-link to="/profile/user-id" class="block p-2 hover:bg-slate-100 dark:hover:bg-slate-600">
           Profile
         </router-link>
-        <a href="#logout" class="block p-2 hover:bg-slate-100" @click.prevent="logout"> Logout </a>
+        <a href="#logout" class="block p-2 hover:bg-slate-100 dark:hover:bg-slate-600" @click.prevent="logout"> Logout
+        </a>
       </div>
     </div>
   </div>
