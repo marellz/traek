@@ -1,5 +1,10 @@
 import { supabase } from '@/database/supabase'
-import type { NotificationAction, NotificationForm, NotificationType } from '@/stores/notifications'
+import {
+  NotificationTypes as NotificationTypeEnum,
+  type NotificationAction,
+  type NotificationForm,
+  type NotificationType,
+} from '@/stores/notifications'
 
 export const useNotificationBuilder = (type: NotificationType, id: string) => {
   const data: {
@@ -15,32 +20,33 @@ export const useNotificationBuilder = (type: NotificationType, id: string) => {
     related_task_id: null,
     related_event_id: null,
   }
+
   switch (type) {
-    case 'project_member_added':
+    case NotificationTypeEnum.PROJECT_MEMBER_ADDED:
       data.actions = [{ label: 'View project', path: { name: 'project', params: { id } } }]
       data.message = 'You have been assigned to <project> project'
       data.related_project_id = id
       break
 
-    case 'task_assigned':
+    case NotificationTypeEnum.TASK_ASSIGNED:
       data.actions = [{ label: 'View task', path: { name: 'task', params: { id } } }]
       data.message = 'You have been assigned to task <task>'
       data.related_task_id = id
       break
 
-    case 'task_overdue':
+    case NotificationTypeEnum.TASK_OVERDUE:
       data.actions = [{ label: 'View task', path: { name: 'task', params: { id } } }]
       data.message = 'Task <task> is overdue'
       data.related_task_id = id
       break
 
-    case 'task_completed':
+    case NotificationTypeEnum.TAST_COMPLETED:
       data.actions = [{ label: 'View task', path: { name: 'task', params: { id } } }]
       data.message = 'Task <task> has been marked as completed'
       data.related_task_id = id
       break
 
-    case 'task_status_update':
+    case NotificationTypeEnum.TASK_STATUS_UPDATE:
       data.actions = [
         {
           label: 'View task',
@@ -51,7 +57,7 @@ export const useNotificationBuilder = (type: NotificationType, id: string) => {
       data.related_task_id = id
       break
 
-    case 'event_invited':
+    case NotificationTypeEnum.EVENT_INVITED:
       data.actions = [
         {
           label: 'View event',
@@ -62,7 +68,7 @@ export const useNotificationBuilder = (type: NotificationType, id: string) => {
       data.related_event_id = id
       break
 
-    case 'event_cancelled':
+    case NotificationTypeEnum.EVENT_CANCELLED:
       data.actions = [
         {
           label: 'View event',
@@ -74,7 +80,7 @@ export const useNotificationBuilder = (type: NotificationType, id: string) => {
 
       break
 
-    case 'event_upcoming':
+    case NotificationTypeEnum.EVENT_UPCOMING:
       data.actions = [
         {
           label: 'View event',

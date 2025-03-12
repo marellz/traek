@@ -2,19 +2,21 @@ import { useLoadingState } from '@/composables/useLoading'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useAuthStore } from './auth'
 import { useErrorStore } from './errors'
-import { v4 } from 'uuid'
 import { useNotificationsService, useNotificationBuilder } from '@/services/notifications'
 import { computed, ref } from 'vue'
 
-export type NotificationType =
-  | 'project_member_added' // + _invited/_request
-  | 'task_assigned'
-  | 'task_status_update'
-  | 'task_completed'
-  | 'task_overdue'
-  | 'event_invited'
-  | 'event_upcoming'
-  | 'event_cancelled'
+export enum NotificationTypes {
+  PROJECT_MEMBER_ADDED = 'project_member_added',
+  TASK_ASSIGNED = 'task_assigned',
+  TASK_STATUS_UPDATE = 'task_status_update',
+  TAST_COMPLETED = 'task_completed',
+  TASK_OVERDUE = 'task_overdue',
+  EVENT_INVITED = 'event_invited',
+  EVENT_UPCOMING = 'event_upcoming',
+  EVENT_CANCELLED = 'event_cancelled',
+}
+
+export type NotificationType = NotificationTypes
 
 export type NotificationAction = {
   path: {
@@ -108,7 +110,6 @@ export const useNotificationStore = defineStore(
         const _notifications: NotificationItem[] = recipients
           .filter((r) => r !== sender)
           .map((r) => ({
-            id: v4(),
             recipient: r,
             type,
             sender,
