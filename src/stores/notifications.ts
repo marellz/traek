@@ -3,7 +3,8 @@ import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useAuthStore } from './auth'
 import { useErrorStore } from './errors'
 import { v4 } from 'uuid'
-import { useRouter } from 'vue-router'
+import { useNotificationsService, useNotificationBuilder } from '@/services/notifications'
+import { computed, ref } from 'vue'
 
 export type NotificationType =
   | 'project_member_added' // + _invited/_request
@@ -16,17 +17,19 @@ export type NotificationType =
   | 'event_cancelled'
 
 export type NotificationAction = {
-  path: string
+  path: {
+    name: string
+    params?: Record<string, string>
+  }
   label: string
 }
 
 export interface Notification {
   id: string
-  type: NotificationType
-  // related
-  related_project_id?: string | null
-  related_task_id?: string | null
-  related_event_id?: string | null
+  type: string
+  related_project_id: { id: string; name: string } | null
+  related_task_id: { id: string; title: string } | null
+  related_event_id: { id: string; title: string } | null
 
   sender: string
   recipient: string
@@ -34,141 +37,130 @@ export interface Notification {
 
   created_at: string
   read_at: string | null
+  actions: any
+}
+
+export interface NotificationForm {
+  id?: string
+  type: string
+  related_project_id: string | null
+  related_task_id: string | null
+  related_event_id: string | null
+
+  sender: string
+  recipient: string
+  message: string
+
+  created_at: string
+  read_at?: string | null
+  actions: any
+}
+
+export type NotificationItem = Omit<NotificationForm, 'actions' | 'type'> & {
+  type: NotificationType
   actions: NotificationAction[]
 }
 
-/*
-const useNotificationActions = (id: string) => {
-  'project_member_added'
-  'task_assigned'
-  'task_status_update'
-  'task_completed'
-  'task_overdue'
-  'event_invited'
-  'event_upcoming'
-  'event_cancelled'
-}
-*/
-
-const notificationBuilder = (type: NotificationType, id: string) => {
-  const router = useRouter()
-  let actions: NotificationAction[] = [],
-    message: string = ''
-  switch (type) {
-    case 'project_member_added':
-      actions = [
-        { label: 'View project', path: router.resolve({ name: 'project', params: { id } }).href },
-      ]
-      message = 'You have been assigned to <project> project'
-      break
-
-    case 'task_assigned':
-      actions = [
-        { label: 'View task', path: router.resolve({ name: 'task', params: { id } }).href },
-      ]
-      message = 'You have been assigned to task <task>'
-      break
-
-    case 'task_overdue':
-      actions = [
-        { label: 'View task', path: router.resolve({ name: 'task', params: { id } }).href },
-      ]
-      message = 'Task <task> is overdue'
-      break
-
-    case 'task_completed':
-      actions = [
-        { label: 'View task', path: router.resolve({ name: 'task', params: { id } }).href },
-      ]
-      message = 'Task <task> has been marked as completed'
-      break
-
-    case 'task_status_update':
-      actions = [
-        {
-          label: 'View task',
-          path: router.resolve({ name: 'task', params: { id } }).href,
-        },
-      ]
-      message = 'Task status updated from <before> to <current>'
-      break
-
-    case 'event_invited':
-      actions = [
-        {
-          label: 'View event',
-          path: router.resolve({ name: 'event', params: { id } }).href,
-        },
-      ]
-      message = "You've been invited to an event <event>"
-      break
-
-    case 'event_cancelled':
-      actions = [
-        {
-          label: 'View event',
-          path: router.resolve({ name: 'event', params: { id } }).href,
-        },
-      ]
-      message = 'Event <event> has been cancelled'
-
-      break
-
-    case 'event_upcoming':
-      actions = [
-        {
-          label: 'View event',
-          path: router.resolve({ name: 'event', params: { id } }).href,
-        },
-      ]
-      message = 'Event <event> is upcoming'
-      break
-
-    default:
-      actions = []
-      message = 'Unkown notification type'
-      break
-  }
-
-  return {
-    actions,
-    message,
-  }
+export enum NotificationLoading {
+  GETTING = 'getting-notification',
+  CREATING = 'creating-notification',
+  UPDATING = 'updating-notification',
 }
 
 export const useNotificationStore = defineStore(
   'notifications',
   () => {
-    const { isLoading /*begin, finish */ } = useLoadingState()
+    const { isLoading, begin, finish } = useLoadingState()
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
+    const service = useNotificationsService()
 
-    const createNotification = (type: NotificationType, id: string, recipient: string) => {
+    const notifications = ref<Notification[]>([])
+
+    const unreadNotifications = computed(() =>
+      notifications.value.filter((n) => n.read_at === null),
+    )
+
+    const get = async () => {
       auth.ensureAuth()
       try {
-        // const message = type
-        // const actions = actions
-        const { message, actions } = notificationBuilder(type, id)
-        const _notification: Notification = {
-          id: v4(),
-          recipient,
-          type,
-          sender: auth.userId!,
-          created_at: new Date().toISOString(),
-          read_at: null,
-          message,
-          actions,
+        begin(NotificationLoading.GETTING)
+        const { data, error } = await service.list(auth.userId!)
+        if (error) throw new Error(error.message)
+        if (data) {
+          notifications.value = data
+          return true
         }
+        return false
+      } catch (error) {
+        handleError('Getting notifications', error)
+      } finally {
+        finish(NotificationLoading.GETTING)
+      }
+    }
 
-        return _notification
+    const create = async (type: NotificationType, id: string, recipients: string[]) => {
+      auth.ensureAuth()
+      try {
+        finish(NotificationLoading.CREATING)
+        const _data = useNotificationBuilder(type, id)
+        const sender = auth.userId!
+        const _notifications: NotificationItem[] = recipients
+          .filter((r) => r !== sender)
+          .map((r) => ({
+            id: v4(),
+            recipient: r,
+            type,
+            sender,
+            created_at: new Date().toISOString(),
+            read_at: null,
+            ..._data,
+          }))
+
+        const { status, error } = await service.create(_notifications)
+        if (error) throw new Error(error.message)
+        return status === 201
       } catch (error) {
         handleError('Creating notification', error)
+      } finally {
+        finish(NotificationLoading.CREATING)
+      }
+    }
+
+    const markAsRead = async (id: string, read: boolean = true) => {
+      try {
+        begin(NotificationLoading.UPDATING)
+        const read_at = read ? new Date().toISOString() : null
+        const { status, error } = await service.update(id, {
+          read_at,
+        })
+
+        if (error) throw new Error(error.message)
+        if (status === 204) {
+          const _notifications = [...notifications.value]
+          const _n = _notifications.findIndex((n) => n.id === id)
+          if (_n !== -1) {
+            _notifications[_n].read_at = read_at
+            notifications.value = _notifications
+          }
+          return true
+        }
+
+        return
+      } catch (error) {
+        handleError('Updating notification', error)
+      } finally {
+        finish(NotificationLoading.UPDATING)
       }
     }
 
     return {
       isLoading,
-      createNotification,
+      get,
+      create,
+      notifications,
+      unreadNotifications,
+      markAsRead,
     }
   },
   {
