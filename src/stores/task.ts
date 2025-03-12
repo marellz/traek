@@ -134,6 +134,20 @@ export const useTaskStore = defineStore(
       }
     }
 
+    const updateStatus = async (id: string, status: TaskStatus) => {
+      try {
+        const { status: responseStatus, error } = await service.updateStatus(id, status)
+        if (error) throw new Error(error.message)
+        if (responseStatus === 204) {
+          return true
+        }
+
+        return false
+      } catch (error) {
+        handleError('Updating status', error)
+      }
+    }
+
     const destroy = async (id: string) => {
       auth.ensureAuth()
       try {
