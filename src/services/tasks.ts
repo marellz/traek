@@ -1,5 +1,5 @@
 import { supabase } from '@/database/supabase'
-import type { TaskForm } from '@/stores/task'
+import type { TaskForm, TaskStatus } from '@/stores/task'
 export type TasksListCriteria = 'project_id' | 'creator' | 'assigned'
 
 export const useTaskService = () => {
@@ -29,6 +29,10 @@ export const useTaskService = () => {
 
   const update = async (id: string, form: TaskForm) => {
     return await supabase.from('tasks').update(form).eq('id', id)
+  }
+
+  const updateStatus = async (id: string, status: TaskStatus) => {
+    return await supabase.from('tasks').update({ status }).eq('id', id)
   }
 
   const destroy = async (id: string) => {
@@ -70,6 +74,7 @@ export const useTaskService = () => {
     getProjectTasks,
     get,
     update,
+    updateStatus,
     destroy,
 
     //

@@ -26,7 +26,7 @@ export interface Task {
   title: string
   description: string | null
   priority: string
-  status: string
+  status: TaskStatus
   created_by: string
   created_at: string
   due_date?: string | null
