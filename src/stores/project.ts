@@ -4,6 +4,7 @@ import { useErrorStore } from './errors'
 import { ref } from 'vue'
 import { useAuthStore, type UserProfile } from '@/stores/auth'
 import { useLoadingState } from '@/composables/useLoading'
+import { NotificationTypes, useNotificationStore } from './notifications'
 
 export type Project = {
   id: string
@@ -66,6 +67,7 @@ export const useProjectStore = defineStore(
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
     const { begin, finish, isLoading } = useLoadingState()
+    const notify = useNotificationStore()
 
     const ensureAuth = (user_id?: string) => {
       if (!(auth.user && (user_id ? auth.user.id !== user_id : true))) {
@@ -211,7 +213,11 @@ export const useProjectStore = defineStore(
         const payload = members.map((user_id) => ({ user_id, project_id: project }))
         const { status, error } = await service.addMembers(payload)
         if (error) throw new Error(error.message)
-        return status === 201
+        if(status === 201){
+          notifyMemberAddition(project, members)
+          return true
+        }
+        return false
       } catch (error) {
         handleError('Adding member to project', error)
       } finally {
@@ -243,6 +249,14 @@ export const useProjectStore = defineStore(
       } finally {
         finish(ProjectLoading.REMOVING_MEMBER)
       }
+    }
+
+    /**
+     * NOTIFICATIONS
+     */
+
+    const notifyMemberAddition = (project: string, users: string[] = []) => {
+      notify.create(NotificationTypes.PROJECT_MEMBER_ADDED, project, users)
     }
 
     return {

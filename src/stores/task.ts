@@ -3,6 +3,7 @@ import { useErrorStore } from './errors'
 import { useTaskService } from '@/services/tasks'
 import { useLoadingState } from '@/composables/useLoading'
 import { useAuthStore, type UserProfile } from './auth'
+import { NotificationTypes, useNotificationStore } from './notifications'
 
 export enum TaskLoading {
   CREATING = 'creating-task',
@@ -66,6 +67,7 @@ export const useTaskStore = defineStore(
     const { handleError } = useErrorStore()
     const { begin, finish, isLoading } = useLoadingState()
     const auth = useAuthStore()
+    const notificationStore = useNotificationStore()
 
     const list = async (project: string) => {
       begin(TaskLoading.GETTING_ALL)
@@ -139,6 +141,11 @@ export const useTaskStore = defineStore(
         const { status: responseStatus, error } = await service.updateStatus(id, status)
         if (error) throw new Error(error.message)
         if (responseStatus === 204) {
+          if (status === 'completed') {
+            notifyComplete(id)
+          } else {
+            notifyStatusUpdate(id)
+          }
           return true
         }
 
@@ -173,7 +180,11 @@ export const useTaskStore = defineStore(
         const payload = assignees.map((user_id) => ({ task_id: task, user_id }))
         const { status, error } = await service.addAssignees(payload)
         if (error) throw new Error(error.message)
-        return status === 204
+        if (status === 201) {
+          notifyAssignees(assignees, task)
+          return true
+        }
+        return true
       } catch (error) {
         handleError('Adding assignee', error)
       } finally {
@@ -226,12 +237,46 @@ export const useTaskStore = defineStore(
       }
     }
 
+    /**
+     * NOTIFICATIONS
+     */
+
+    const notifyAssignees = (users: string[] = [], task: string) => {
+      notificationStore.create(NotificationTypes.TASK_ASSIGNED, task, users)
+    }
+
+    const notifyStatusUpdate = async (task: string) => {
+      const _users = await getAssignees(task)
+      if (_users) {
+        const users = _users.map((u) => u.user_id)
+        notificationStore.create(NotificationTypes.TASK_STATUS_UPDATE, task, users)
+      }
+    }
+
+    const notifyComplete = async (task: string) => {
+      const _users = await getAssignees(task)
+      if (_users) {
+        const users = _users.map((u) => u.user_id)
+        notificationStore.create(NotificationTypes.TAST_COMPLETED, task, users)
+      }
+    }
+
+    // todo: to be used later as hook
+    const notifyOverdue = async (task: string) => {
+      const _users = await getAssignees(task)
+      if (_users) {
+        const users = _users.map((u) => u.user_id)
+        notificationStore.create(NotificationTypes.TASK_OVERDUE, task, users)
+      }
+    }
+
     return {
       // tasks,
       list,
       get,
       create,
       update,
+      updateStatus,
       destroy,
       isLoading,
 
@@ -242,6 +287,9 @@ export const useTaskStore = defineStore(
 
       //info
       getTaskInfo,
+
+      // notifications
+      notifyOverdue,
     }
   },
   {
