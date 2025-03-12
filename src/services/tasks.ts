@@ -12,7 +12,11 @@ export const useTaskService = () => {
   }
 
   const getProjectTasks = async (project: string) => {
-    return await supabase.from('tasks').select('*').eq('project_id', project)
+    return await supabase
+      .from('tasks')
+      .select('*')
+      .eq('project_id', project)
+      .order('due_date', { ascending: false })
   }
 
   const create = async (form: TaskForm) => {
