@@ -53,7 +53,7 @@ export const useNotificationBuilder = (type: NotificationType, id: string) => {
           path: { name: 'task', params: { id } },
         },
       ]
-      data.message = 'Task status updated from <before> to <current>'
+      data.message = 'Task status updated to <status>'
       data.related_task_id = id
       break
 
