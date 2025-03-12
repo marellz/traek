@@ -191,6 +191,84 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          actions: Json[]
+          created_at: string
+          id: string
+          message: string
+          read_at: string | null
+          recipient: string
+          related_event_id: string | null
+          related_project_id: string | null
+          related_task_id: string | null
+          sender: string
+          type: string
+        }
+        Insert: {
+          actions: Json[]
+          created_at?: string
+          id?: string
+          message: string
+          read_at?: string | null
+          recipient: string
+          related_event_id?: string | null
+          related_project_id?: string | null
+          related_task_id?: string | null
+          sender: string
+          type: string
+        }
+        Update: {
+          actions?: Json[]
+          created_at?: string
+          id?: string
+          message?: string
+          read_at?: string | null
+          recipient?: string
+          related_event_id?: string | null
+          related_project_id?: string | null
+          related_task_id?: string | null
+          sender?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_recipient_fkey"
+            columns: ["recipient"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_related_event_id_fkey"
+            columns: ["related_event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_related_project_id_fkey"
+            columns: ["related_project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_related_task_id_fkey"
+            columns: ["related_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_sender_fkey"
+            columns: ["sender"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_members: {
         Row: {
           created_at: string
