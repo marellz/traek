@@ -1,5 +1,5 @@
 import { supabase } from '@/database/supabase'
-import type { ProjectEventForm } from '@/stores/event'
+import type { EventCancelPayload, ProjectEventForm } from '@/stores/event'
 
 export const useEventService = () => {
   const list = async (project: string) => {
@@ -23,8 +23,8 @@ export const useEventService = () => {
     return await supabase.from('events').delete().eq('id', id)
   }
 
-  const cancelEvent = async (event: ProjectEventForm) => {
-    return await supabase.from('events').upsert(event)
+  const cancelEvent = async (id: string, payload: EventCancelPayload) => {
+    return await supabase.from('events').update(payload).eq('id', id)
   }
 
   /**
@@ -40,7 +40,7 @@ export const useEventService = () => {
    */
 
   const addInvitees = async (payload: { user_id: string; event_id: string }[]) => {
-    return await supabase.from('event_invitees').insert(payload).select()
+    return await supabase.from('event_invitees').insert(payload)
   }
 
   const getInvitees = async (event_id: string) => {

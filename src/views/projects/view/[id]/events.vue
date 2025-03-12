@@ -11,16 +11,10 @@
       <div class="mb-4">
         <form-checkbox v-model="showCancelled" label="Show cancelled"></form-checkbox>
       </div>
-      <event-item
-        v-for="item in filteredEvents"
-        :key="item.id"
-        :item
-        @cancel-event="cancelEvent"
-        @edit-event="editEvent"
-        :cancelling="loading.cancelling && cancelId === item.id"
-      ></event-item>
+      <event-item v-for="item in filteredEvents" :key="item.id" :item @cancel-event="cancelEvent"
+        @edit-event="editEvent" :cancelling="loading.cancelling && cancelId === item.id"></event-item>
     </div>
-    <Empty class="mt-10" text="No events created in the project" v-else/>
+    <Empty class="mt-10" text="No events created in the project" v-else />
     <base-modal :title="edit ? 'Update event' : 'Create event'" v-model:show="showEventFormModal">
       <event-form :project-id="id" :edit @submit="handleSubmit"></event-form>
     </base-modal>
@@ -39,6 +33,11 @@ import {
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Empty from '@/components/common/empty.vue'
+
+interface EventFormPayload {
+  form: ProjectEventForm
+  invitees: string[]
+}
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)
@@ -63,10 +62,6 @@ const getEvents = async () => {
   if (_events) {
     events.value = _events
   }
-}
-interface EventFormPayload {
-  form: ProjectEventForm
-  invitees: string[]
 }
 
 const handleSubmit = (payload: EventFormPayload) => {
@@ -106,19 +101,9 @@ const createEvent = async ({ form, invitees = [] }: EventFormPayload) => {
 }
 
 const cancelEvent = async (id: string) => {
-  const _event = events.value.find((e) => e.id === id)
-  if (!_event) {
-    return
-  }
-
   cancelId.value = id
-  // reset creator
-  const payload = {
-    ..._event,
-    created_by: _event.created_by.id,
-  }
 
-  const success = await eventStore.cancelEvent(payload)
+  const success = await eventStore.cancelEvent(id)
   if (success) {
     cancelId.value = null
     getEvents()
