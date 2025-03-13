@@ -1,5 +1,5 @@
 import { supabase } from '@/database/supabase'
-import type { TaskForm, TaskStatus } from '@/stores/task'
+import type { TaskForm, TaskStatusForm } from '@/stores/task'
 export type TasksListCriteria = 'project_id' | 'creator' | 'assigned'
 
 export const useTaskService = () => {
@@ -7,16 +7,16 @@ export const useTaskService = () => {
     return await supabase.from('tasks').select('*').eq('created_by', user)
   }
 
-  const getUserTasks = async (user: string) => {
-    return await supabase.from('task_assignees').select('*').eq('user_id', user)
-  }
-
   const getProjectTasks = async (project: string) => {
     return await supabase
       .from('tasks')
-      .select('*')
+      .select(
+        `*,
+        created_by: users (id, name, email, username, avatar_url),
+        task_assignees(...users(id, name, email, username, avatar_url))`,
+      )
       .eq('project_id', project)
-      .order('due_date', { ascending: false })
+      .order('due_date', { ascending: true })
   }
 
   const create = async (form: TaskForm) => {
@@ -24,32 +24,26 @@ export const useTaskService = () => {
   }
 
   const get = async (id: string) => {
-    return await supabase.from('tasks').select().eq('id', id)
+    return await supabase
+      .from('tasks')
+      .select(
+        `*,
+        created_by: users (id, name, email, username, avatar_url),
+        task_assignees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('id', id)
   }
 
   const update = async (id: string, form: TaskForm) => {
     return await supabase.from('tasks').update(form).eq('id', id)
   }
 
-  const updateStatus = async (id: string, status: TaskStatus) => {
-    return await supabase.from('tasks').update({ status }).eq('id', id)
+  const updateStatus = async (id: string, payload: TaskStatusForm) => {
+    return await supabase.from('tasks').update(payload).eq('id', id)
   }
 
   const destroy = async (id: string) => {
     return await supabase.from('tasks').delete().eq('id', id)
-  }
-
-  /**
-   * INFO
-   */
-  const getTaskInfo = async (id: string) => {
-    return await supabase
-      .from('tasks')
-      .select(
-        `created_by: users (id, name, email, username, avatar_url),
-        task_assignees(...users(id, name, email, username, avatar_url))`,
-      )
-      .eq('id', id)
   }
 
   /**
@@ -78,14 +72,8 @@ export const useTaskService = () => {
     destroy,
 
     //
-    getUserTasks,
-
-    //
     getAssignees,
     addAssignees,
     removeAssignee,
-
-    //
-    getTaskInfo,
   }
 }

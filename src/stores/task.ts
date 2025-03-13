@@ -2,7 +2,7 @@ import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import { useTaskService } from '@/services/tasks'
 import { useLoadingState } from '@/composables/useLoading'
-import { useAuthStore, type UserProfile } from './auth'
+import { useAuthStore } from './auth'
 import { NotificationTypes, useNotificationStore } from './notifications'
 
 export enum TaskLoading {
@@ -17,9 +17,17 @@ export enum TaskLoading {
   GETTING_ASSIGNEES = 'getting-assignees',
 }
 
-export type TaskStatus = 'pending' | 'in_progress' | 'completed'
+export type TaskStatus = 'pending' | 'in_progress' | 'completed' | string
 
 export type TaskPriority = 'high' | 'medium' | 'low'
+
+export type TaskUser = {
+  id: string
+  name: string | null
+  email: string
+  username: string | null
+  avatar_url: string | null
+}
 
 export interface Task {
   id: string
@@ -28,13 +36,14 @@ export interface Task {
   description: string | null
   priority: string
   status: TaskStatus
-  created_by: string
+  created_by: TaskUser
   created_at: string
   due_date?: string | null
   end_date?: string | null
   start_date?: string | null
   updated_at?: string | null
   closed_at?: string | null
+  task_assignees: TaskUser[]
 }
 
 export interface TaskForm {
@@ -53,11 +62,15 @@ export interface TaskForm {
   closed_at?: string
 }
 
-export type TaskUser = Pick<UserProfile, 'id' | 'name' | 'username' | 'email' | 'avatar_url'>
-
 export interface TaskInfo {
   created_by: TaskUser
   task_assignees: TaskUser[]
+}
+
+export interface TaskStatusForm {
+  status: TaskStatus
+  end_date?: string | null
+  start_date?: string | null
 }
 
 export const useTaskStore = defineStore(
@@ -122,9 +135,14 @@ export const useTaskStore = defineStore(
 
     const update = async (id: string, form: TaskForm) => {
       auth.ensureAuth()
+      const payload = {
+        ...form,
+        created_by: form.created_by,
+        task_assignees: undefined,
+      }
       try {
         begin(TaskLoading.UPDATING)
-        const { status, error } = await service.update(id, form)
+        const { status, error } = await service.update(id, payload)
 
         if (error) throw new Error(error.message)
 
@@ -138,7 +156,26 @@ export const useTaskStore = defineStore(
 
     const updateStatus = async (id: string, status: TaskStatus) => {
       try {
-        const { status: responseStatus, error } = await service.updateStatus(id, status)
+        const payload: TaskStatusForm = {
+          status,
+        }
+
+        const now = new Date().toISOString()
+
+        if (status === 'completed') {
+          payload.end_date = now
+        }
+
+        if (status === 'in_progress') {
+          payload.start_date = now
+          payload.end_date = null
+        } else {
+          // pending
+          payload.start_date = null
+          payload.end_date = null
+        }
+
+        const { status: responseStatus, error } = await service.updateStatus(id, payload)
         if (error) throw new Error(error.message)
         if (responseStatus === 204) {
           if (status === 'completed') {
@@ -146,7 +183,7 @@ export const useTaskStore = defineStore(
           } else {
             notifyStatusUpdate(id)
           }
-          return true
+          return payload
         }
 
         return false
@@ -220,24 +257,6 @@ export const useTaskStore = defineStore(
     }
 
     /**
-     * INFO
-     */
-
-    const getTaskInfo = async (task: string) => {
-      try {
-        begin(TaskLoading.GETTING_INFO)
-        const { data, error } = await service.getTaskInfo(task)
-        if (error) throw new Error(error.message)
-        if (data) return data[0]
-        return null
-      } catch (error) {
-        handleError('Getting task info', error)
-      } finally {
-        finish(TaskLoading.GETTING_INFO)
-      }
-    }
-
-    /**
      * NOTIFICATIONS
      */
 
@@ -284,9 +303,6 @@ export const useTaskStore = defineStore(
       addAssignees,
       getAssignees,
       removeAssignee,
-
-      //info
-      getTaskInfo,
 
       // notifications
       notifyOverdue,
