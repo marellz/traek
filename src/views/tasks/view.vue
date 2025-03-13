@@ -3,15 +3,17 @@
 
     <base-loader v-if="loading.getting"></base-loader>
     <template v-else-if="task">
-      <base-link v-if="task" :to="{
-        name: 'project-tasks',
-        params: { id: task.project_id }
-      }">
-        <ArrowLeft :size="20" />
-        <span>Back to tasks</span>
-      </base-link>
+      <div class="mt-6">
+        <base-link v-if="task" :to="{
+          name: 'project-tasks',
+          params: { id: task.project_id }
+        }">
+          <ArrowLeft :size="20" />
+          <span>Project tasks</span>
+        </base-link>
+      </div>
 
-      <div class="space-y-4 mt-10">
+      <div class="space-y-4 mt-6">
         <div class="flex items-center space-x-2">
           <h1 class="font-bold text-4xl">{{ task.title }}</h1>
           <div v-if="isOverdue" class="text-red-500 bg-red-100 rounded-lg p-2 flex items-center space-x-2">
@@ -41,7 +43,7 @@
               Due on {{ parseDate(task.due_date) }}
             </p>
           </div>
-          <div class="ml-auto flex items-center space-x-2">
+          <div v-if="task.created_by.id === auth.userId" class="ml-auto flex items-center space-x-2">
             <task-status-switch v-model="task.status" @switch="updateTaskStatus"></task-status-switch>
             <base-action class="!border-amber-600 !text-amber-600" @click="editTask">
               <span>
@@ -65,7 +67,7 @@
           <p class="font-medium text-sm text-slate-500">Created by</p>
           <div class="flex space-x-2 items-center">
             <span class="font-medium">
-              {{ task.created_by.name }}  {{ task.created_by.id === auth.userId ? `(you)` : '' }}
+              {{ task.created_by.name }} {{ task.created_by.id === auth.userId ? `(you)` : '' }}
             </span>
             <span>/</span>
             <span class="flex items-center space-x-1 text-slate-600">
@@ -75,15 +77,18 @@
         </div>
         <div>
           <p class="font-medium text-sm text-slate-500">Assigned to</p>
-          <div v-for="user in task.task_assignees" :key="user.id" class="flex space-x-2 items-center">
-            <span class="font-medium">
-              {{ user.name }}  {{ user.id === auth.userId ? `(you)` : '' }}
-            </span>
-            <span>/</span>
-            <span class="flex items-center space-x-1 text-slate-600">
-              <Mail :size="16" /> <span>{{ user.email }}</span>
-            </span>
-          </div>
+          <p v-if="!task.task_assignees.length" class="italic">No assignees</p>
+          <template v-else>
+            <div v-for="user in task.task_assignees" :key="user.id" class="flex space-x-2 items-center">
+              <span class="font-medium">
+                {{ user.name }} {{ user.id === auth.userId ? `(you)` : '' }}
+              </span>
+              <span>/</span>
+              <span class="flex items-center space-x-1 text-slate-600">
+                <Mail :size="16" /> <span>{{ user.email }}</span>
+              </span>
+            </div>
+          </template>
         </div>
       </div>
     </template>
