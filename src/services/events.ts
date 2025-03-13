@@ -4,11 +4,26 @@ import type { EventCancelPayload, ProjectEventForm } from '@/stores/event'
 export const useEventService = () => {
   const list = async (project: string) => {
     // event
-    return await supabase.from('events').select('*, created_by(*)').eq('project_id', project).order('datetime', {ascending: true})
+    return await supabase
+      .from('events')
+      .select(
+        `*,
+        created_by(id, name, email, username, avatar_url),
+        event_invitees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('project_id', project)
+      .order('datetime', { ascending: true })
   }
 
   const getEvent = async (id: string) => {
-    return await supabase.from('events').select('*, created_by(*)').eq('id', id)
+    return await supabase
+      .from('events')
+      .select(
+        `*,
+        created_by(id, name, email, username, avatar_url),
+        event_invitees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('id', id)
   }
 
   const create = async (form: ProjectEventForm) => {

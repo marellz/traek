@@ -13,6 +13,14 @@ export const eventTypes: Record<EventTypes, string> = {
   // meeting: "Meeting",
   physical: 'Physical meeting',
   event: 'Day event',
+
+}
+
+export const eventStatusColors: Record<EventStatus, string> = {
+  upcoming: 'text-slate-800', //bg-blue-100 text-blue-500
+  in_progress: 'bg-green-100 border-green-500',
+  past: 'bg-slate-100 text-slate-700',
+  cancelled: 'bg-slate-100 text-slate-700',
 }
 
 export const eventDurations: Record<string, number> = {

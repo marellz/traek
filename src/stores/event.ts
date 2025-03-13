@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useAuthStore, type UserProfile } from './auth'
+import { useAuthStore } from './auth'
 import { useErrorStore } from './errors'
 import { useEventService } from '@/services/events'
 import { useLoadingState } from '@/composables/useLoading'
@@ -21,6 +21,11 @@ export enum EventLoading {
   ADDING_INVITEES = 'adding-invitees',
   DELETING_INVITEE = 'deleting-invitee',
   GETTING_USER = 'getting-user-events',
+}
+
+export interface EventFormPayload {
+  form: ProjectEventForm
+  invitees: string[]
 }
 
 export const useEventStore = defineStore(
@@ -90,7 +95,11 @@ export const useEventStore = defineStore(
       auth.ensureAuth()
       try {
         begin(EventLoading.UPDATING)
-        const { status, error } = await service.update(id, form)
+        const payload = {
+          ...form,
+          updated_at: new Date().toISOString()
+        }
+        const { status, error } = await service.update(id, payload)
         if (error) throw new Error(error.message)
 
         return status === 204
@@ -101,11 +110,10 @@ export const useEventStore = defineStore(
       }
     }
 
-
     const cancelEvent = async (id: string) => {
       try {
         begin(EventLoading.CANCELLING)
-        const payload : EventCancelPayload = {
+        const payload: EventCancelPayload = {
           cancelled_at: new Date().toISOString(),
           status: 'cancelled',
         }
@@ -114,9 +122,9 @@ export const useEventStore = defineStore(
         if (error) throw new Error(error.message)
         if (status === 204) {
           notifyCancellation(id)
-          return true
+          return payload
         }
-        return false
+        return null
       } catch (error) {
         handleError('Cancelling event', error)
       } finally {
@@ -260,7 +268,7 @@ export const useEventStore = defineStore(
       isLoading,
 
       // notifications
-      notifyUpcoming
+      notifyUpcoming,
     }
   },
   {
@@ -272,13 +280,21 @@ if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useEventStore, import.meta.hot))
 }
 
+export interface EventUser {
+  id: string
+  email: string
+  name: string | null
+  username: string | null
+  avatar_url: string | null
+}
+
 export interface ProjectEvent {
   id: string
   project_id: string
   title: string
   description: string | null
   created_at: string
-  created_by: UserProfile
+  created_by: EventUser
   url: string | null
   venue: string | null
   event_type: string
@@ -287,6 +303,7 @@ export interface ProjectEvent {
   duration_hours: number | null
   updated_at: string | null
   cancelled_at: string | null
+  event_invitees: EventUser[]
 }
 
 export interface ProjectEventForm {
