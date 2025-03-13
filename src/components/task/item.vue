@@ -1,86 +1,90 @@
 <template>
-  <div class="rounded-lg border border-slate-300 p-4">
-    <!-- header -->
+  <router-link :to="{ name: 'task', params: { id: task.id } }">
+    <div class="rounded-lg border border-slate-300 p-4" :class="{ '!border-red-500 bg-red-50': isOverdue }">
+      <!-- header -->
 
-    <div class="flex">
-      <div class="flex-auto">
-        <div class="flex items-center space-x-2">
-          <h1 class="font-medium">
-            {{ task.title }}
+      <div class="flex space-x-3">
+        <div v-if="dueDate.length" class="rounded-lg bg-primary/20 p-3 self-start text-center">
+          <h1 class="text-4xl font-bold">
+            {{ dueDate[0] }}
           </h1>
-          <span> | </span>
-          <span class="text-sm">{{ TaskPriorityLabels[task.priority as TaskPriority] }}</span>
-          <span> | </span>
-          <span class="text-sm">{{ TaskStatusLabels[task.status as TaskStatus] }}</span>
+          <p>
+            {{ dueDate[1] }}
+          </p>
         </div>
-        <p v-if="task.description" class="text-sm text-slate-600">{{ task.description }}</p>
-      </div>
-      <div class="ml-auto flex items-center space-x-2">
-        <button
-          type="button"
-          class="rounded border border-slate-300 px-4 py-1 font-medium hover:border-black"
-          @click="toggleShowMore"
-        >
-          <span v-if="isShowingMore">Hide</span>
-          <span v-else>More</span>
-        </button>
-        <button
-          type="button"
-          class="rounded border border-slate-300 px-4 py-1 font-medium hover:border-black"
-          @click="editTask"
-        >
-          <span>Edit</span>
-        </button>
-        <button
-          type="button"
-          class="rounded border border-slate-300 px-4 py-1 font-medium hover:border-black"
-          @click="deleteTask"
-        >
-          <span>Delete</span>
-        </button>
-      </div>
-    </div>
-
-    <template v-if="isShowingMore && info">
-      <div>
-        <div class="mt-4 flex space-x-4 border-t border-t-slate-300 py-4">
-          <div>
-            <h1 class="text-sm font-medium">Created by</h1>
-            <p>{{ info.created_by.name }}</p>
-          </div>
-          <span class="border-l border-slate-300"></span>
-          <div>
-            <h1 class="text-sm font-medium">Assigned to</h1>
+        <div class="flex-auto space-y-1.5">
+          <div class="flex items-center space-x-2">
+            <h1 class="font-medium text-xl">
+              {{ task.title }}
+            </h1>
+            <span>|</span>
             <div>
-              <template v-if="info.task_assignees.length">
-                <p v-for="user in info.task_assignees" :key="user.id">
-                  {{ user.name ?? user.email }}
-                </p>
+              <span>
+                {{ TaskPriorityLabels[task.priority as TaskPriority] }}
+              </span>
+            </div>
+            <div class="ml-auto flex items-center space-x-2">
+              <template v-if="isOverdue">
+                <span class="bg-red-500 text-white rounded-full px-2 text-sm font-medium py-0.5">Overdue</span>
               </template>
-              <p v-else class="italic">No assignees</p>
+              <base-tag :variant="`task.${task.status}`">
+                <span>
+                  {{ TaskStatusLabels[task.status as TaskStatus] }}
+                </span>
+              </base-tag>
+
+              <dropdown trigger-class="!border-transparent p-1 hover:bg-slate-200 rounded">
+                <template #trigger>
+                  <span>
+                    <EllipsisVertical :size="16" />
+                  </span>
+                </template>
+                <dropdown-item @click="editTask">Edit task</dropdown-item>
+                <dropdown-item @click="deleteTask">Delete task</dropdown-item>
+              </dropdown>
             </div>
           </div>
+          <p v-if="task.description" class="text-sm text-slate-600">{{ task.description }}</p>
+          <div>
+            <span class="inline-flex items-center space-x-1">
+              <User2 :size="20" :stroke-width="1.5" />
+              <span class="text-sm">{{ task.task_assignees.length }} assignee{{ task.task_assignees.length !== 1 ? 's' :
+                '' }}</span>
+            </span>
+          </div>
         </div>
       </div>
-    </template>
-  </div>
+    </div>
+  </router-link>
 </template>
 <script lang="ts" setup>
 import {
-  useTaskStore,
   type Task,
-  type TaskInfo,
   type TaskPriority,
   type TaskStatus,
 } from '@/stores/task'
 import { TaskPriorityLabels, TaskStatusLabels } from '@/data/task-data'
-import { ref } from 'vue'
+import { computed } from 'vue'
+import moment from 'moment';
+import { EllipsisVertical, User2 } from 'lucide-vue-next';
 
 const props = defineProps<{
   task: Task
 }>()
 
 const emit = defineEmits(['delete-task', 'edit-task'])
+
+const dueDate = computed(() => {
+  if (!props.task.due_date) return []
+  return moment(props.task.due_date).format('DD MMM').split(' ')
+})
+
+const isComplete = computed(() => props.task.status === 'completed')
+
+const isOverdue = computed(() => {
+  if (!props.task.due_date) return false
+  return moment(props.task.due_date).isBefore(moment(), 'date') && !isComplete.value
+})
 
 const deleteTask = () => {
   emit('delete-task', props.task.id)
@@ -90,22 +94,4 @@ const editTask = () => {
   emit('edit-task', props.task.id)
 }
 
-const isShowingMore = ref(false)
-const taskStore = useTaskStore()
-const info = ref<TaskInfo>()
-const toggleShowMore = () => {
-  if (isShowingMore.value) {
-    isShowingMore.value = false
-  } else {
-    showMore()
-  }
-}
-
-const showMore = async () => {
-  const _t = await taskStore.getTaskInfo(props.task.id)
-  if (_t) {
-    isShowingMore.value = true
-    info.value = _t
-  }
-}
 </script>

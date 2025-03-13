@@ -140,6 +140,20 @@ const router = createRouter({
     /**
      *
      *
+     * TASK
+     *
+     *
+     */
+
+    {
+      path: "/tasks/:id",
+      name: "task",
+      component: () => import('@/views/tasks/view.vue')
+    },
+
+    /**
+     *
+     *
      * USER PROFILE/SETTING ROUTES
      *
      *
