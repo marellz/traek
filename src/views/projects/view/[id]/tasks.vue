@@ -13,8 +13,8 @@
           </base-button>
         </router-link>
         <base-button variant="secondary-outline" @click="getTasks" :disabled="loading.gettingTasks">
-          <span>Refresh</span></base-button>
-
+          <span>Refresh</span>
+        </base-button>
       </div>
     </div>
     <base-loader class="py-20" v-if="loading.gettingTasks"></base-loader>

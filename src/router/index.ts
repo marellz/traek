@@ -146,9 +146,19 @@ const router = createRouter({
      */
 
     {
-      path: "/tasks/:id",
+      path: "/tasks/view/:id",
       name: "task",
       component: () => import('@/views/tasks/view.vue')
+    },
+    {
+      path: "/tasks/edit/:id",
+      name: 'edit-task',
+      component: () => import('@/views/tasks/form.vue')
+    },
+    {
+      path: "/tasks/new/:project",
+      name: 'create-task',
+      component: () => import('@/views/tasks/form.vue')
     },
 
     /**
