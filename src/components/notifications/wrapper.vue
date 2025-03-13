@@ -34,9 +34,10 @@ import NotificationItem from '@/components/notifications/item.vue'
 import { Bell } from 'lucide-vue-next';
 import { onClickOutside } from '@vueuse/core';
 import { NotificationLoading, useNotificationStore, type NotificationAction } from '@/stores/notifications';
-import moment from 'moment';
 import { useRouter } from 'vue-router';
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar';
+import moment from 'moment';
+import 'vue3-perfect-scrollbar/style.css'
 
 const showNotifications = ref(false)
 const notificationStore = useNotificationStore()
