@@ -18,7 +18,7 @@
       </div>
     </div>
     <base-loader class="py-20" v-if="loading.gettingTasks"></base-loader>
-    <template v-else>
+    <template v-else-if="tasks.length">
       <div></div>
       <ul class="mt-10 space-y-2">
         <li v-for="task in tasks" :key="task.id">
@@ -26,9 +26,11 @@
         </li>
       </ul>
     </template>
+    <Empty v-else class="mt-10"></Empty>
   </div>
 </template>
 <script lang="ts" setup>
+import Empty from '@/components/common/empty.vue'
 import TaskItem from '@/components/task/item.vue'
 import { useTaskStore, type Task } from '@/stores/task'
 import { computed, onMounted, ref } from 'vue'
