@@ -164,6 +164,29 @@ const router = createRouter({
     /**
      *
      *
+     * EVENT
+     *
+     *
+     */
+    {
+      path: "/event/view/:id",
+      name: "event",
+      component: () => import('@/views/events/view.vue')
+    },
+    {
+      path: "/event/edit/:id",
+      name: "edit-event",
+      component: () => import('@/views/events/form.vue')
+    },
+    {
+      path: "/event/creater/:project",
+      name: "create-event",
+      component: () => import('@/views/events/form.vue')
+    },
+
+    /**
+     *
+     *
      * USER PROFILE/SETTING ROUTES
      *
      *
