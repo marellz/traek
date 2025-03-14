@@ -15,9 +15,20 @@ export enum TaskLoading {
   ADDING_ASSIGNEES = 'adding-assignees',
   REMOVING_ASSIGNEE = 'removing assignee',
   GETTING_ASSIGNEES = 'getting-assignees',
+
+export enum TaskStatusEnum {
+  COMPLETED = 'completed',
+  IN_PROGRESS = 'in_progress',
+  PENDING = 'pending',
 }
 
-export type TaskStatus = 'pending' | 'in_progress' | 'completed' | string
+export enum TaskPriorityEnum {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+}
+
+export type TaskStatus = `${TaskStatusEnum}` | string
 
 export type TaskPriority = 'high' | 'medium' | 'low'
 
@@ -162,17 +173,21 @@ export const useTaskStore = defineStore(
 
         const now = new Date().toISOString()
 
-        if (status === 'completed') {
-          payload.end_date = now
-        }
+        switch (status) {
 
-        if (status === 'in_progress') {
-          payload.start_date = now
-          payload.end_date = null
-        } else {
-          // pending
-          payload.start_date = null
-          payload.end_date = null
+          case TaskStatusEnum.COMPLETED:
+            payload.end_date = now
+            break
+
+          case TaskStatusEnum.IN_PROGRESS:
+            payload.start_date = now
+            payload.end_date = null
+            break
+
+          default:
+            payload.start_date = null
+            payload.end_date = null
+            break
         }
 
         const { status: responseStatus, error } = await service.updateStatus(id, payload)
