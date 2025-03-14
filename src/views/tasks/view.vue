@@ -14,24 +14,24 @@
       </div>
 
       <div class="space-y-4 mt-6">
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-4">
           <h1 class="font-bold text-4xl">{{ task.title }}</h1>
-          <div v-if="isOverdue" class="text-red-500 bg-red-100 rounded-lg p-2 flex items-center space-x-2">
+          <span v-if="isOverdue" class="text-red-500 bg-red-500/10 rounded-lg px-2 py-1 flex items-center space-x-2">
             <p class="font-medium">Overdue</p>
             <AlertCircle />
-          </div>
+          </span>
         </div>
         <div class="flex space-x-2 items-center">
-          <p class="inline-block px-2 py-1 rounded-lg font-medium"
+          <p class="inline-block px-2 py-0.5 rounded-full font-medium dark:bg-slate-800 text-sm"
             :class="TaskPriorityColors[task.priority as TaskPriority]">
             {{ TaskPriorityLabels[task.priority as TaskPriority] }}
           </p>
-          <base-tag>{{ TaskStatusLabels[task.status] }}</base-tag>
+          <base-tag :class="TaskStatusColors[task.status]">{{ TaskStatusLabels[task.status] }}</base-tag>
         </div>
         <div class="flex space-x-3 p-4 border rounded-xl border-slate-200">
           <Calendar :size="24" :stroke-width="1.5"></Calendar>
-          <div class="space-y-1">
-            <p class="text-sm text-slate-500">
+          <div class="space-y-1 text-sm text-slate-500">
+            <p>
               {{ task.updated_at ? 'Updated at' : 'Created on' }} {{ parseDate(task.updated_at ?? task.created_at) }}
             </p>
             <template v-if="task.start_date">
@@ -103,7 +103,7 @@ import moment from 'moment';
 import { computed, onMounted, ref, watch } from 'vue';
 import { Mail } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router';
-import { TaskPriorityColors, TaskPriorityLabels, TaskStatusLabels } from '@/data/task-data';
+import { TaskPriorityColors, TaskPriorityLabels, TaskStatusColors, TaskStatusLabels } from '@/data/task-data';
 import TaskStatusSwitch from '@/components/task/status-switch.vue'
 
 const route = useRoute()
@@ -134,7 +134,7 @@ const isOverdue = computed(() => {
 })
 
 const parseDate = (date: string) => {
-  return moment(date).format('Mo MMM YYYY, h:mm A')
+  return moment(date).format('Do MMM YYYY, h:mm A')
 }
 
 const editTask = async () => {
