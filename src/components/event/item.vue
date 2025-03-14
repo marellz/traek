@@ -1,8 +1,8 @@
 <template>
   <router-link :to="{ name: 'event', params: { id: item.id } }" class="block">
-    <div class="rounded-xl border border-slate-300 hover:bg-slate-100 p-4" ref="card" :class="[eventStatusColors[item.status as EventStatus]]">
+    <div class="rounded-xl border border-slate-300 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/50 p-4" ref="card">
       <div class="flex space-x-3">
-        <div class="rounded-lg bg-primary/20 py-2 px-4 self-start" :class="{ 'bg-slate-800/10': item.cancelled_at !== null }">
+        <div class="rounded-lg bg-primary/20 py-2 px-4 self-start" :class="{ 'bg-slate-800/10': isCancelled }">
           <div class="text-center">
             <p class="text-2xl font-bold">
               {{ dateData.date }}
@@ -14,8 +14,11 @@
           <div>
             <div class="flex items-center space-x-2">
               <h1 class="text-2xl font-medium">{{ item.title }}</h1>
-              <span class="rounded-full border border-slate-300 px-2 py-0.5 text-sm font-medium text-slate-700">{{
-                eventStatuses[item.status as EventStatus] }}</span>
+              <base-tag :class="eventStatusColors[item.status as EventStatus]">
+                <span>
+                  {{ eventStatuses[item.status as EventStatus] }}
+                </span>
+              </base-tag>
             </div>
             <p class="">{{ item.description }}</p>
           </div>
@@ -78,6 +81,8 @@ const duration = computed(() => {
 
   return dur < 1 ? dur * 60 + 'min' : dur + 'h'
 })
+
+const isCancelled = computed(() => props.item.cancelled_at !== null)
 
 
 // todo: implement in CRON

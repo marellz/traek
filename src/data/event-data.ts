@@ -11,17 +11,16 @@ export const eventStatuses : Record<EventStatus, string> = {
 }
 
 export const eventStatusColors: Record<EventStatus, string> = {
-  [EventStatusEnum.UPCOMING]: 'text-slate-800', //bg-blue-100 text-blue-500
-  [EventStatusEnum.IN_PROGRESS]: 'bg-green-100 border-green-500',
-  [EventStatusEnum.PAST]: 'bg-slate-100 text-slate-700',
-  [EventStatusEnum.CANCELLED]: 'bg-slate-100 text-slate-700',
+  [EventStatusEnum.UPCOMING]: 'bg-blue-500 text-white !border-blue-500',
+  [EventStatusEnum.IN_PROGRESS]: 'bg-green-500 text-white !border-green-500',
+  [EventStatusEnum.PAST]: 'bg-slate-500 text-white border-slate-500',
+  [EventStatusEnum.CANCELLED]: 'bg-orange-500 text-white border-orange-500',
 }
 
 export const eventTypes: Record<EventTypes, string> = {
   [EventTypeEnum.ONLINE]: 'Online - Zoom, Meet',
   [EventTypeEnum.PHYSICAL]: 'Physical meeting',
   [EventTypeEnum.EVENT]: 'Day event',
-
 }
 
 export const eventDurations: Record<string, number> = {

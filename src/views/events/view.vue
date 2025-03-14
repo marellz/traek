@@ -13,18 +13,18 @@
       </div>
 
       <div class="mt-6 space-y-4">
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-5">
           <h1 class="font-bold text-4xl">{{ _event.title }}</h1>
-          <div v-if="isCancelled" class="text-slate-500 bg-slate-100 rounded-lg p-2 flex items-center space-x-2">
-            <p class="font-medium text-sm">Cancelled</p>
+          <div v-if="isCancelled" class="bg-orange-500/10 text-orange-500 rounded-lg p-2 flex items-center space-x-2">
             <CalendarX :size="20" />
+            <p class="font-medium text-sm">This event was cancelled</p>
           </div>
         </div>
         <div class="flex space-x-4 items-center">
           <p class="px-2 py-1 text-sm rounded-lg bg-black/10 font-medium">
             {{ eventTypes[_event.event_type as EventTypes] }}
           </p>
-          <base-tag>
+          <base-tag :class="eventStatusColors[_event.status as EventStatus]">
             {{ _event.status }}
           </base-tag>
         </div>
@@ -124,7 +124,7 @@
   </layout-container>
 </template>
 <script lang="ts" setup>
-import { eventTypes, type EventTypes } from '@/data/event-data';
+import { eventStatusColors, eventTypes, type EventStatus, type EventTypes } from '@/data/event-data';
 import { useAuthStore } from '@/stores/auth';
 import { EventLoading, useEventStore, type ProjectEvent } from '@/stores/event';
 import { ArrowLeft, CalendarArrowUp, CalendarCheck, CalendarX, Clock9, Link, Mail, MapPin } from 'lucide-vue-next';
@@ -152,7 +152,7 @@ const duration = computed(() =>
 )
 
 const parseDate = (date: string) => {
-  return moment(date).format('Mo MMM YYYY, h:mm A')
+  return moment(date).format('Do MMM YYYY, h:mm A')
 }
 
 const getEvent = async () => {
