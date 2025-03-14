@@ -4,7 +4,7 @@
     :class="{ 'text-slate-800 bg-slate-100 hover:bg-slate-200 dark:bg-slate-600 dark:hover:bg-slate-500': !isRead, 'opacity-60 bg-transparent hover:bg-slate-100 dark:bg-slate-700 dark:hover:bg-slate-600': isRead }">
     <p v-html="message"></p>
     <p class="text-slate-500 dark:text-slate-400 italic">
-      <span>{{ moment(item.created_at).format('Mo MMM h:mm A') }}</span>
+      <span>{{ moment(item.created_at).format('Do MMM h:mm A') }}</span>
     </p>
     <div class="flex items-center">
       <button type="button" class="p-1 text-xs font-medium hover:underline cursor-pointer"

@@ -24,7 +24,7 @@
           <strong> {{ project.creator.name }} (@{{ project.creator.username }}) </strong>
           on
           <strong>
-            {{ moment(project.created_at).format('Mo MMM YYYY') }}
+            {{ moment(project.created_at).format('Do MMM YYYY') }}
           </strong>
         </p>
 

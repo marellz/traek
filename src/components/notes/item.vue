@@ -23,7 +23,7 @@
         by
         <span class="font-medium"> {{ item.created_by.name }}</span>
       </p>
-      <p class="text-xs">{{ item.updated_at === null ? 'Created' : 'Updated' }} {{ moment(item.created_at).format('Mo MMM YYYY, h:mm A') }}</p>
+      <p class="text-xs">{{ item.updated_at === null ? 'Created' : 'Updated' }} {{ moment(item.created_at).format('Do MMM YYYY, h:mm A') }}</p>
     </div>
   </div>
 </template>
