@@ -10,7 +10,7 @@
         </span>
       </template>
       <dropdown-item v-for="(status, key) in TaskStatusLabels" :key @click="promptSwitch(key)">
-        <p class="flex">
+        <p class="flex space-x-2">
           <span>
             {{ status }}
           </span>

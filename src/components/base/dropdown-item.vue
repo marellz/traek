@@ -1,7 +1,7 @@
 <template>
   <li>
     <button type="button" @click.prevent="onClick"
-      class="text-left whitespace-nowrap flex space-x-2 items-center text-sm font-medium px-4 py-1 hover:bg-slate-100 w-full">
+      class="text-left whitespace-nowrap flex space-x-2 items-center text-sm font-medium px-4 py-1 hover:bg-slate-100 dark:hover:bg-slate-600 w-full">
       <slot />
     </button>
   </li>

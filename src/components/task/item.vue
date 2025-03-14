@@ -1,6 +1,6 @@
 <template>
   <router-link :to="{ name: 'task', params: { id: task.id } }">
-    <div class="rounded-lg border border-slate-300 p-4" :class="{ '!border-red-500 bg-red-50': isOverdue }">
+    <div class="rounded-lg border border-slate-300 hover:bg-slate-600/10 dark:border-slate-800 p-4" :class="{ '!border-red-500 dark:!border-red-400 bg-red-50 dark:bg-red-500/10': isOverdue }">
       <!-- header -->
 
       <div class="flex space-x-3">
