@@ -4,7 +4,29 @@ export type TasksListCriteria = 'project_id' | 'creator' | 'assigned'
 
 export const useTaskService = () => {
   const getMyTasks = async (user: string) => {
-    return await supabase.from('tasks').select('*').eq('created_by', user)
+    return await supabase
+      .from('tasks')
+      .select(
+        `*,
+        project: project_id(id, name),
+        created_by: users (id, name, email, username, avatar_url),
+        task_assignees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('created_by', user)
+  }
+
+  const getUserTasks = async (user: string) => {
+    return await supabase
+      .from('task_assignees')
+      .select(
+        `...task_id(
+          *,
+          project: project_id(id, name),
+          creator: created_by(id, name, email, username, avatar_url),
+          assignees: task_assignees(...users(id, name,email, username, avatar_url))
+        )`,
+      )
+      .eq('user_id', user)
   }
 
   const getProjectTasks = async (project: string) => {
@@ -65,6 +87,7 @@ export const useTaskService = () => {
   return {
     create,
     getMyTasks,
+    getUserTasks,
     getProjectTasks,
     get,
     update,

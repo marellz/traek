@@ -15,6 +15,8 @@ export enum TaskLoading {
   ADDING_ASSIGNEES = 'adding-assignees',
   REMOVING_ASSIGNEE = 'removing assignee',
   GETTING_ASSIGNEES = 'getting-assignees',
+  GETTING_USER_TASKS = 'getting-user-tasks'
+}
 
 export enum TaskStatusEnum {
   COMPLETED = 'completed',
@@ -272,6 +274,38 @@ export const useTaskStore = defineStore(
     }
 
     /**
+     * USERS
+     */
+
+    const getMyTasks = async () => {
+      auth.ensureAuth()
+      try {
+        begin(TaskLoading.GETTING_USER_TASKS)
+        const { data, error } = await service.getMyTasks(auth.userId!)
+        if (error) throw new Error(error.message)
+          return data
+      } catch (error) {
+        handleError('Getting my tasks', error)
+      } finally{
+        finish(TaskLoading.GETTING_USER_TASKS)
+      }
+    }
+
+    const getUserTasks = async () => {
+      auth.ensureAuth()
+      try {
+        begin(TaskLoading.GETTING_USER_TASKS)
+        const { data, error } = await service.getUserTasks(auth.userId!)
+        if (error) throw new Error(error.message)
+          return data
+      } catch (error) {
+        handleError('Getting user tasks', error)
+      } finally {
+        finish(TaskLoading.GETTING_USER_TASKS)
+      }
+    }
+
+    /**
      * NOTIFICATIONS
      */
 
@@ -313,6 +347,10 @@ export const useTaskStore = defineStore(
       updateStatus,
       destroy,
       isLoading,
+
+      // users
+      getMyTasks,
+      getUserTasks,
 
       //assignees
       addAssignees,
