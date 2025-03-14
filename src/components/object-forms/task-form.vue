@@ -43,8 +43,7 @@ import UserSelector from '@/components/form/user-selector.vue'
 import { computed, onMounted, ref } from 'vue'
 import { TaskPriorityLabels, TaskStatusLabels } from '@/data/task-data'
 import { useTaskStore, TaskLoading, type TaskForm } from '@/stores/task'
-import { useProjectStore } from '@/stores/project'
-import { type UserProfile } from '@/stores/auth'
+import { useProjectStore, type ProjectUser } from '@/stores/project'
 import { Form, useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { useDebounceFn } from '@vueuse/core'
@@ -116,6 +115,7 @@ const getForm = async () => {
 
 }
 
+const projectMembers = ref<ProjectUser[]>([])
 const getMembers = async () => {
   const _users = await projectStore.getMembers(props.projectId)
   if (_users) {
@@ -159,9 +159,7 @@ onMounted(() => {
   }
 })
 
-const projectMembers = ref<UserProfile[]>([])
-const queriedUsers = ref<UserProfile[]>([])
-
+const queriedUsers = ref<ProjectUser[]>([])
 const filterMembers = (q: string) => {
   if (!q) {
     queriedUsers.value = projectMembers.value

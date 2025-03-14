@@ -21,7 +21,7 @@
         </div>
         <p class="mt-1 text-sm">
           Created by
-          <strong> {{ project.created_by.name }} (@{{ project.created_by.username }}) </strong>
+          <strong> {{ project.creator.name }} (@{{ project.creator.username }}) </strong>
           on
           <strong>
             {{ moment(project.created_at).format('Mo MMM YYYY') }}
@@ -77,7 +77,7 @@ const sections: { key: keyof ProjectStats; label: string; pathName: string }[] =
 
 const projectStore = useProjectStore()
 const loading = computed(() => projectStore.isLoading(ProjectLoading.GETTING_ONE))
-const createdByMe = computed(() => project.value?.created_by.id === auth.userId)
+const createdByMe = computed(() => project.value?.creator.id === auth.userId)
 const getProject = async () => {
   const _d = await projectStore.getProjectStats(id.value)
   if (_d) {

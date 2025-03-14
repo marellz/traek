@@ -73,8 +73,7 @@ import { Form, useForm } from 'vee-validate'
 import { computed, onMounted, watch, ref } from 'vue'
 import * as yup from 'yup'
 import { EventLoading, useEventStore, type ProjectEvent } from '@/stores/event'
-import { useProjectStore } from '@/stores/project'
-import type { UserProfile } from '@/stores/auth'
+import { useProjectStore, type ProjectMember } from '@/stores/project'
 import { useDebounceFn } from '@vueuse/core'
 
 const props = defineProps<{
@@ -179,8 +178,8 @@ watch(
 
 /**Members/Invitees */
 const invitees = ref<string[]>([])
-const projectMembers = ref<UserProfile[]>([])
-const queriedUsers = ref<UserProfile[]>([])
+const projectMembers = ref<ProjectMember[]>([])
+const queriedUsers = ref<ProjectMember[]>([])
 const searchUsers = useDebounceFn((query: string) => {
   if (!query) {
     return []

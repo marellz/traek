@@ -24,9 +24,9 @@
 import FormInput from '@/components/form/input.vue'
 import FormUserSelector from '@/components/form/user-selector.vue'
 import FormText from '@/components/form/text.vue'
-import { ProjectLoading, useProjectStore, type ProjectForm } from '@/stores/project'
+import { ProjectLoading, useProjectStore, type ProjectForm, type ProjectUser } from '@/stores/project'
 import { computed, onUnmounted, ref } from 'vue'
-import { useAuthStore, type UserProfile } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 import { useDebounceFn } from '@vueuse/core'
 import { Form, useForm } from 'vee-validate'
 import * as yup from 'yup'
@@ -60,7 +60,7 @@ const [description] = defineField('description')
 
 const members = ref<string[]>([])
 
-const queriedUsers = ref<UserProfile[]>([])
+const queriedUsers = ref<ProjectUser[]>([])
 
 const searchUsers = useDebounceFn(async (q: string) => {
   if (q == '') {

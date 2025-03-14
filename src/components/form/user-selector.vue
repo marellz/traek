@@ -47,20 +47,21 @@ import FormGroup from '@/components/form/group.vue'
 import FormDropdown from '@/components/form/dropdown.vue'
 import { watchDebounced } from '@vueuse/core'
 import { onMounted, ref } from 'vue'
-import { useAuthStore, type UserProfile } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 import { Trash2 } from 'lucide-vue-next'
+import type { ProjectUser } from '@/stores/project'
 
 const auth = useAuthStore()
 
 defineProps<{
   label: string
-  queriedUsers: UserProfile[]
+  queriedUsers: ProjectUser[]
 }>()
 
 const model = defineModel<string[]>({ default: [] })
 const emit = defineEmits(['search-users', 'remove-user', 'add-user'])
 
-const profiles = ref<UserProfile[]>([])
+const profiles = ref<ProjectUser[]>([])
 const getProfiles = async () => {
   const _users = await auth.getProfiles(model.value, 'id')
   if (_users) {
