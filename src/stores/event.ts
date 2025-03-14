@@ -23,6 +23,18 @@ export enum EventLoading {
   GETTING_USER = 'getting-user-events',
 }
 
+export enum EventStatusEnum {
+  UPCOMING = 'upcoming',
+  IN_PROGRESS = 'in_progress',
+  PAST = 'past',
+  CANCELLED = 'cancelled',
+}
+export enum EventTypeEnum {
+  ONLINE = 'online',
+  PHYSICAL = 'physical',
+  EVENT = 'event',
+}
+
 export interface EventFormPayload {
   form: ProjectEventForm
   invitees: string[]
@@ -97,7 +109,7 @@ export const useEventStore = defineStore(
         begin(EventLoading.UPDATING)
         const payload = {
           ...form,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         }
         const { status, error } = await service.update(id, payload)
         if (error) throw new Error(error.message)

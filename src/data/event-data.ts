@@ -1,26 +1,27 @@
+import { EventStatusEnum, EventTypeEnum } from "@/stores/event"
 
-export type EventStatus = 'upcoming' | 'in_progress' | 'past' | 'cancelled'
+export type EventStatus =  `${EventStatusEnum}`
+export type EventTypes = `${EventTypeEnum}`
+
 export const eventStatuses : Record<EventStatus, string> = {
-  upcoming: 'Upcoming',
-  in_progress: 'In progress',
-  past: 'Past event',
-  cancelled: "Cancelled"
-}
-
-export type EventTypes = 'online' | 'physical' | 'event'
-export const eventTypes: Record<EventTypes, string> = {
-  online: 'Online - Zoom, Meet',
-  // meeting: "Meeting",
-  physical: 'Physical meeting',
-  event: 'Day event',
-
+  [EventStatusEnum.UPCOMING]: 'Upcoming',
+  [EventStatusEnum.IN_PROGRESS]: 'In progress',
+  [EventStatusEnum.PAST]: 'Past event',
+  [EventStatusEnum.CANCELLED]: "Cancelled"
 }
 
 export const eventStatusColors: Record<EventStatus, string> = {
-  upcoming: 'text-slate-800', //bg-blue-100 text-blue-500
-  in_progress: 'bg-green-100 border-green-500',
-  past: 'bg-slate-100 text-slate-700',
-  cancelled: 'bg-slate-100 text-slate-700',
+  [EventStatusEnum.UPCOMING]: 'text-slate-800', //bg-blue-100 text-blue-500
+  [EventStatusEnum.IN_PROGRESS]: 'bg-green-100 border-green-500',
+  [EventStatusEnum.PAST]: 'bg-slate-100 text-slate-700',
+  [EventStatusEnum.CANCELLED]: 'bg-slate-100 text-slate-700',
+}
+
+export const eventTypes: Record<EventTypes, string> = {
+  [EventTypeEnum.ONLINE]: 'Online - Zoom, Meet',
+  [EventTypeEnum.PHYSICAL]: 'Physical meeting',
+  [EventTypeEnum.EVENT]: 'Day event',
+
 }
 
 export const eventDurations: Record<string, number> = {
