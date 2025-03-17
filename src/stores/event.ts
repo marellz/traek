@@ -40,6 +40,11 @@ export interface EventFormPayload {
   invitees: string[]
 }
 
+export interface EventDateRange {
+  end_date: string;
+  start_date: string;
+}
+
 export const useEventStore = defineStore(
   'project_events',
   () => {
@@ -163,10 +168,12 @@ export const useEventStore = defineStore(
      * USER
      */
 
-    const getUserEvents = async (user_id: string) => {
+    const getUserEvents = async (dateRange: EventDateRange) => {
+      auth.ensureAuth()
+      const user_id = auth.userId!
       try {
         begin(EventLoading.GETTING_USER)
-        const { error, data } = await service.getUserEvents(user_id)
+        const { error, data } = await service.getUserEvents(user_id, dateRange)
         if (error) throw new Error(error.message)
         return data
       } catch (error) {

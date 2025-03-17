@@ -1,5 +1,5 @@
 import { supabase } from '@/database/supabase'
-import type { TaskForm, TaskStatusForm } from '@/stores/task'
+import type { TaskDateRange, TaskForm, TaskStatusForm } from '@/stores/task'
 export type TasksListCriteria = 'project_id' | 'creator' | 'assigned'
 
 export const useTaskService = () => {
@@ -15,18 +15,25 @@ export const useTaskService = () => {
       .eq('created_by', user)
   }
 
-  const getUserTasks = async (user: string) => {
-    return await supabase
+  const getUserTasks = async (user: string, dateRange?: TaskDateRange) => {
+    const query = supabase
       .from('task_assignees')
       .select(
         `...task_id(
-          *,
-          project: project_id(id, name),
-          creator: created_by(id, name, email, username, avatar_url),
-          assignees: task_assignees(...users(id, name,email, username, avatar_url))
+        *,
+        project: project_id(id, name),
+        creator: created_by(id, name, email, username, avatar_url),
+        assignees: task_assignees(...users(id, name,email, username, avatar_url))
         )`,
       )
       .eq('user_id', user)
+
+    if (dateRange)
+      query
+        .gte('task_id.due_date', dateRange.start_date)
+        .lte('task_id.due_date', dateRange.end_date)
+
+    return await query
   }
 
   const getProjectTasks = async (project: string) => {

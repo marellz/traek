@@ -1,5 +1,6 @@
 import { supabase } from '@/database/supabase'
 import type { EventCancelPayload, ProjectEventForm } from '@/stores/event'
+import type { TaskDateRange } from '@/stores/task'
 
 export const useEventService = () => {
   const list = async (project: string) => {
@@ -46,8 +47,23 @@ export const useEventService = () => {
    * USER
    */
 
-  const getUserEvents = async (user_id: string) => {
-    return await supabase.from('event_invitees').select().eq('user_id', user_id)
+  const getUserEvents = async (user_id: string, dateRange?: TaskDateRange) => {
+    const query = supabase
+      .from('event_invitees')
+      .select(
+        `...event_id(
+        *,
+        project: project_id(id, name),
+        creator: users(id, name, email, username, avatar_url),
+        invitees: event_invitees(...users(id, name, email, username, avatar_url))
+        )
+      `,
+      )
+      .eq('user_id', user_id)
+    if (dateRange)
+      query.gte('event_id.datetime', dateRange.start_date).lt('event_id.datetime', dateRange.end_date)
+
+    return await query
   }
 
   /**

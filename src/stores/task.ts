@@ -34,6 +34,11 @@ export type TaskStatus = `${TaskStatusEnum}` | string
 
 export type TaskPriority = 'high' | 'medium' | 'low'
 
+export interface TaskDateRange {
+  start_date: string;
+  end_date: string;
+}
+
 export type TaskUser = {
   id: string
   name: string | null
@@ -291,11 +296,11 @@ export const useTaskStore = defineStore(
       }
     }
 
-    const getUserTasks = async () => {
+    const getUserTasks = async (dateRange: TaskDateRange) => {
       auth.ensureAuth()
       try {
         begin(TaskLoading.GETTING_USER_TASKS)
-        const { data, error } = await service.getUserTasks(auth.userId!)
+        const { data, error } = await service.getUserTasks(auth.userId!, dateRange)
         if (error) throw new Error(error.message)
           return data
       } catch (error) {
