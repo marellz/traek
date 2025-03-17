@@ -40,3 +40,40 @@ $light-cyan: #cdedf6ff;
 $orange-crayola: #ef7b45ff;
 $chili-red: #d84727ff;
 */
+
+.calendar {
+  @apply w-full border-separate border-spacing-0;
+}
+
+.calendar thead th:first-child {
+  @apply rounded-tl-xl;
+}
+
+.calendar thead th:last-child {
+  @apply rounded-tr-xl;
+}
+
+.calendar tr:last-child td:first-child {
+  @apply rounded-bl-xl;
+}
+
+.calendar tr:last-child td:last-child {
+  @apply rounded-br-xl;
+}
+
+.calendar td,
+.calendar th {
+  @apply border-t border-l border-slate-300 p-4 first:border-l last:border-r dark:border-slate-700;
+}
+
+.calendar td {
+  @apply h-32
+}
+
+.calendar tbody tr:last-child td {
+  @apply border-b;
+}
+
+.calendar th {
+  @apply bg-slate-100 dark:bg-slate-800/50;
+}
