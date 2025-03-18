@@ -193,9 +193,14 @@ const router = createRouter({
      */
 
     {
-      name: 'user-profile',
-      path: '/profile/:id',
-      component: () => import('@/views/profile/[id].vue'),
+      name: 'view-profile',
+      path: '/user/:id',
+      component: () => import('@/views/user/profile/id.vue'),
+    },
+    {
+      name: 'edit-profile',
+      path: '/update-profile',
+      component: () => import('@/views/user/profile/update.vue')
     },
   ],
 })
