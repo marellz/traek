@@ -52,15 +52,15 @@
 </template>
 <script lang="ts" setup>
 import FormUserSelector from '@/components/form/user-selector.vue'
-import { useAuthStore } from '@/stores/auth'
 import { useProjectStore, type Project, type ProjectMember, type ProjectUser } from '@/stores/project'
+import { useUserStore } from '@/stores/user'
 import { useDebounceFn } from '@vueuse/core'
 import moment from 'moment'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const auth = useAuthStore()
+const userStore = useUserStore()
 const id = computed(() => route.params.id as string)
 const projectStore = useProjectStore()
 const loading = computed(() => ({
@@ -84,7 +84,7 @@ const showAddMemberModal = ref(false)
 const queriedUsers = ref<ProjectUser[]>([])
 
 const searchUsers = async (q: string) => {
-  const _users = await auth.queryUsers(q)
+  const _users = await userStore.queryUsers(q)
   if (_users && _users.length) {
     const notMembers = _users.filter((u) => {
       return members.value.findIndex((m) => m.id === u.id) === -1

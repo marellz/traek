@@ -160,11 +160,10 @@ export const useAuthStore = defineStore(
       }
     })
 
-
     //
 
     const ensureAuth = () => {
-      if(isAuthenticated.value){
+      if (isAuthenticated.value) {
         return true
       }
 
@@ -221,72 +220,6 @@ export const useAuthStore = defineStore(
       }
     }
 
-    const checkUsername = async (username: string) => {
-      try {
-        const { count, status } = await AuthService.checkUsername(username)
-        if (status !== 200) {
-          handleError('Checking username', 'Unknown error')
-        }
-
-        if (count && count === 0) {
-          return true
-        }
-
-        return false
-      } catch (error) {
-        handleError('Checking username', error)
-      } finally {
-      }
-    }
-
-    /**
-     *
-     * USERS SERVICES
-     *
-     */
-
-    const queryUsers = async (query: string) => {
-      if (!userId.value) {
-        return
-      }
-
-      try {
-        const { data, error } = await AuthService.queryUsers({ query })
-        if (error) {
-          handleError('Querying users', error.message)
-        }
-
-        if (data) {
-          return data.filter((u) => u.id !== userId.value && u.username !== null)
-        }
-
-        return null
-      } catch (error) {
-        handleError('Querying users', error)
-      }
-    }
-
-    const getProfiles = async (list: string[], column: 'id' | 'username' = 'id') => {
-      if (!userId.value) {
-        return
-      }
-
-      try {
-        const { error, data } = await AuthService.getProfiles(list, column)
-        if (error) {
-          handleError('Getting profiles', error.message)
-        }
-
-        if (data) {
-          return data
-        }
-
-        return null
-      } catch (error) {
-        handleError('Getting profiles', error)
-      }
-    }
-
     const resetErrors = () => {
       errors.value = null
     }
@@ -310,17 +243,9 @@ export const useAuthStore = defineStore(
       profile,
       hasProfile,
       getProfile,
-      getProfiles,
       updateProfile,
-      checkUsername,
-
-      //user
-      queryUsers,
-
       //
-      ensureAuth
-
-
+      ensureAuth,
     }
   },
   {

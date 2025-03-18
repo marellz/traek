@@ -26,10 +26,10 @@ import FormUserSelector from '@/components/form/user-selector.vue'
 import FormText from '@/components/form/text.vue'
 import { ProjectLoading, useProjectStore, type ProjectForm, type ProjectUser } from '@/stores/project'
 import { computed, onUnmounted, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
 import { useDebounceFn } from '@vueuse/core'
 import { Form, useForm } from 'vee-validate'
 import * as yup from 'yup'
+import { useUserStore } from '@/stores/user'
 
 const props = defineProps<{
   id?: string
@@ -37,7 +37,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['submit'])
 const projectStore = useProjectStore()
-const auth = useAuthStore()
+const userStore = useUserStore()
 
 const loading = computed(() => {
   return {
@@ -67,7 +67,7 @@ const searchUsers = useDebounceFn(async (q: string) => {
     queriedUsers.value = []
     return
   }
-  const _users = await auth.queryUsers(q)
+  const _users = await userStore.queryUsers(q)
   if (_users && _users.length) {
     queriedUsers.value = _users
   }
