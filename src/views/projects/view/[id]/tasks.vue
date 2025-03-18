@@ -12,7 +12,7 @@
             <span>Create task</span>
           </base-button>
         </router-link>
-        <base-button variant="secondary-outline" @click="getTasks" :disabled="loading.gettingTasks">
+        <base-button variant="secondary-outline" @click="getTasks" :loading="loading.gettingTasks">
           <span>Refresh</span>
         </base-button>
       </div>

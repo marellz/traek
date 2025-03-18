@@ -39,7 +39,7 @@ const themes: VariantThemes = {
   secondary:
     "text-white border-gray-800 bg-gray-800 hover:bg-gray-700 hover:border-gray-700 disabled:bg-gray-500/50 disabled:border-gray-500/10 focus:ring-slate-400",
   "secondary-outline":
-    "border-current text-slate-800 hover:bg-slate-300 disabled:hover:bg-transparent disabled:text-gray-400 disabled:opacity-50 focus:ring-slate-400",
+    "border-current text-slate-800 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-800 disabled:hover:bg-transparent disabled:text-gray-400 disabled:opacity-50 focus:ring-slate-400",
   danger:
     "border-red-100 text-red-500 hover:text-white hover:bg-red-500 hover:border-red-500 disabled:border-red-500/50 disabled:text-red-500/50 disabled:hover:bg-transparent focus:ring-red-200",
   "white-outline":
