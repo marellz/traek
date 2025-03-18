@@ -296,7 +296,7 @@ export const useTaskStore = defineStore(
       }
     }
 
-    const getUserTasks = async (dateRange: TaskDateRange) => {
+    const getUserTasks = async (dateRange?: TaskDateRange) => {
       auth.ensureAuth()
       try {
         begin(TaskLoading.GETTING_USER_TASKS)
