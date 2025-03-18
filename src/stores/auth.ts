@@ -184,6 +184,7 @@ export const useAuthStore = defineStore(
         return null
       }
       try {
+        loading.value = true
         const { data, error } = await AuthService.getProfile(userId.value)
         if (error) {
           handleError('Getting profile', error)
@@ -198,6 +199,8 @@ export const useAuthStore = defineStore(
         return false
       } catch (error) {
         handleError('Getting profile', error)
+      } finally {
+        loading.value = false
       }
     }
 
@@ -207,6 +210,7 @@ export const useAuthStore = defineStore(
       }
       // update
       try {
+        loading.value =  true
         const { status } = await AuthService.updateProfile(userId.value, form)
         if (status === 204) {
           profile.value = { ...profile.value, ...form }
@@ -217,6 +221,8 @@ export const useAuthStore = defineStore(
         return false
       } catch (error) {
         handleError('Updating profile', error)
+      } finally {
+        loading.value =  true
       }
     }
 
