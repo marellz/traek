@@ -1,14 +1,30 @@
 import { supabase } from '@/database/supabase'
-import type { ProjectEventForm } from '@/stores/event'
+import type { EventCancelPayload, ProjectEventForm } from '@/stores/event'
+import type { TaskDateRange } from '@/stores/task'
 
 export const useEventService = () => {
   const list = async (project: string) => {
     // event
-    return await supabase.from('events').select('*, created_by(*)').eq('project_id', project).order('datetime', {ascending: true})
+    return await supabase
+      .from('events')
+      .select(
+        `*,
+        created_by(id, name, email, username, avatar_url),
+        event_invitees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('project_id', project)
+      .order('datetime', { ascending: true })
   }
 
   const getEvent = async (id: string) => {
-    return await supabase.from('events').select('*, created_by(*)').eq('id', id)
+    return await supabase
+      .from('events')
+      .select(
+        `*,
+        created_by(id, name, email, username, avatar_url),
+        event_invitees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('id', id)
   }
 
   const create = async (form: ProjectEventForm) => {
@@ -23,16 +39,31 @@ export const useEventService = () => {
     return await supabase.from('events').delete().eq('id', id)
   }
 
-  const cancelEvent = async (event: ProjectEventForm) => {
-    return await supabase.from('events').upsert(event)
+  const cancelEvent = async (id: string, payload: EventCancelPayload) => {
+    return await supabase.from('events').update(payload).eq('id', id)
   }
 
   /**
    * USER
    */
 
-  const getUserEvents = async (user_id: string) => {
-    return await supabase.from('event_invitees').select().eq('user_id', user_id)
+  const getUserEvents = async (user_id: string, dateRange?: TaskDateRange) => {
+    const query = supabase
+      .from('event_invitees')
+      .select(
+        `...event_id(
+        *,
+        project: project_id(id, name),
+        creator: users(id, name, email, username, avatar_url),
+        invitees: event_invitees(...users(id, name, email, username, avatar_url))
+        )
+      `,
+      )
+      .eq('user_id', user_id)
+    if (dateRange)
+      query.gte('event_id.datetime', dateRange.start_date).lt('event_id.datetime', dateRange.end_date)
+
+    return await query
   }
 
   /**
@@ -40,7 +71,7 @@ export const useEventService = () => {
    */
 
   const addInvitees = async (payload: { user_id: string; event_id: string }[]) => {
-    return await supabase.from('event_invitees').insert(payload).select()
+    return await supabase.from('event_invitees').insert(payload)
   }
 
   const getInvitees = async (event_id: string) => {

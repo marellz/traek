@@ -17,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="user in members" :key="user.id">
+        <tr v-for="user in members" :key="user.id" :class="{'bg-slate-100 dark:bg-slate-500': project?.creator.id === user.id}">
           <td class="py-4">
             <p>
               {{ user.name }}
@@ -31,7 +31,7 @@
             {{ parseDate(user.joined_at) }}
           </td>
           <td class="py-4">
-            <base-action @click="removeMember(user.id)" :disabled="project?.created_by.id === user.id">
+            <base-action v-if="project?.creator.id !== user.id" @click="removeMember(user.id)">
               <span>Remove</span>
             </base-action>
           </td>
@@ -42,12 +42,8 @@
     <base-modal title="Add members" v-model:show="showAddMemberModal">
       <form @submit.prevent="addMembers">
         <div class="space-y-4">
-          <form-user-selector
-            label="Search users"
-            v-model="newMembers"
-            :queried-users
-            @search-users="handleQuery"
-          ></form-user-selector>
+          <form-user-selector label="Search users" v-model="newMembers" :queried-users
+            @search-users="handleQuery"></form-user-selector>
           <base-button> <span> Add Members </span></base-button>
         </div>
       </form>
@@ -56,8 +52,8 @@
 </template>
 <script lang="ts" setup>
 import FormUserSelector from '@/components/form/user-selector.vue'
-import { useAuthStore, type UserProfile } from '@/stores/auth'
-import { useProjectStore, type Project, type ProjectMember } from '@/stores/project'
+import { useAuthStore } from '@/stores/auth'
+import { useProjectStore, type Project, type ProjectMember, type ProjectUser } from '@/stores/project'
 import { useDebounceFn } from '@vueuse/core'
 import moment from 'moment'
 import { computed, onMounted, ref } from 'vue'
@@ -81,11 +77,11 @@ const getMembers = async () => {
 }
 
 const parseDate = (dt: string) => {
-  return moment(dt).format('Mo MMM YYYY')
+  return moment(dt).format('Do MMM YYYY')
 }
 
 const showAddMemberModal = ref(false)
-const queriedUsers = ref<UserProfile[]>([])
+const queriedUsers = ref<ProjectUser[]>([])
 
 const searchUsers = async (q: string) => {
   const _users = await auth.queryUsers(q)

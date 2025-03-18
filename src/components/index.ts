@@ -8,6 +8,12 @@ import BaseAction from '@/components/base/action.vue'
 import BaseAlert from '@/components/base/alert.vue'
 import BaseModal from '@/components/base/modal.vue'
 import BaseTabs from '@/components/base/tabs.vue'
+import BaseConfirm from '@/components/base/confirm.vue'
+import BaseTag from '@/components/base/tag.vue'
+import BaseLink from '@/components/base/link.vue'
+import BaseDropdown from '@/components/base/dropdown.vue'
+import BaseDropdownItem from '@/components/base/dropdown-item.vue'
+
 import { type Component } from 'vue'
 const components: Record<string, Component> = {
   'layout-banner': LayoutBanner,
@@ -20,6 +26,11 @@ const components: Record<string, Component> = {
   'base-loader': BaseLoader,
   'base-modal': BaseModal,
   'base-tabs': BaseTabs,
+  'base-tag': BaseTag,
+  'base-link': BaseLink,
+  'base-confirm': BaseConfirm,
+  'dropdown': BaseDropdown,
+  'dropdown-item' : BaseDropdownItem
 }
 
 export default components

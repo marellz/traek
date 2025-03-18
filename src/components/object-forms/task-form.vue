@@ -4,52 +4,29 @@
       <base-loader v-if="loading.getting"></base-loader>
       <div v-else class="space-y-4">
         <form-input label="Task name" v-model="title" :error="errors.title"></form-input>
-        <form-text
-          label="Task description"
-          v-model="description"
-          :error="errors.description"
-        ></form-text>
+        <form-text label="Task description" v-model="description" :error="errors.description"></form-text>
         <div class="grid grid-cols-2 gap-4">
           <form-group label="Status" :error="errors.priority">
             <div class="mt-4 flex flex-col gap-4">
-              <form-radio
-                v-for="(label, key) in TaskStatusLabels"
-                :key
-                v-model="status"
-                :value="key"
-                :label
-                name="status"
-              >
+              <form-radio v-for="(label, key) in TaskStatusLabels" :key v-model="status" :value="key" :label
+                name="status">
               </form-radio>
             </div>
           </form-group>
           <form-group label="Priority" :error="errors.priority">
             <div class="mt-4 flex flex-col gap-4">
-              <form-radio
-                v-for="(label, key) in TaskPriorityLabels"
-                :key
-                v-model="priority"
-                :value="key"
-                :label
-                name="priority"
-              >
+              <form-radio v-for="(label, key) in TaskPriorityLabels" :key v-model="priority" :value="key" :label
+                name="priority">
               </form-radio>
             </div>
           </form-group>
         </div>
         <form-datepicker label="Due date" v-model="due_date"></form-datepicker>
-        <user-selector
-        v-model="assignees"
-          label="Assignees"
-          :queriedUsers
-          @search-users="searchUsers"
-          @add-user="addAssignee"
-          @remove-user="removeAssignee"
-        ></user-selector>
+        <user-selector v-model="assignees" label="Assignees" :queriedUsers @search-users="searchUsers"
+          @add-user="addAssignee" @remove-user="removeAssignee"></user-selector>
         <div>
           <base-button type="submit" :loading="loading.updating || loading.creating">
-            <span>Save changes</span></base-button
-          >
+            <span>Save changes</span></base-button>
         </div>
         <!-- <div class="mt-10">{{ errors }}</div> -->
       </div>
@@ -63,11 +40,10 @@ import FormGroup from '@/components/form/group.vue'
 import FormRadio from '@/components/form/radio.vue'
 import FormDatepicker from '@/components/form/datepicker.vue'
 import UserSelector from '@/components/form/user-selector.vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { TaskPriorityLabels, TaskStatusLabels } from '@/data/task-data'
 import { useTaskStore, TaskLoading, type TaskForm } from '@/stores/task'
-import { useProjectStore } from '@/stores/project'
-import { type UserProfile } from '@/stores/auth'
+import { useProjectStore, type ProjectUser } from '@/stores/project'
 import { Form, useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { useDebounceFn } from '@vueuse/core'
@@ -76,7 +52,6 @@ const projectStore = useProjectStore()
 
 const props = defineProps<{
   edit?: string | null
-  active: boolean
   projectId: string
 }>()
 const emit = defineEmits(['submit'])
@@ -117,52 +92,30 @@ const loading = computed(() => ({
 
 const _form = ref()
 
-const reset = () => {
-  resetForm({
-    values: {
-      title: '',
-      description: '',
-      due_date: '',
-      status: 'pending',
-      priority: 'medium',
-    },
-  })
-}
-
 const getForm = async () => {
   if (!props.edit) {
     return
   }
-  const _task = await tasksStore.get(props.edit as string)
-  if (!_task) {
-    return
-  }
-  _form.value = _task
 
-  resetForm({
-    values: _task,
-  })
+  // get task
+  const _task = await tasksStore.get(props.edit as string)
+  if (_task) {
+    _form.value = _task
+
+    resetForm({
+      values: _task,
+    })
+  }
+
+  // get assignees
+  const _users = await tasksStore.getAssignees(props.edit)
+  if (_users) {
+    assignees.value = _users.map((u) => u.user_id)
+  }
+
 }
 
-watch(
-  () => props.active,
-  () => {
-    if (!props.active) {
-      reset()
-    }
-  },
-)
-
-watch(
-  () => props.edit,
-  (v) => {
-    if (v) {
-      getForm()
-      getAssignees()
-    }
-  },
-)
-
+const projectMembers = ref<ProjectUser[]>([])
 const getMembers = async () => {
   const _users = await projectStore.getMembers(props.projectId)
   if (_users) {
@@ -170,60 +123,43 @@ const getMembers = async () => {
   }
 }
 
-const getAssignees = async () => {
+const addAssignee = async (userId: string) => {
   if (!props.edit) {
     return
   }
 
-  const _users = await tasksStore.getAssignees(props.edit)
-  if (_users) {
-    assignees.value = _users.map((u) => u.user_id)
-  }
-}
-
-/**
- * REFACTOR:
- *
- * current:
- * add/remove assignee if user-selector changes
- *
- *
- * ideal:
- * add-remove assignee by comparison every time there is a change?
- */
-
-const addAssignee = async (userId: string) => {
-  if(!props.edit){
-    return
-  }
-
   const success = await tasksStore.addAssignees(props.edit, [userId])
-  if(success){
+  if (success) {
     // todo: toast
   }
 }
 
 const removeAssignee = async (id: string) => {
-  if(!props.edit){
+  if (!props.edit) {
     return
   }
   const success = await tasksStore.removeAssignee(props.edit, id)
-  if(success){
+  if (success) {
     // todo: toast
-    assignees.value.splice(assignees.value.findIndex(a=>a==id), 1)
+    assignees.value.splice(assignees.value.findIndex(a => a == id), 1)
   }
 }
 
 onMounted(() => {
   getMembers()
-  if(props.edit){
+  if (props.edit) {
     getForm()
+  } else {
+    resetForm({
+      values: {
+        status: 'pending',
+        priority: 'medium',
+      }
+    })
   }
 })
 
-const projectMembers = ref<UserProfile[]>([])
-const queriedUsers = ref<UserProfile[]>([])
-
+const queriedUsers = ref<ProjectUser[]>([])
 const filterMembers = (q: string) => {
   if (!q) {
     queriedUsers.value = projectMembers.value

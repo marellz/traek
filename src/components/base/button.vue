@@ -3,7 +3,7 @@
     class="px-3 py-1.5 md:px-4 text-sm md:text-base font-semibold font-secondary rounded-lg transition-colors border inline-flex items-center space-x-2 justify-center relative focus:ring disabled:cursor-not-allowed focus:ring-offset-2 focus:outline-none disabled:pointer-events-none"
     :type :class="themes[variant]" :disabled="loading || disabled">
     <slot />
-    <base-loader class="absolute right-0" loader-class="h-4" v-if="loading" />
+    <base-loader class="absolute right-0 top-1/2 -translate-y-1/2 !py-0" loader-class="!h-4 !w-4" v-if="loading" />
   </button>
 </template>
 <script lang="ts" setup>
@@ -39,7 +39,7 @@ const themes: VariantThemes = {
   secondary:
     "text-white border-gray-800 bg-gray-800 hover:bg-gray-700 hover:border-gray-700 disabled:bg-gray-500/50 disabled:border-gray-500/10 focus:ring-slate-400",
   "secondary-outline":
-    "border-current text-slate-800 hover:bg-slate-300 disabled:hover:bg-transparent disabled:text-gray-400 disabled:opacity-50 focus:ring-slate-400",
+    "border-current text-slate-800 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-800 disabled:hover:bg-transparent disabled:text-gray-400 disabled:opacity-50 focus:ring-slate-400",
   danger:
     "border-red-100 text-red-500 hover:text-white hover:bg-red-500 hover:border-red-500 disabled:border-red-500/50 disabled:text-red-500/50 disabled:hover:bg-transparent focus:ring-red-200",
   "white-outline":

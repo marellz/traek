@@ -2,7 +2,8 @@ import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import { useTaskService } from '@/services/tasks'
 import { useLoadingState } from '@/composables/useLoading'
-import { useAuthStore, type UserProfile } from './auth'
+import { useAuthStore } from './auth'
+import { NotificationTypes, useNotificationStore } from './notifications'
 
 export enum TaskLoading {
   CREATING = 'creating-task',
@@ -14,11 +15,37 @@ export enum TaskLoading {
   ADDING_ASSIGNEES = 'adding-assignees',
   REMOVING_ASSIGNEE = 'removing assignee',
   GETTING_ASSIGNEES = 'getting-assignees',
+  GETTING_USER_TASKS = 'getting-user-tasks'
 }
 
-export type TaskStatus = 'pending' | 'in_progress' | 'completed'
+export enum TaskStatusEnum {
+  COMPLETED = 'completed',
+  IN_PROGRESS = 'in_progress',
+  PENDING = 'pending',
+}
+
+export enum TaskPriorityEnum {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+}
+
+export type TaskStatus = `${TaskStatusEnum}` | string
 
 export type TaskPriority = 'high' | 'medium' | 'low'
+
+export interface TaskDateRange {
+  start_date: string;
+  end_date: string;
+}
+
+export type TaskUser = {
+  id: string
+  name: string | null
+  email: string
+  username: string | null
+  avatar_url: string | null
+}
 
 export interface Task {
   id: string
@@ -26,14 +53,15 @@ export interface Task {
   title: string
   description: string | null
   priority: string
-  status: string
-  created_by: string
+  status: TaskStatus
+  created_by: TaskUser
   created_at: string
   due_date?: string | null
   end_date?: string | null
   start_date?: string | null
   updated_at?: string | null
   closed_at?: string | null
+  task_assignees: TaskUser[]
 }
 
 export interface TaskForm {
@@ -52,11 +80,15 @@ export interface TaskForm {
   closed_at?: string
 }
 
-export type TaskUser = Pick<UserProfile, 'id' | 'name' | 'username' | 'email' | 'avatar_url'>
-
 export interface TaskInfo {
   created_by: TaskUser
   task_assignees: TaskUser[]
+}
+
+export interface TaskStatusForm {
+  status: TaskStatus
+  end_date?: string | null
+  start_date?: string | null
 }
 
 export const useTaskStore = defineStore(
@@ -66,6 +98,7 @@ export const useTaskStore = defineStore(
     const { handleError } = useErrorStore()
     const { begin, finish, isLoading } = useLoadingState()
     const auth = useAuthStore()
+    const notificationStore = useNotificationStore()
 
     const list = async (project: string) => {
       begin(TaskLoading.GETTING_ALL)
@@ -120,9 +153,14 @@ export const useTaskStore = defineStore(
 
     const update = async (id: string, form: TaskForm) => {
       auth.ensureAuth()
+      const payload = {
+        ...form,
+        created_by: form.created_by,
+        task_assignees: undefined,
+      }
       try {
         begin(TaskLoading.UPDATING)
-        const { status, error } = await service.update(id, form)
+        const { status, error } = await service.update(id, payload)
 
         if (error) throw new Error(error.message)
 
@@ -131,6 +169,48 @@ export const useTaskStore = defineStore(
         handleError('Updating task', error)
       } finally {
         finish(TaskLoading.UPDATING)
+      }
+    }
+
+    const updateStatus = async (id: string, status: TaskStatus) => {
+      try {
+        const payload: TaskStatusForm = {
+          status,
+        }
+
+        const now = new Date().toISOString()
+
+        switch (status) {
+
+          case TaskStatusEnum.COMPLETED:
+            payload.end_date = now
+            break
+
+          case TaskStatusEnum.IN_PROGRESS:
+            payload.start_date = now
+            payload.end_date = null
+            break
+
+          default:
+            payload.start_date = null
+            payload.end_date = null
+            break
+        }
+
+        const { status: responseStatus, error } = await service.updateStatus(id, payload)
+        if (error) throw new Error(error.message)
+        if (responseStatus === 204) {
+          if (status === 'completed') {
+            notifyComplete(id)
+          } else {
+            notifyStatusUpdate(id)
+          }
+          return payload
+        }
+
+        return false
+      } catch (error) {
+        handleError('Updating status', error)
       }
     }
 
@@ -159,7 +239,11 @@ export const useTaskStore = defineStore(
         const payload = assignees.map((user_id) => ({ task_id: task, user_id }))
         const { status, error } = await service.addAssignees(payload)
         if (error) throw new Error(error.message)
-        return status === 204
+        if (status === 201) {
+          notifyAssignees(assignees, task)
+          return true
+        }
+        return true
       } catch (error) {
         handleError('Adding assignee', error)
       } finally {
@@ -195,20 +279,67 @@ export const useTaskStore = defineStore(
     }
 
     /**
-     * INFO
+     * USERS
      */
 
-    const getTaskInfo = async (task: string) => {
+    const getMyTasks = async () => {
+      auth.ensureAuth()
       try {
-        begin(TaskLoading.GETTING_INFO)
-        const { data, error } = await service.getTaskInfo(task)
+        begin(TaskLoading.GETTING_USER_TASKS)
+        const { data, error } = await service.getMyTasks(auth.userId!)
         if (error) throw new Error(error.message)
-        if (data) return data[0]
-        return null
+          return data
       } catch (error) {
-        handleError('Getting task info', error)
+        handleError('Getting my tasks', error)
+      } finally{
+        finish(TaskLoading.GETTING_USER_TASKS)
+      }
+    }
+
+    const getUserTasks = async (dateRange?: TaskDateRange) => {
+      auth.ensureAuth()
+      try {
+        begin(TaskLoading.GETTING_USER_TASKS)
+        const { data, error } = await service.getUserTasks(auth.userId!, dateRange)
+        if (error) throw new Error(error.message)
+          return data
+      } catch (error) {
+        handleError('Getting user tasks', error)
       } finally {
-        finish(TaskLoading.GETTING_INFO)
+        finish(TaskLoading.GETTING_USER_TASKS)
+      }
+    }
+
+    /**
+     * NOTIFICATIONS
+     */
+
+    const notifyAssignees = (users: string[] = [], task: string) => {
+      notificationStore.create(NotificationTypes.TASK_ASSIGNED, task, users)
+    }
+
+    const notifyStatusUpdate = async (task: string) => {
+      const _users = await getAssignees(task)
+      if (_users) {
+        const users = _users.map((u) => u.user_id)
+        notificationStore.create(NotificationTypes.TASK_STATUS_UPDATE, task, users)
+      }
+    }
+
+    const notifyComplete = async (task: string) => {
+      const _users = await getAssignees(task)
+      if (_users) {
+        const users = _users.map((u) => u.user_id)
+        notificationStore.create(NotificationTypes.TAST_COMPLETED, task, users)
+      }
+    }
+
+    // todo: to be used later as hook
+    const notifyOverdue = async (task: string) => {
+      const _users = await getAssignees(task)
+      if (_users) {
+        const users = _users.map((u) => u.user_id)
+        notificationStore.create(NotificationTypes.TASK_OVERDUE, task, users)
       }
     }
 
@@ -218,16 +349,21 @@ export const useTaskStore = defineStore(
       get,
       create,
       update,
+      updateStatus,
       destroy,
       isLoading,
+
+      // users
+      getMyTasks,
+      getUserTasks,
 
       //assignees
       addAssignees,
       getAssignees,
       removeAssignee,
 
-      //info
-      getTaskInfo,
+      // notifications
+      notifyOverdue,
     }
   },
   {

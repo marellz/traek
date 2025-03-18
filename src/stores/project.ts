@@ -2,13 +2,24 @@ import { useProjectService } from '@/services/projects'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import { ref } from 'vue'
-import { useAuthStore, type UserProfile } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 import { useLoadingState } from '@/composables/useLoading'
+import { NotificationTypes, useNotificationStore } from './notifications'
+
+export interface ProjectUser {
+  id: string;
+  email: string;
+  name: string | null;
+  username: string | null;
+  avatar_url: string | null
+}
 
 export type Project = {
   id: string
   name: string
-  created_by: UserProfile
+  created_by: string
+  creator: ProjectUser
+  members: ProjectUser[]
   created_at: string
   updated_at: string | null
   description: string
@@ -22,9 +33,9 @@ export interface ProjectStats {
   notes: { count: number }[]
 }
 
-export type ProjectInfo = Omit<Project, 'created_by'> &
+export type ProjectInfo = Omit<Project, 'created_by' | 'members'> &
   ProjectStats & {
-    created_by: UserProfile
+    creator: ProjectUser
   }
 
 export interface ProjectForm {
@@ -37,7 +48,7 @@ export interface ProjectForm {
   closed_at?: string | null
 }
 
-export interface ProjectMember extends UserProfile {
+export interface ProjectMember extends ProjectUser {
   joined_at: string
 }
 
@@ -66,6 +77,7 @@ export const useProjectStore = defineStore(
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
     const { begin, finish, isLoading } = useLoadingState()
+    const notify = useNotificationStore()
 
     const ensureAuth = (user_id?: string) => {
       if (!(auth.user && (user_id ? auth.user.id !== user_id : true))) {
@@ -135,11 +147,13 @@ export const useProjectStore = defineStore(
         if (error) throw new Error(error.message)
         if (data) {
           // todo: know what to do depending on origin/purpose
-          const _projects = [...projects.value]
-          _projects.push(data[0])
-          projects.value = _projects
+          // const _projects = [...projects.value]
+          // projects.value = _projects
+          // _projects.push(data[0])
 
           await addMembers(data[0].id, [...members, auth.userId!])
+
+          await getUserProjects()
 
           return data
         }
@@ -178,11 +192,11 @@ export const useProjectStore = defineStore(
           throw new Error('Project not found')
         }
 
-        ensureAuth(form.created_by.id)
+        ensureAuth(form.creator.id)
         const closed_at = new Date().toISOString()
         const { error, status } = await service.update(id, {
           ...form,
-          created_by: form.created_by.id,
+          created_by: form.creator.id,
           closed_at,
           updated_at: closed_at,
         })
@@ -211,7 +225,11 @@ export const useProjectStore = defineStore(
         const payload = members.map((user_id) => ({ user_id, project_id: project }))
         const { status, error } = await service.addMembers(payload)
         if (error) throw new Error(error.message)
-        return status === 201
+        if(status === 201){
+          notifyMemberAddition(project, members)
+          return true
+        }
+        return false
       } catch (error) {
         handleError('Adding member to project', error)
       } finally {
@@ -243,6 +261,14 @@ export const useProjectStore = defineStore(
       } finally {
         finish(ProjectLoading.REMOVING_MEMBER)
       }
+    }
+
+    /**
+     * NOTIFICATIONS
+     */
+
+    const notifyMemberAddition = (project: string, users: string[] = []) => {
+      notify.create(NotificationTypes.PROJECT_MEMBER_ADDED, project, users)
     }
 
     return {

@@ -1,18 +1,51 @@
 import { supabase } from '@/database/supabase'
-import type { TaskForm } from '@/stores/task'
+import type { TaskDateRange, TaskForm, TaskStatusForm } from '@/stores/task'
 export type TasksListCriteria = 'project_id' | 'creator' | 'assigned'
 
 export const useTaskService = () => {
   const getMyTasks = async (user: string) => {
-    return await supabase.from('tasks').select('*').eq('created_by', user)
+    return await supabase
+      .from('tasks')
+      .select(
+        `*,
+        project: project_id(id, name),
+        created_by: users (id, name, email, username, avatar_url),
+        task_assignees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('created_by', user)
   }
 
-  const getUserTasks = async (user: string) => {
-    return await supabase.from('task_assignees').select('*').eq('user_id', user)
+  const getUserTasks = async (user: string, dateRange?: TaskDateRange) => {
+    const query = supabase
+      .from('task_assignees')
+      .select(
+        `...task_id(
+        *,
+        project: project_id(id, name),
+        creator: created_by(id, name, email, username, avatar_url),
+        assignees: task_assignees(...users(id, name,email, username, avatar_url))
+        )`,
+      )
+      .eq('user_id', user)
+
+    if (dateRange)
+      query
+        .gte('task_id.due_date', dateRange.start_date)
+        .lte('task_id.due_date', dateRange.end_date)
+
+    return await query
   }
 
   const getProjectTasks = async (project: string) => {
-    return await supabase.from('tasks').select('*').eq('project_id', project)
+    return await supabase
+      .from('tasks')
+      .select(
+        `*,
+        created_by: users (id, name, email, username, avatar_url),
+        task_assignees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('project_id', project)
+      .order('due_date', { ascending: true })
   }
 
   const create = async (form: TaskForm) => {
@@ -20,28 +53,26 @@ export const useTaskService = () => {
   }
 
   const get = async (id: string) => {
-    return await supabase.from('tasks').select().eq('id', id)
+    return await supabase
+      .from('tasks')
+      .select(
+        `*,
+        created_by: users (id, name, email, username, avatar_url),
+        task_assignees(...users(id, name, email, username, avatar_url))`,
+      )
+      .eq('id', id)
   }
 
   const update = async (id: string, form: TaskForm) => {
     return await supabase.from('tasks').update(form).eq('id', id)
   }
 
-  const destroy = async (id: string) => {
-    return await supabase.from('tasks').delete().eq('id', id)
+  const updateStatus = async (id: string, payload: TaskStatusForm) => {
+    return await supabase.from('tasks').update(payload).eq('id', id)
   }
 
-  /**
-   * INFO
-   */
-  const getTaskInfo = async (id: string) => {
-    return await supabase
-      .from('tasks')
-      .select(
-        `created_by: users (id, name, email, username, avatar_url),
-        task_assignees(...users(id, name, email, username, avatar_url))`,
-      )
-      .eq('id', id)
+  const destroy = async (id: string) => {
+    return await supabase.from('tasks').delete().eq('id', id)
   }
 
   /**
@@ -63,20 +94,16 @@ export const useTaskService = () => {
   return {
     create,
     getMyTasks,
+    getUserTasks,
     getProjectTasks,
     get,
     update,
+    updateStatus,
     destroy,
-
-    //
-    getUserTasks,
 
     //
     getAssignees,
     addAssignees,
     removeAssignee,
-
-    //
-    getTaskInfo,
   }
 }

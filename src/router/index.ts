@@ -140,6 +140,53 @@ const router = createRouter({
     /**
      *
      *
+     * TASK
+     *
+     *
+     */
+
+    {
+      path: "/tasks/view/:id",
+      name: "task",
+      component: () => import('@/views/tasks/view.vue')
+    },
+    {
+      path: "/tasks/edit/:id",
+      name: 'edit-task',
+      component: () => import('@/views/tasks/form.vue')
+    },
+    {
+      path: "/tasks/new/:project",
+      name: 'create-task',
+      component: () => import('@/views/tasks/form.vue')
+    },
+
+    /**
+     *
+     *
+     * EVENT
+     *
+     *
+     */
+    {
+      path: "/event/view/:id",
+      name: "event",
+      component: () => import('@/views/events/view.vue')
+    },
+    {
+      path: "/event/edit/:id",
+      name: "edit-event",
+      component: () => import('@/views/events/form.vue')
+    },
+    {
+      path: "/event/creater/:project",
+      name: "create-event",
+      component: () => import('@/views/events/form.vue')
+    },
+
+    /**
+     *
+     *
      * USER PROFILE/SETTING ROUTES
      *
      *

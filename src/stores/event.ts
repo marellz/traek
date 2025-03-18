@@ -1,8 +1,14 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useAuthStore, type UserProfile } from './auth'
+import { useAuthStore } from './auth'
 import { useErrorStore } from './errors'
 import { useEventService } from '@/services/events'
 import { useLoadingState } from '@/composables/useLoading'
+import { NotificationTypes, useNotificationStore } from './notifications'
+
+export interface EventCancelPayload {
+  cancelled_at: string
+  status: string
+}
 
 export enum EventLoading {
   GETTING = 'getting-events',
@@ -15,6 +21,28 @@ export enum EventLoading {
   ADDING_INVITEES = 'adding-invitees',
   DELETING_INVITEE = 'deleting-invitee',
   GETTING_USER = 'getting-user-events',
+}
+
+export enum EventStatusEnum {
+  UPCOMING = 'upcoming',
+  IN_PROGRESS = 'in_progress',
+  PAST = 'past',
+  CANCELLED = 'cancelled',
+}
+export enum EventTypeEnum {
+  ONLINE = 'online',
+  PHYSICAL = 'physical',
+  EVENT = 'event',
+}
+
+export interface EventFormPayload {
+  form: ProjectEventForm
+  invitees: string[]
+}
+
+export interface EventDateRange {
+  end_date: string;
+  start_date: string;
 }
 
 export const useEventStore = defineStore(
@@ -84,7 +112,11 @@ export const useEventStore = defineStore(
       auth.ensureAuth()
       try {
         begin(EventLoading.UPDATING)
-        const { status, error } = await service.update(id, form)
+        const payload = {
+          ...form,
+          updated_at: new Date().toISOString(),
+        }
+        const { status, error } = await service.update(id, payload)
         if (error) throw new Error(error.message)
 
         return status === 204
@@ -95,18 +127,21 @@ export const useEventStore = defineStore(
       }
     }
 
-    const cancelEvent = async (_event: ProjectEventForm) => {
+    const cancelEvent = async (id: string) => {
       try {
         begin(EventLoading.CANCELLING)
-        const payload = {
-          ..._event,
+        const payload: EventCancelPayload = {
           cancelled_at: new Date().toISOString(),
-          status: 'cancelled'
+          status: 'cancelled',
         }
 
-        const { status, error } = await service.cancelEvent(payload)
+        const { status, error } = await service.cancelEvent(id, payload)
         if (error) throw new Error(error.message)
-        return status === 200 // upsert
+        if (status === 204) {
+          notifyCancellation(id)
+          return payload
+        }
+        return null
       } catch (error) {
         handleError('Cancelling event', error)
       } finally {
@@ -133,10 +168,12 @@ export const useEventStore = defineStore(
      * USER
      */
 
-    const getUserEvents = async (user_id: string) => {
+    const getUserEvents = async (dateRange: EventDateRange) => {
+      auth.ensureAuth()
+      const user_id = auth.userId!
       try {
         begin(EventLoading.GETTING_USER)
-        const { error, data } = await service.getUserEvents(user_id)
+        const { error, data } = await service.getUserEvents(user_id, dateRange)
         if (error) throw new Error(error.message)
         return data
       } catch (error) {
@@ -178,7 +215,12 @@ export const useEventStore = defineStore(
         const { error, status } = await service.addInvitees(payload)
 
         if (error) throw new Error(error.message)
-        return status === 204
+        if (status === 201) {
+          notifyInvitation(event_id, invitees)
+          return true
+        }
+
+        return false
       } catch (error) {
         handleError('Adding invitees', error)
       } finally {
@@ -200,6 +242,33 @@ export const useEventStore = defineStore(
       }
     }
 
+    /**
+     * NOTIFICATIONS
+     */
+
+    const notify = useNotificationStore()
+
+    const notifyInvitation = (event_id: string, users: string[] = []) => {
+      notify.create(NotificationTypes.EVENT_INVITED, event_id, users)
+    }
+
+    const notifyCancellation = async (event_id: string) => {
+      const _users = await getInvitees(event_id)
+      if (_users) {
+        const users = _users.map((u) => u.id)
+        notify.create(NotificationTypes.EVENT_CANCELLED, event_id, users)
+      }
+    }
+
+    // todo: to be used later as hook
+    const notifyUpcoming = async (event_id: string) => {
+      const _users = await getInvitees(event_id)
+      if (_users) {
+        const users = _users.map((u) => u.id)
+        notify.create(NotificationTypes.EVENT_UPCOMING, event_id, users)
+      }
+    }
+
     return {
       create,
       getEvent,
@@ -216,6 +285,9 @@ export const useEventStore = defineStore(
       deleteInvitee,
 
       isLoading,
+
+      // notifications
+      notifyUpcoming,
     }
   },
   {
@@ -227,13 +299,21 @@ if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useEventStore, import.meta.hot))
 }
 
+export interface EventUser {
+  id: string
+  email: string
+  name: string | null
+  username: string | null
+  avatar_url: string | null
+}
+
 export interface ProjectEvent {
   id: string
   project_id: string
   title: string
   description: string | null
   created_at: string
-  created_by: UserProfile
+  created_by: EventUser
   url: string | null
   venue: string | null
   event_type: string
@@ -242,6 +322,7 @@ export interface ProjectEvent {
   duration_hours: number | null
   updated_at: string | null
   cancelled_at: string | null
+  event_invitees: EventUser[]
 }
 
 export interface ProjectEventForm {
