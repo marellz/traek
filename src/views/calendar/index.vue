@@ -3,7 +3,7 @@
     <div class="mt-10">
       <div class="flex items-center justify-between">
         <h1 class="text-4xl">Calendar</h1>
-        <base-button @click="getActivities">
+        <base-button @click="getActivities" :loading>
           <span>Refresh</span>
         </base-button>
       </div>
@@ -20,7 +20,7 @@
             <custom-select-option name="years" v-for="v in years" :key="v" :value="v">{{ v }}</custom-select-option>
           </form-select>
         </div>
-        <div>
+        <div class="flex items-center">
           <form-checkbox v-model="showCancelled" label="Show cancelled"></form-checkbox>
         </div>
       </div>
@@ -32,12 +32,23 @@
         </thead>
         <tbody>
           <tr v-for="(week, w) in calendar" :key="w">
-            <td :width="`${100 / week.length}%`" v-for="(day, d) in week" :key="`${d}-${w}`" class="relative align-top">
-              <p class="text-slate-400 dark:text-slate-600 text-xs font-black absolute top-2 left-2">
-                {{ day.date }}
-              </p>
+            <td :width="`${100 / week.length}%`" v-for="(day, d) in week" :key="`${d}-${w}`" class="relative align-top group">
+              <div class="flex items-center top-2 left-2 absolute">
+                <p class="text-slate-400 dark:text-slate-600 text-xs font-black">
+                  {{ day.date }}
+                </p>
+                <dropdown trigger-class="p-0.5 border-none mt-1 invisible group-hover:visible">
+                  <template #trigger >
+                    <Plus :size="16" />
+                  </template>
+                  <dropdown-item>
+                    <span>New event</span>
+                  </dropdown-item>
+                </dropdown>
+              </div>
+
               <div>
-                <ul class="space-y-1 mt-2">
+                <ul class="space-y-1 mt-4">
                   <li v-for="item in day.activity" :key="item.id">
                     <router-link :to="{ name: item.type, params: { id: item.id } }">
                       <div
@@ -72,11 +83,11 @@
 import FormSelect from '@/components/form/custom/select.vue'
 import FormCheckbox from '@/components/form/checkbox.vue'
 import CustomSelectOption from '@/components/form/custom/select-option.vue'
-import { EventStatusEnum, useEventStore } from '@/stores/event';
-import { TaskStatusEnum, useTaskStore } from '@/stores/task';
+import { EventLoading, EventStatusEnum, useEventStore } from '@/stores/event';
+import { TaskLoading, TaskStatusEnum, useTaskStore } from '@/stores/task';
 import { onMounted, ref, computed, watch } from 'vue';
 import moment from 'moment';
-import { CalendarX, Check } from 'lucide-vue-next';
+import { CalendarX, Check, Plus } from 'lucide-vue-next';
 
 type ActivityType = 'event' | 'task'
 interface Activity {
@@ -94,12 +105,15 @@ interface Day {
   allActivity: Activity[],
   activity: Activity[]
 }
+const tasksStore = useTaskStore()
+const eventStore = useEventStore()
+
 const months: string[] = moment.months()
 const month = ref<string | number>(months[moment().month()])
 const year = ref<number>(moment().year())
 const years = computed(() => Array.from({ length: 10 }, (_, c) => moment().year() - c))
 const calendar = ref<Day[][]>([])
-
+const loading = computed(() => tasksStore.isLoading(TaskLoading.GETTING_USER_TASKS) && eventStore.isLoading(EventLoading.GETTING_USER))
 const dateRange = computed(() => {
   const m = moment().month(month.value).year(year.value)
   return {
@@ -156,7 +170,6 @@ const dateRangeString = computed(() => {
 
 const loadingTasks = ref(false)
 
-const tasksStore = useTaskStore()
 const getTasks = async () => {
   loadingTasks.value = true
   // for this one month
@@ -177,7 +190,6 @@ const getTasks = async () => {
   }
 }
 
-const eventStore = useEventStore()
 const getEvents = async () => {
   // for this one month
   const events = await eventStore.getUserEvents(dateRangeString.value)
