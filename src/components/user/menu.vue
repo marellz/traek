@@ -6,7 +6,8 @@
     <div v-show="active"
       class="absolute top-full right-0 w-auto min-w-40 overflow-hidden rounded-md border border-slate-300 bg-white dark:bg-slate-700 dark:border-slate-600 z-10">
       <div class="flex flex-col">
-        <div class="flex items-center space-x-2 bg-slate-100 dark:bg-slate-700 p-2 border-b border-b-slate-200 dark:border-b-slate-600">
+        <div
+          class="flex items-center space-x-2 bg-slate-100 dark:bg-slate-700 p-2 border-b border-b-slate-200 dark:border-b-slate-600">
           <user-avatar size="h-10 w-10" :avatar="auth.profile?.avatar"></user-avatar>
           <div>
             <p class="font-medium text-sm">

@@ -6,8 +6,10 @@
   </span>
 </template>
 <script lang="ts" setup>
+import { useUserStore } from "@/stores/user";
 import { User } from "lucide-vue-next"
-withDefaults(
+import { onMounted, ref, watch } from "vue";
+const props = withDefaults(
   defineProps<{
     avatar: string | null | undefined
     size?: string
@@ -18,4 +20,17 @@ withDefaults(
     size: "h-6 w-6",
   },
 )
+const url = ref<string | null>(null)
+const userStore = useUserStore()
+const getAvatar = async () => {
+  if (!props.avatar) return
+  const _url = await userStore.getAvatarLink(props.avatar)
+  if (_url) {
+    url.value = _url
+  }
+}
+
+onMounted(getAvatar)
+
+watch(() => props.avatar, getAvatar)
 </script>
