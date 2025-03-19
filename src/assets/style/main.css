@@ -67,7 +67,7 @@ $chili-red: #d84727ff;
 }
 
 .calendar td {
-  @apply h-32
+  @apply h-32;
 }
 
 .calendar tbody tr:last-child td {
@@ -76,4 +76,16 @@ $chili-red: #d84727ff;
 
 .calendar th {
   @apply bg-slate-100 dark:bg-slate-800/50;
+}
+
+.member-table {
+  @apply w-full border-separate border-spacing-y-2 border-spacing-x-0;
+}
+
+.member-table td.disabled td{
+  @apply bg-slate-100 dark:bg-slate-500;
+}
+
+.member-table td {
+  @apply p-2;
 }

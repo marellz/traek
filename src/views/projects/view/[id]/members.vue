@@ -10,25 +10,39 @@
       </base-button>
     </div>
     <base-loader class="py-20" v-if="loading.gettingTasks"></base-loader>
-    <table class="mt-10 table w-full">
-      <thead>
+    <table class="mt-10 member-table">
+      <!-- <thead>
         <tr class="border-b border-b-slate-200 text-left font-medium">
           <th class="font-medium" v-for="(header, index) in headers" :key="index">{{ header }}</th>
         </tr>
-      </thead>
+      </thead> -->
       <tbody>
-        <tr v-for="user in members" :key="user.id" :class="{'bg-slate-100 dark:bg-slate-500': project?.creator.id === user.id}">
+        <tr v-for="user in members" :key="user.id" :class="{ 'disabled': project?.creator.id === user.id }">
+          <td class="py-4">
+            <div class="flex items-center space-x-2">
+              <user-avatar size="h-12 w-12" :avatar="user.avatar_url"></user-avatar>
+              <div>
+                <p>
+                  {{ user.name }}
+                  <span class="text-sm text-slate-400">@{{ user.username }}</span>
+                </p>
+                <div class="flex space-x-2 items-center text-slate-400">
+                  <Mail :size="12" />
+                  <p class="text-sm ">
+                    {{ user.email }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <base-tag><span>Active</span></base-tag>
+          </td>
           <td class="py-4">
             <p>
-              {{ user.name }}
+              {{ parseDate(user.joined_at) }}
             </p>
-            <p class="text-sm text-slate-400">@{{ user.username }}</p>
-          </td>
-          <td class="py-4">
-            {{ user.email }}
-          </td>
-          <td class="py-4">
-            {{ parseDate(user.joined_at) }}
+            <p class="text-xs text-slate-400">Member since</p>
           </td>
           <td class="py-4">
             <base-action v-if="project?.creator.id !== user.id" @click="removeMember(user.id)">
@@ -51,10 +65,12 @@
   </div>
 </template>
 <script lang="ts" setup>
+import UserAvatar from '@/components/user/avatar.vue'
 import FormUserSelector from '@/components/form/user-selector.vue'
 import { useProjectStore, type Project, type ProjectMember, type ProjectUser } from '@/stores/project'
 import { useUserStore } from '@/stores/user'
 import { useDebounceFn } from '@vueuse/core'
+import { Mail } from 'lucide-vue-next'
 import moment from 'moment'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
