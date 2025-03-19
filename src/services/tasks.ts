@@ -9,8 +9,8 @@ export const useTaskService = () => {
       .select(
         `*,
         project: project_id(id, name),
-        created_by: users (id, name, email, username, avatar_url),
-        task_assignees(...users(id, name, email, username, avatar_url))`,
+        created_by: users (id, name, email, username, avatar),
+        task_assignees(...users(id, name, email, username, avatar))`,
       )
       .eq('created_by', user)
   }
@@ -22,8 +22,8 @@ export const useTaskService = () => {
         `...task_id(
         *,
         project: project_id(id, name),
-        creator: created_by(id, name, email, username, avatar_url),
-        assignees: task_assignees(...users(id, name,email, username, avatar_url))
+        creator: created_by(id, name, email, username, avatar),
+        assignees: task_assignees(...users(id, name,email, username, avatar))
         )`,
       )
       .eq('user_id', user)
@@ -41,8 +41,8 @@ export const useTaskService = () => {
       .from('tasks')
       .select(
         `*,
-        created_by: users (id, name, email, username, avatar_url),
-        task_assignees(...users(id, name, email, username, avatar_url))`,
+        created_by: users (id, name, email, username, avatar),
+        task_assignees(...users(id, name, email, username, avatar))`,
       )
       .eq('project_id', project)
       .order('due_date', { ascending: true })
@@ -57,8 +57,8 @@ export const useTaskService = () => {
       .from('tasks')
       .select(
         `*,
-        created_by: users (id, name, email, username, avatar_url),
-        task_assignees(...users(id, name, email, username, avatar_url))`,
+        created_by: users (id, name, email, username, avatar),
+        task_assignees(...users(id, name, email, username, avatar))`,
       )
       .eq('id', id)
   }

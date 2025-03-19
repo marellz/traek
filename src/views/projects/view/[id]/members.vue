@@ -20,7 +20,7 @@
         <tr v-for="user in members" :key="user.id" :class="{ 'disabled': project?.creator.id === user.id }">
           <td class="py-4">
             <div class="flex items-center space-x-2">
-              <user-avatar size="h-12 w-12" :avatar="user.avatar_url"></user-avatar>
+              <user-avatar size="h-12 w-12" :avatar="user.avatar"></user-avatar>
               <div>
                 <p>
                   {{ user.name }}
@@ -153,5 +153,5 @@ onMounted(async () => {
   }
 })
 
-const headers = ['Name', 'Email', 'Member since', 'Actions']
+// const headers = ['Name', 'Email', 'Member since', 'Actions']
 </script>

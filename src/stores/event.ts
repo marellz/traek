@@ -304,7 +304,7 @@ export interface EventUser {
   email: string
   name: string | null
   username: string | null
-  avatar_url: string | null
+  avatar: string | null
 }
 
 export interface ProjectEvent {

@@ -356,7 +356,6 @@ export type UserProfile = {
   name: string | null
   phone?: string | null
   avatar?: string | null
-  avatar_url?: string | null
   created_at: string
 }
 
@@ -367,6 +366,5 @@ export type UserProfileForm = {
   username: string
   phone?: string | null
   avatar?: string | null
-  avatar_url?: string | null
   created_at: string
 }

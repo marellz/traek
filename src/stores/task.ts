@@ -44,7 +44,7 @@ export type TaskUser = {
   name: string | null
   email: string
   username: string | null
-  avatar_url: string | null
+  avatar: string | null
 }
 
 export interface Task {

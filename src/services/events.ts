@@ -9,8 +9,8 @@ export const useEventService = () => {
       .from('events')
       .select(
         `*,
-        created_by(id, name, email, username, avatar_url),
-        event_invitees(...users(id, name, email, username, avatar_url))`,
+        created_by(id, name, email, username, avatar),
+        event_invitees(...users(id, name, email, username, avatar))`,
       )
       .eq('project_id', project)
       .order('datetime', { ascending: true })
@@ -21,8 +21,8 @@ export const useEventService = () => {
       .from('events')
       .select(
         `*,
-        created_by(id, name, email, username, avatar_url),
-        event_invitees(...users(id, name, email, username, avatar_url))`,
+        created_by(id, name, email, username, avatar),
+        event_invitees(...users(id, name, email, username, avatar))`,
       )
       .eq('id', id)
   }
@@ -54,8 +54,8 @@ export const useEventService = () => {
         `...event_id(
         *,
         project: project_id(id, name),
-        creator: users(id, name, email, username, avatar_url),
-        invitees: event_invitees(...users(id, name, email, username, avatar_url))
+        creator: users(id, name, email, username, avatar),
+        invitees: event_invitees(...users(id, name, email, username, avatar))
         )
       `,
       )

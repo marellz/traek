@@ -96,7 +96,6 @@ const getProfile = async () => {
         username: '',
         phone: '',
         avatar: '',
-        avatar_url: '',
         created_at,
       },
     })
