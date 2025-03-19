@@ -3,27 +3,34 @@
     <layout-banner-title> User profile </layout-banner-title>
   </layout-banner>
   <layout-container class="m-10">
-    <div>
-      <Form @submit="submit()">
-        <div class="space-y-4">
-          <form-input v-model="name" label="Name" required :error="errors.name"></form-input>
-          <form-input type="email" v-model="email" label="Email" :disabled="email !== null"
-            :error="errors.email"></form-input>
-          <form-input v-model="username" label="Username" required :error="errors.username"></form-input>
-          <form-input v-model="phone" label="Phone number" :error="errors.phone"></form-input>
-          <base-button>
-            <span>Update changes</span>
-          </base-button>
-        </div>
-      </Form>
+    <div class="grid grid-cols-3 gap-10">
+      <div class="py-10">
+        <form-file></form-file>
+      </div>
+      <div class="col-span-2">
+        <Form @submit="submit()">
+          <div class="space-y-4">
+            <form-input v-model="name" label="Name" required :error="errors.name"></form-input>
+            <form-input type="email" v-model="email" label="Email" :disabled="email !== null"
+              :error="errors.email"></form-input>
+            <form-input v-model="username" label="Username" required :error="errors.username"></form-input>
+            <form-input v-model="phone" label="Phone number" :error="errors.phone"></form-input>
+            <base-button :loading="loading.updating">
+              <span>Update changes</span>
+            </base-button>
+          </div>
+        </Form>
+      </div>
+
     </div>
   </layout-container>
 </template>
 <script lang="ts" setup>
 import FormInput from '@/components/form/input.vue'
-import { useAuthStore, type UserProfile, type UserProfileForm } from '@/stores/auth'
+import FormFile from '@/components/form/avatar.vue'
+import { AuthLoading, useAuthStore, type UserProfile, type UserProfileForm } from '@/stores/auth'
 import { watchDebounced } from '@vueuse/core'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import { Form, useForm } from 'vee-validate'
 import * as yup from 'yup'
@@ -31,6 +38,9 @@ import { useUserStore } from '@/stores/user'
 
 const auth = useAuthStore()
 const userStore = useUserStore()
+const loading = computed(() => ({
+  updating: auth.isLoading(AuthLoading.UPDATING_PROFILE)
+}))
 const { errors, defineField, handleSubmit, resetForm } = useForm({
   validationSchema: yup.object({
     id: yup.string().required('ID is required'),

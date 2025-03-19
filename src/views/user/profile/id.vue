@@ -22,7 +22,7 @@
       </div>
       <layout-card v-else>
         <div class="flex gap-10">
-          <user-avatar :icon-size="60" size="h-28 w-28" :avatar="user.avatar_url"></user-avatar>
+          <user-avatar :icon-size="60" size="h-40 w-40" :avatar="user.avatar"></user-avatar>
           <div class="col-span-2 space-y-2">
             <h1 class="text-2xl">{{ user.name }}</h1>
             <div class="text-sm space-y-3">
@@ -51,7 +51,7 @@
 <script lang="ts" setup>
 import Empty from '@/components/common/empty.vue';
 import UserAvatar from '@/components/user/avatar.vue'
-import { useAuthStore, type UserProfile } from '@/stores/auth';
+import { AuthLoading, useAuthStore, type UserProfile } from '@/stores/auth';
 import { AtSign, Mail, Phone } from 'lucide-vue-next';
 import moment from 'moment';
 import { computed, onMounted, ref } from 'vue';
@@ -61,7 +61,7 @@ const route = useRoute()
 
 const isMe = computed(() => auth.userId === id.value)
 const id = computed(() => route.params.id as string)
-const loading = computed(() => auth.loading)
+const loading = computed(() => auth.isLoading(AuthLoading.GETTING_PROFILE))
 const user = ref<UserProfile>()
 const getUser = async () => {
   const _user = await auth.getProfile()
