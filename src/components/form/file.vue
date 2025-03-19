@@ -10,9 +10,9 @@
         '!border-primary !bg-primary-lighter/25': !!model,
         grayscale: disabled || uploading,
       }">
-      <div>
+      <!-- <div>
         <img class="max-w-40" src="@/assets/images/undraw_add-files_d04y.svg" alt="" />
-      </div>
+      </div> -->
       <div>
         <template v-if="model">
           <div class="space-y-2">
