@@ -1,5 +1,5 @@
 <template>
-  <img v-if="avatar" class="object-center object-cover rounded-full border-2" :class="size" :src="avatar" alt="" />
+  <img v-if="url" class="object-center object-cover rounded-full border-2" :class="size" :src="url" alt="" />
   <span v-else class="rounded-full border-2 border-white/10 bg-white/20 inline-flex items-center justify-center"
     :class="size">
     <User :size="iconSize" :stroke-width="1" />
