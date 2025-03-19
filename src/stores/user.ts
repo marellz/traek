@@ -3,12 +3,18 @@ import { useErrorStore } from './errors'
 import { useUserService } from '@/services/user'
 import { useAuthStore } from './auth'
 import { useLoadingState } from '@/composables/useLoading'
+import { useAvatarService } from '@/services/avatars'
 
-enum UserLoading {
+export enum UserLoading {
   GETTING_ONE = 'getting-user-profile',
   GETTING_MANY = 'getting-user-profiles',
-  QUERYING_USERS ='querying-users',
-  CHECKING_USERNAME = 'checking-username'
+  QUERYING_USERS = 'querying-users',
+  GETTING_LINK = 'getting-avatar-link',
+  CHECKING_USERNAME = 'checking-username',
+}
+
+export interface AvatarTransform {
+  size:number
 }
 
 export const useUserStore = defineStore(
@@ -16,8 +22,9 @@ export const useUserStore = defineStore(
   () => {
     const { handleError } = useErrorStore()
     const service = useUserService()
+    const avatarService = useAvatarService()
     const auth = useAuthStore()
-    const {isLoading, finish, begin} = useLoadingState()
+    const { isLoading, finish, begin } = useLoadingState()
 
     const getProfile = async (q: string, column: 'id' | 'username' = 'id') => {
       auth.ensureAuth()
@@ -85,6 +92,19 @@ export const useUserStore = defineStore(
       }
     }
 
+    const getAvatarLink = async (path: string) => {
+      try {
+        begin(UserLoading.GETTING_LINK)
+        const { data } = await avatarService.getAvatarLink(path)
+        if (!data.publicUrl) throw new Error('Invalid/not found')
+        return data.publicUrl
+      } catch (error) {
+        handleError('Getting avatar link', error)
+      } finally {
+        finish(UserLoading.GETTING_LINK)
+      }
+    }
+
     const checkUsername = async (username: string) => {
       try {
         begin(UserLoading.CHECKING_USERNAME)
@@ -110,9 +130,10 @@ export const useUserStore = defineStore(
       getProfiles,
       queryUsers,
       checkUsername,
+      getAvatarLink,
 
       //
-      isLoading
+      isLoading,
     }
   },
   {

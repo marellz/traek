@@ -3,6 +3,19 @@ import AuthService, { type AuthPayload } from '@/services/auth'
 import { computed, ref, watch } from 'vue'
 import { useErrorStore } from './errors'
 import type { User } from '@supabase/supabase-js'
+import { useLoadingState } from '@/composables/useLoading'
+import { useAvatarService } from '@/services/avatars'
+import { generateAvatarName } from '@/utils/generateAvatarName'
+import { useUserStore } from './user'
+
+export enum AuthLoading {
+  UPLOADING = 'uploading-user-avatar',
+  DELETING = 'deleting-user-avatar',
+  GETTING = 'getting-user-avatar',
+
+  GETTING_PROFILE = 'getting-user-profile',
+  UPDATING_PROFILE = 'updating-user-profile',
+}
 
 export const useAuthStore = defineStore(
   'auth',
@@ -14,6 +27,8 @@ export const useAuthStore = defineStore(
     const errors = ref<Record<string, string> | null>(null)
     const isAuthenticated = computed(() => user.value !== null)
     const userId = computed(() => (user.value ? user.value.id : null))
+    const { isLoading, begin, finish } = useLoadingState()
+    const userStore = useUserStore()
 
     const init = async () => {
       try {
@@ -170,6 +185,15 @@ export const useAuthStore = defineStore(
       throw new Error('User not authenticated')
     }
 
+    const ensureProfile = () => {
+      ensureAuth()
+      if (profile.value) {
+        return true
+      }
+
+      throw new Error('No profile found')
+    }
+
     /**
      * PROFILE
      */
@@ -184,7 +208,7 @@ export const useAuthStore = defineStore(
         return null
       }
       try {
-        loading.value = true
+        begin(AuthLoading.GETTING_PROFILE)
         const { data, error } = await AuthService.getProfile(userId.value)
         if (error) {
           handleError('Getting profile', error)
@@ -200,7 +224,7 @@ export const useAuthStore = defineStore(
       } catch (error) {
         handleError('Getting profile', error)
       } finally {
-        loading.value = false
+        finish(AuthLoading.GETTING_PROFILE)
       }
     }
 
@@ -210,11 +234,10 @@ export const useAuthStore = defineStore(
       }
       // update
       try {
-        loading.value =  true
+        begin(AuthLoading.UPDATING_PROFILE)
         const { status } = await AuthService.updateProfile(userId.value, form)
         if (status === 204) {
           profile.value = { ...profile.value, ...form }
-
           return true
         }
 
@@ -222,7 +245,60 @@ export const useAuthStore = defineStore(
       } catch (error) {
         handleError('Updating profile', error)
       } finally {
-        loading.value =  true
+        finish(AuthLoading.UPDATING_PROFILE)
+      }
+    }
+
+    /**
+     * AVATARS
+     */
+    const avatarService = useAvatarService()
+
+    const deleteAvatar = async () => {
+      ensureProfile()
+      try {
+        begin(AuthLoading.DELETING)
+        const path = profile.value?.avatar
+        if (!path) throw new Error('User profile has no avatar saved')
+        const { data, error } = await avatarService.deleteAvatar(path)
+        if (error) throw new Error(error.message)
+        if (data) {
+          profile.value = { ...profile.value!, avatar: null }
+          const form = profile.value as UserProfileForm
+          updateProfile({ ...form!, avatar: null })
+          return true
+        }
+
+        return false
+      } catch (error) {
+        handleError('Deleting user avatar', error)
+      } finally {
+        finish(AuthLoading.DELETING)
+      }
+    }
+
+    const uploadAvatar = async (file: File) => {
+      ensureProfile()
+      try {
+        begin(AuthLoading.UPLOADING)
+        // const name = profile.value?.id + file.name
+        const name = generateAvatarName(file.name, profile.value!.id)
+        const { data, error } = await avatarService.uploadAvatar(file, name)
+        if (error) throw new Error(error.message)
+        if (data) {
+          const { path: avatar } = data
+          // profile.value!.avatar = avatar
+          profile.value = { ...profile.value!, avatar }
+          const form = profile.value as UserProfileForm
+          await updateProfile({ ...form!, avatar })
+          return userStore.getAvatarLink(avatar)
+        }
+
+        return null
+      } catch (error) {
+        handleError('Uploading user avatar', error)
+      } finally {
+        finish(AuthLoading.UPLOADING)
       }
     }
 
@@ -252,6 +328,13 @@ export const useAuthStore = defineStore(
       updateProfile,
       //
       ensureAuth,
+
+      // avatars
+      deleteAvatar,
+      uploadAvatar,
+
+      //
+      isLoading,
     }
   },
   {
