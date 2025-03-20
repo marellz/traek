@@ -11,7 +11,7 @@ export enum NotesLoading {
   DELETING = 'deleting-note',
 }
 export const useNotesStore = defineStore(
-  'counter',
+  'notes',
   () => {
     const service = useNotesService()
     const { handleError } = useErrorStore()

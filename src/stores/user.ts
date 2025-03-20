@@ -18,7 +18,7 @@ export interface AvatarTransform {
 }
 
 export const useUserStore = defineStore(
-  'counter',
+  'users',
   () => {
     const { handleError } = useErrorStore()
     const service = useUserService()
