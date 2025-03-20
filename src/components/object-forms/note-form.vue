@@ -3,7 +3,7 @@
   <Form v-else @submit="submitForm()">
     <div class="space-y-4">
       <form-input label="Title" v-model="title" :error="errors.title"></form-input>
-      <form-text label="Content" v-model="content" :error="errors.content"></form-text>
+      <form-quill v-model="content" :error="errors.content"></form-quill>
       <base-button :loading="loading.creating || loading.updating">
         <span>Save changes</span></base-button
       >
@@ -12,7 +12,7 @@
 </template>
 <script lang="ts" setup>
 import FormInput from '@/components/form/input.vue'
-import FormText from '@/components/form/text.vue'
+import FormQuill from '@/components/form/quill.vue'
 import { NotesLoading, useNotesStore, type ProjectNote } from '@/stores/notes'
 import { Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'

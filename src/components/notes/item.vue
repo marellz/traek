@@ -15,9 +15,9 @@
       </div>
     </div>
     <a class="block" href="#" @click.prevent="emit('open-note', item.id)">
-      <p class="mt-2 line-clamp-4 text-sm text-slate-500" :class="{ 'line-clamp-none': showAll }" :title="item.content">
-        {{ item.content }}
-      </p>
+      <div class="mt-2 line-clamp-4 text-sm text-slate-500" :class="{ 'line-clamp-none': showAll }">
+        <p v-html="item.content"></p>
+      </div>
       <div class="mt-10">
         <div class="flex items-center space-x-2">
           <user-avatar size="h-10 w-10" :avatar="item.created_by.avatar"></user-avatar>
