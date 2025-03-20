@@ -11,7 +11,7 @@
       </p>
       <div class="text-sm text-slate-600 flex space-x-1">
         <span>
-          Created on {{ parseDate(item.created_at) }}
+          Created {{ parseDate(item.created_at) }}
         </span>
         <span v-if="item.created_by">by {{ item.creator.name }}</span>
       </div>
@@ -20,7 +20,7 @@
 </template>
 <script lang="ts" setup>
 import type { Project } from '@/stores/project'
-import moment from 'moment'
+import { parseDate } from '@/utils/parseDate';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -28,8 +28,4 @@ const props = defineProps<{
 }>()
 
 const isActive = computed(() => props.item.closed_at === null)
-
-const parseDate = (str: string) => {
-  return moment(str).format('Do MMM YYYY')
-}
 </script>

@@ -71,9 +71,9 @@ import { useProjectStore, type Project, type ProjectMember, type ProjectUser } f
 import { useUserStore } from '@/stores/user'
 import { useDebounceFn } from '@vueuse/core'
 import { Mail } from 'lucide-vue-next'
-import moment from 'moment'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { parseDate } from '@/utils/parseDate'
 
 const route = useRoute()
 const userStore = useUserStore()
@@ -90,10 +90,6 @@ const getMembers = async () => {
   if (_users) {
     members.value = _users
   }
-}
-
-const parseDate = (dt: string) => {
-  return moment(dt).format('Do MMM YYYY')
 }
 
 const showAddMemberModal = ref(false)

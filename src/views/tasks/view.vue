@@ -32,15 +32,15 @@
           <Calendar :size="24" :stroke-width="1.5"></Calendar>
           <div class="space-y-1 text-sm text-slate-500">
             <p>
-              {{ task.updated_at ? 'Updated at' : 'Created on' }} {{ parseDate(task.updated_at ?? task.created_at) }}
+              {{ task.updated_at ? 'Updated at' : 'Created on' }} {{ parseDate(task.updated_at ?? task.created_at, 'Do MMM YYYY, h:mm A') }}
             </p>
             <template v-if="task.start_date">
-              <p>Started on {{ parseDate(task.start_date) }} </p>
-              <p v-if="task.end_date">Completed on {{ parseDate(task.end_date) }}</p>
+              <p>Started on {{ parseDate(task.start_date, 'Do MMM YYYY, h:mm A') }} </p>
+              <p v-if="task.end_date">Completed on {{ parseDate(task.end_date, 'Do MMM YYYY, h:mm A') }}</p>
               <p v-else>in progress...</p>
             </template>
             <p v-if="task.due_date && inComplete" :class="{ 'text-red-500 font-medium': isOverdue }">
-              Due on {{ parseDate(task.due_date) }}
+              Due on {{ parseDate(task.due_date, 'Do MMM YYYY, h:mm A') }}
             </p>
           </div>
           <div v-if="task.created_by.id === auth.userId" class="ml-auto flex items-center space-x-2">
@@ -105,6 +105,7 @@ import { Mail } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router';
 import { TaskPriorityColors, TaskPriorityLabels, TaskStatusColors, TaskStatusLabels } from '@/data/task-data';
 import TaskStatusSwitch from '@/components/task/status-switch.vue'
+import { parseDate } from '@/utils/parseDate';
 
 const route = useRoute()
 const router = useRouter()
@@ -132,10 +133,6 @@ const isOverdue = computed(() => {
   if (!(task.value && task.value.due_date)) return false
   return moment(task.value.due_date).isAfter(moment()) && inComplete.value
 })
-
-const parseDate = (date: string) => {
-  return moment(date).format('Do MMM YYYY, h:mm A')
-}
 
 const editTask = async () => {
   if (!task.value?.id) {

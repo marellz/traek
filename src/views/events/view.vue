@@ -83,7 +83,8 @@
         </div>
 
         <p class="text-sm text-slate-500">
-          {{ _event.updated_at ? 'Updated at' : 'Created on' }} {{ parseDate(_event.updated_at ?? _event.created_at) }}
+          {{ _event.updated_at ? 'Updated at' : 'Created on' }}
+          {{ parseDate(_event.updated_at ?? _event.created_at, 'Do MMM YYYY, h:mm A') }}
         </p>
 
         <div class="space-y-4">
@@ -127,6 +128,7 @@
 import { eventStatusColors, eventTypes, type EventStatus, type EventTypes } from '@/data/event-data';
 import { useAuthStore } from '@/stores/auth';
 import { EventLoading, useEventStore, type ProjectEvent } from '@/stores/event';
+import { parseDate } from '@/utils/parseDate';
 import { ArrowLeft, CalendarArrowUp, CalendarCheck, CalendarX, Clock9, Link, Mail, MapPin } from 'lucide-vue-next';
 import moment from 'moment';
 import { computed, onMounted, ref } from 'vue';
@@ -150,10 +152,6 @@ const duration = computed(() =>
     _event.value.duration_hours < 1 ? `${_event.value.duration_hours * 60} minutes` : `${_event.value.duration_hours}hours` :
     ''
 )
-
-const parseDate = (date: string) => {
-  return moment(date).format('Do MMM YYYY, h:mm A')
-}
 
 const getEvent = async () => {
   const data = await eventStore.getEvent(id.value)
