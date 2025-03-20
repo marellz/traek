@@ -13,6 +13,7 @@ import BaseTag from '@/components/base/tag.vue'
 import BaseLink from '@/components/base/link.vue'
 import BaseDropdown from '@/components/base/dropdown.vue'
 import BaseDropdownItem from '@/components/base/dropdown-item.vue'
+import BasePopover from '@/components/base/popover.vue'
 
 import { type Component } from 'vue'
 const components: Record<string, Component> = {
@@ -29,6 +30,7 @@ const components: Record<string, Component> = {
   'base-tag': BaseTag,
   'base-link': BaseLink,
   'base-confirm': BaseConfirm,
+  'base-popover': BasePopover,
   'dropdown': BaseDropdown,
   'dropdown-item' : BaseDropdownItem
 }
