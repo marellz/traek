@@ -1,12 +1,11 @@
 <template>
-  <base-loader v-if="loading.getting"></base-loader>
+  <base-loader v-if="getting"></base-loader>
   <Form v-else @submit="submitForm()">
     <div class="space-y-4">
       <form-input label="Title" v-model="title" :error="errors.title"></form-input>
       <form-quill v-model="content" :error="errors.content"></form-quill>
-      <base-button :loading="loading.creating || loading.updating">
-        <span>Save changes</span></base-button
-      >
+      <base-button :loading>
+        <span>Save changes</span></base-button>
     </div>
   </Form>
 </template>
@@ -20,14 +19,11 @@ import * as yup from 'yup'
 
 const props = defineProps<{
   edit?: string | null
+  loading?: boolean;
 }>()
 
 const notesStore = useNotesStore()
-const loading = computed(() => ({
-  getting: notesStore.isLoading(NotesLoading.GETTING_ONE),
-  creating: notesStore.isLoading(NotesLoading.CREATING),
-  updating: notesStore.isLoading(NotesLoading.UPDATING),
-}))
+const getting = computed(() => notesStore.isLoading(NotesLoading.GETTING_ONE))
 
 const validationSchema = yup.object({
   title: yup.string().required('Note title is required'),
@@ -48,7 +44,10 @@ const submitForm = handleSubmit((values) => {
 
 const reset = () => {
   resetForm({
-    values: {},
+    values: {
+      title: '',
+      content: '<p></p>'
+    },
   })
 }
 
