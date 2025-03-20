@@ -12,8 +12,8 @@
         @open-note="openNote"></note-item>
     </div>
     <common-empty class="mt-10" v-else />
-    <base-modal title="Add note" v-model:show="showNoteFormModal">
-      <note-form :edit @submit="handleSubmit" :loading="loading.creating || loading.updating"></note-form>
+    <base-modal title="Add note" v-model:show="showNoteFormModal" @close="edit = null">
+      <note-form :edit @submit="handleSubmit" :loading="(loading.creating || loading.updating)"></note-form>
     </base-modal>
     <base-modal title="View note" v-model:show="showNoteViewModal">
       <base-loader v-if="loading.gettingNote"></base-loader>

@@ -48,7 +48,11 @@ const close = () => {
 
 const modal = ref()
 
-onClickOutside(modal, close)
+onClickOutside(modal, () => {
+  if(show.value){
+    close()
+  }
+})
 
 watch(show, (v) => {
   const w = document.body.classList
