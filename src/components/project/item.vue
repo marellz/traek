@@ -13,12 +13,20 @@
         <span>
           Created {{ parseDate(item.created_at) }}
         </span>
-        <span v-if="item.created_by">by {{ item.creator.name }}</span>
+      </div>
+      <div class="flex space-x-1 mt-auto">
+        <div v-for="member in item.members" :key="member.id">
+          <base-popover popover-class="whitespace-nowrap" :text="member.name ?? `email: ${member.email}`">
+            <user-avatar size="h-9 w-9" :border-class="member.id === item.created_by ? '!border-green-500': ''"
+              :avatar="member.avatar"></user-avatar>
+          </base-popover>
+        </div>
       </div>
     </div>
   </router-link>
 </template>
 <script lang="ts" setup>
+import UserAvatar from '@/components/user/avatar.vue'
 import type { Project } from '@/stores/project'
 import { parseDate } from '@/utils/parseDate';
 import { computed } from 'vue';

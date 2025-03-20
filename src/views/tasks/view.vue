@@ -66,6 +66,7 @@
         <div>
           <p class="font-medium text-sm text-slate-500">Created by</p>
           <div class="flex space-x-2 items-center">
+            <user-avatar size="h-10 w-10" :avatar="task.created_by.avatar"></user-avatar>
             <span class="font-medium">
               {{ task.created_by.name }} {{ task.created_by.id === auth.userId ? `(you)` : '' }}
             </span>
@@ -78,8 +79,9 @@
         <div>
           <p class="font-medium text-sm text-slate-500">Assigned to</p>
           <p v-if="!task.task_assignees.length" class="italic">No assignees</p>
-          <template v-else>
+          <div v-else class="space-y-2">
             <div v-for="user in task.task_assignees" :key="user.id" class="flex space-x-2 items-center">
+              <user-avatar size="h-10 w-10" :avatar="user.avatar"></user-avatar>
               <span class="font-medium">
                 {{ user.name }} {{ user.id === auth.userId ? `(you)` : '' }}
               </span>
@@ -88,14 +90,14 @@
                 <Mail :size="16" /> <span>{{ user.email }}</span>
               </span>
             </div>
-          </template>
+          </div>
         </div>
       </div>
     </template>
   </layout-container>
 </template>
 <script lang="ts" setup>
-
+import UserAvatar from '@/components/user/avatar.vue'
 import { useAuthStore } from '@/stores/auth';
 import { TaskLoading, useTaskStore, type Task, type TaskPriority, type TaskStatus } from '@/stores/task';
 import { AlertCircle, ArrowLeft, Calendar } from 'lucide-vue-next';

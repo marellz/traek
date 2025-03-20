@@ -45,12 +45,12 @@
             </div>
           </div>
           <p v-if="task.description" class="text-sm text-slate-600">{{ task.description }}</p>
-          <div>
-            <span class="inline-flex items-center space-x-1">
-              <User2 :size="20" :stroke-width="1.5" />
-              <span class="text-sm">{{ task.task_assignees.length }} assignee{{ task.task_assignees.length !== 1 ? 's' :
-                '' }}</span>
-            </span>
+          <div class="flex space-x-2 mt-4">
+            <div v-for="assignee in task.task_assignees" :key="assignee.id">
+              <base-popover popover-class="whitespace-nowrap" :text="assignee.name ?? `email: ${assignee.email}`">
+                <user-avatar size="h-8 w-8" :avatar="assignee.avatar"></user-avatar>
+              </base-popover>
+            </div>
           </div>
         </div>
       </div>
@@ -58,6 +58,7 @@
   </router-link>
 </template>
 <script lang="ts" setup>
+import UserAvatar from '@/components/user/avatar.vue'
 import {
   type Task,
   type TaskPriority,
@@ -66,7 +67,7 @@ import {
 import { TaskPriorityLabels, TaskStatusLabels } from '@/data/task-data'
 import { computed } from 'vue'
 import moment from 'moment';
-import { EllipsisVertical, User2 } from 'lucide-vue-next';
+import { EllipsisVertical } from 'lucide-vue-next';
 
 const props = defineProps<{
   task: Task

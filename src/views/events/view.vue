@@ -95,6 +95,7 @@
           <div>
             <p class="font-medium text-sm text-slate-500">Created by</p>
             <div class="flex space-x-2 items-center">
+              <user-avatar size="h-10 w-10" :avatar="_event.created_by.avatar"></user-avatar>
               <span class="font-medium">
                 {{ _event.created_by.name }} {{ _event.created_by.id === auth.userId ? `(you)` : '' }}
               </span>
@@ -107,8 +108,9 @@
           <div>
             <p class="font-medium text-sm text-slate-500">Invited members</p>
             <p v-if="!_event.event_invitees.length" class="italic">No assignees</p>
-            <template v-else>
+            <div v-else class="space-y-2">
               <div v-for="user in _event.event_invitees" :key="user.id" class="flex space-x-2 items-center">
+                <user-avatar size="h-10 w-10" :avatar="user.avatar"></user-avatar>
                 <span class="font-medium">
                   {{ user.name ?? '(No name)' }} {{ user.id === auth.userId ? `(you)` : '' }}
                 </span>
@@ -125,6 +127,7 @@
   </layout-container>
 </template>
 <script lang="ts" setup>
+import UserAvatar from '@/components/user/avatar.vue'
 import { eventStatusColors, eventTypes, type EventStatus, type EventTypes } from '@/data/event-data';
 import { useAuthStore } from '@/stores/auth';
 import { EventLoading, useEventStore, type ProjectEvent } from '@/stores/event';
