@@ -1,11 +1,11 @@
 <template>
   <router-link :to="{ name: 'task', params: { id: task.id } }">
     <div class="rounded-lg border border-slate-300 hover:bg-slate-600/10 dark:border-slate-800 p-4"
-      :class="{ '!border-red-500 dark:!border-red-400 bg-red-50 dark:bg-red-500/10': isOverdue }">
+      :class="{ '!border-red-500 dark:!border-red-400 bg-red-50 dark:bg-red-500/10': isOverdue, 'bg-slate-200 dark:bg-slate-700': isComplete }">
       <!-- header -->
 
       <div class="flex space-x-3">
-        <div v-if="dueDate.length" class="rounded-lg bg-primary/20 p-3 self-start text-center">
+        <div v-if="dueDate.length" class="rounded-lg bg-primary/20 p-3 self-start text-center" :class="{'!bg-slate-500/20': isComplete}">
           <h1 class="text-4xl font-bold">
             {{ dueDate[0] }}
           </h1>
