@@ -4,10 +4,10 @@
       <div class="flex space-x-3">
         <div class="rounded-lg bg-primary/20 py-2 px-4 self-start" :class="{ 'bg-slate-800/10': isCancelled }">
           <div class="text-center">
-            <p class="text-2xl font-bold">
+            <p class="text-4xl font-bold">
               {{ dateData.date }}
             </p>
-            <p class="text-sm">{{ dateData.month }}</p>
+            <p class="text-sm text-slate-500 uppercase tracking-wider">{{ dateData.month }}</p>
           </div>
         </div>
         <div class="flex-auto">
@@ -20,7 +20,7 @@
                 </span>
               </base-tag>
             </div>
-            <p class="">{{ item.description }}</p>
+            <p class="text-slate-500 text-sm">{{ item.description }}</p>
           </div>
           <div class="flex items-center space-x-2 text-sm mt-2">
             <p class="text-sm">
