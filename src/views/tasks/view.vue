@@ -59,12 +59,12 @@
         </div>
 
         <div>
-          <p class="font-medium text-sm text-slate-500">Description</p>
+          <p class="font-medium text-sm text-slate-500 mb-2">Description</p>
           <p>{{ task.description ?? 'No description' }}</p>
         </div>
 
         <div>
-          <p class="font-medium text-sm text-slate-500">Created by</p>
+          <p class="font-medium text-sm text-slate-500 mb-2">Created by</p>
           <div class="flex space-x-2 items-center">
             <user-avatar size="h-10 w-10" :avatar="task.created_by.avatar"></user-avatar>
             <span class="font-medium">
@@ -77,7 +77,7 @@
           </div>
         </div>
         <div>
-          <p class="font-medium text-sm text-slate-500">Assigned to</p>
+          <p class="font-medium text-sm text-slate-500 mb-2">Assigned to</p>
           <p v-if="!task.task_assignees.length" class="italic">No assignees</p>
           <div v-else class="space-y-2">
             <div v-for="user in task.task_assignees" :key="user.id" class="flex space-x-2 items-center">

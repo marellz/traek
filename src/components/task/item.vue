@@ -1,6 +1,7 @@
 <template>
   <router-link :to="{ name: 'task', params: { id: task.id } }">
-    <div class="rounded-lg border border-slate-300 hover:bg-slate-600/10 dark:border-slate-800 p-4" :class="{ '!border-red-500 dark:!border-red-400 bg-red-50 dark:bg-red-500/10': isOverdue }">
+    <div class="rounded-lg border border-slate-300 hover:bg-slate-600/10 dark:border-slate-800 p-4"
+      :class="{ '!border-red-500 dark:!border-red-400 bg-red-50 dark:bg-red-500/10': isOverdue }">
       <!-- header -->
 
       <div class="flex space-x-3">
@@ -17,17 +18,15 @@
             <h1 class="font-medium text-xl">
               {{ task.title }}
             </h1>
-            <span>|</span>
-            <div>
-              <span>
-                {{ TaskPriorityLabels[task.priority as TaskPriority] }}
-              </span>
-            </div>
             <div class="ml-auto flex items-center space-x-2">
               <template v-if="isOverdue">
                 <span class="bg-red-500 text-white rounded-full px-2 text-sm font-medium py-0.5">Overdue</span>
               </template>
-              <base-tag :variant="`task.${task.status}`">
+              <span class="font-medium rounded-full py-0.5 text-sm px-2"
+                :class="TaskPriorityColors[task.priority as TaskPriority]">
+                {{ TaskPriorityLabels[task.priority as TaskPriority] }}
+              </span>
+              <base-tag :class="TaskStatusColors[task.status]">
                 <span>
                   {{ TaskStatusLabels[task.status as TaskStatus] }}
                 </span>
@@ -64,7 +63,7 @@ import {
   type TaskPriority,
   type TaskStatus,
 } from '@/stores/task'
-import { TaskPriorityLabels, TaskStatusLabels } from '@/data/task-data'
+import { TaskPriorityColors, TaskPriorityLabels, TaskStatusColors, TaskStatusLabels } from '@/data/task-data'
 import { computed } from 'vue'
 import moment from 'moment';
 import { EllipsisVertical } from 'lucide-vue-next';

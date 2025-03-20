@@ -32,31 +32,33 @@
         <div class="border rounded-xl border-slate-200 flex space-x-3 p-4">
           <div class="flex items-center space-x-4 font-medium">
             <div class="flex items-center space-x-2">
-              <CalendarCheck :size="20" v-if="isPast" />
-              <CalendarX :size="20" v-else-if="isCancelled"></CalendarX>
-              <CalendarArrowUp :size="20" v-else />
+              <span class="text-slate-500">
+                <CalendarCheck :size="20" v-if="isPast" />
+                <CalendarX :size="20" v-else-if="isCancelled"></CalendarX>
+                <CalendarArrowUp :size="20" v-else />
+              </span>
               <span :class="{ 'text-slate-500': isCancelled || isPast, 'line-through': isCancelled }">{{
-                parseDate(_event.datetime) }}</span>
+                parseDate(_event.datetime, 'Do MMM YYYY, h:mm A') }}</span>
             </div>
             <div class="flex items-center space-x-2">
-              <Clock9 :size="20" />
+              <Clock9 class="text-slate-500" :size="20" />
               <span>{{ duration }}</span>
             </div>
             <div class="flex items-center space-x-2">
               <template v-if="_event.event_type === 'physical'">
-                <MapPin :size="20" />
+                <MapPin class="text-slate-500" :size="20" />
                 <span>
                   {{ _event.venue }}
                 </span>
               </template>
               <template v-if="_event.event_type === 'event'">
-                <MapPin :size="20" />
+                <MapPin class="text-slate-500" :size="20" />
                 <span>
                   {{ _event.venue }}
                 </span>
               </template>
               <template v-else>
-                <Link :size="20" />
+                <Link class="text-slate-500" :size="20" />
                 <span>
                   {{ _event.url }}
                 </span>
@@ -89,11 +91,11 @@
 
         <div class="space-y-4">
           <div>
-            <p class="font-medium text-sm text-slate-500">Description</p>
+            <p class="font-medium text-sm text-slate-500 mb-2">Description</p>
             <p>{{ _event.description ?? 'No description' }}</p>
           </div>
           <div>
-            <p class="font-medium text-sm text-slate-500">Created by</p>
+            <p class="font-medium text-sm text-slate-500 mb-2">Created by</p>
             <div class="flex space-x-2 items-center">
               <user-avatar size="h-10 w-10" :avatar="_event.created_by.avatar"></user-avatar>
               <span class="font-medium">
@@ -106,7 +108,7 @@
             </div>
           </div>
           <div>
-            <p class="font-medium text-sm text-slate-500">Invited members</p>
+            <p class="font-medium text-sm text-slate-500 mb-2">Invited members</p>
             <p v-if="!_event.event_invitees.length" class="italic">No assignees</p>
             <div v-else class="space-y-2">
               <div v-for="user in _event.event_invitees" :key="user.id" class="flex space-x-2 items-center">
@@ -119,7 +121,7 @@
                   <Mail :size="16" /> <span>{{ user.email }}</span>
                 </span>
               </div>
-            </template>
+            </div>
           </div>
         </div>
       </div>
