@@ -351,7 +351,7 @@ if (import.meta.hot) {
 
 export type UserProfile = {
   id: string
-  email?: string
+  email: string
   username: string | null
   name: string | null
   phone?: string | null
@@ -362,7 +362,7 @@ export type UserProfile = {
 export type UserProfileForm = {
   id: string
   name: string
-  email?: string
+  email: string
   username: string
   phone?: string | null
   avatar?: string | null
