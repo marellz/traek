@@ -16,7 +16,7 @@
         <div v-else-if="projects.length" class="grid grid-cols-3 gap-4">
           <project-item v-for="item in projects" :key="item.id" :item></project-item>
         </div>
-        <Empty v-else />
+        <Empty title="No projects." text="You do not belong to any projects yet." v-else />
       </div>
     </layout-container>
   </div>
