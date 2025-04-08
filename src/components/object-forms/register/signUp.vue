@@ -52,7 +52,7 @@
       <div>
         <p class="text-center text-gray-600">
           Already have an account?
-          <router-link class="font-medium text-primary" to="/login">Login</router-link>
+          <router-link class="font-medium text-primary dark:text-indigo-400" to="/login">Login</router-link>
         </p>
       </div>
     </div>

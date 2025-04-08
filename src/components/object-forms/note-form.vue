@@ -1,18 +1,17 @@
 <template>
-  <base-loader v-if="loading.getting"></base-loader>
+  <base-loader v-if="getting"></base-loader>
   <Form v-else @submit="submitForm()">
     <div class="space-y-4">
       <form-input label="Title" v-model="title" :error="errors.title"></form-input>
-      <form-text label="Content" v-model="content" :error="errors.content"></form-text>
-      <base-button :loading="loading.creating || loading.updating">
-        <span>Save changes</span></base-button
-      >
+      <form-quill v-model="content" :error="errors.content"></form-quill>
+      <base-button :loading>
+        <span>Save changes</span></base-button>
     </div>
   </Form>
 </template>
 <script lang="ts" setup>
 import FormInput from '@/components/form/input.vue'
-import FormText from '@/components/form/text.vue'
+import FormQuill from '@/components/form/quill.vue'
 import { NotesLoading, useNotesStore, type ProjectNote } from '@/stores/notes'
 import { Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -20,14 +19,11 @@ import * as yup from 'yup'
 
 const props = defineProps<{
   edit?: string | null
+  loading?: boolean;
 }>()
 
 const notesStore = useNotesStore()
-const loading = computed(() => ({
-  getting: notesStore.isLoading(NotesLoading.GETTING_ONE),
-  creating: notesStore.isLoading(NotesLoading.CREATING),
-  updating: notesStore.isLoading(NotesLoading.UPDATING),
-}))
+const getting = computed(() => notesStore.isLoading(NotesLoading.GETTING_ONE))
 
 const validationSchema = yup.object({
   title: yup.string().required('Note title is required'),
@@ -48,7 +44,10 @@ const submitForm = handleSubmit((values) => {
 
 const reset = () => {
   resetForm({
-    values: {},
+    values: {
+      title: '',
+      content: '<p></p>'
+    },
   })
 }
 

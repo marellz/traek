@@ -1,28 +1,40 @@
 <template>
-  <img v-if="avatar" class="object-center object-cover rounded-full border-2" :class="sizes[size]" :src="avatar"
-    alt="" />
-  <span v-else class="rounded-full border-2 border-white/10 bg-white/20 inline-flex items-center justify-center"
-    :class="sizes[size]">
-    <User2 :size="30" :stroke-width="1" />
+  <img v-if="url" class="object-center object-cover rounded-full border-2 border-slate-200 dark:border-slate-800"
+    :class="[size, borderClass]" :src="url" alt="" />
+  <span v-else
+    class="rounded-full bg-slate-200 dark:bg-slate-800 inline-flex items-center justify-center border-2 border-slate-200 dark:border-slate-800"
+    :class="[size, borderClass]">
+    <User :size="iconSize" :stroke-width="1" />
   </span>
 </template>
 <script lang="ts" setup>
-import { User2 } from "lucide-vue-next"
-type sizes = "lg" | "md" | "sm"
-type sizeClasses = Record<sizes, string>
-withDefaults(
+import { useUserStore } from "@/stores/user";
+import { User } from "lucide-vue-next"
+import { onMounted, ref, watch } from "vue";
+const props = withDefaults(
   defineProps<{
     avatar: string | null | undefined
-    size?: sizes
+    size?: string
+    borderClass?: string
+    iconSize?: number
   }>(),
   {
-    size: "md",
+    iconSize: 24,
+    size: "h-6 w-6",
+    borderClass: ''
   },
 )
-
-const sizes: sizeClasses = {
-  sm: "h-9 w-9",
-  md: "h-12 w-12",
-  lg: "h-16 w-16",
+const url = ref<string | null>(null)
+const userStore = useUserStore()
+const getAvatar = async () => {
+  if (!props.avatar) return
+  const _url = await userStore.getAvatarLink(props.avatar)
+  if (_url) {
+    url.value = _url
+  }
 }
+
+onMounted(getAvatar)
+
+watch(() => props.avatar, getAvatar)
 </script>

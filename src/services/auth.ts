@@ -40,24 +40,7 @@ const updatePassword = async (password: string) => {
 }
 
 const updateProfile = async (id: string, form: UserProfile) => {
-  return await supabase.from('users').update(form).eq('id', id)
-}
-
-const checkUsername = async (username: string) => {
-  return await supabase
-    .from('users')
-    .select('*', { count: 'exact', head: true })
-    .eq('username', username)
-}
-
-const queryUsers = async (params: { query: string }) => {
-  const { query } = params
-  const matchesQuery = ['name', 'email', 'username'].map((c) => `${c}.ilike.%${query}%`).join(',')
-  return await supabase.from('users').select().or(matchesQuery)
-}
-
-const getProfiles = async (list: string[], column: string = 'id') => {
-  return await supabase.from('users').select().in(column, list)
+  return await supabase.from('users').upsert([form]).eq('id', id)
 }
 
 export default {
@@ -69,7 +52,4 @@ export default {
   resetPassword,
   updatePassword,
   updateProfile,
-  checkUsername,
-  queryUsers,
-  getProfiles,
 }

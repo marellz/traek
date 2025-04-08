@@ -3,6 +3,19 @@ import AuthService, { type AuthPayload } from '@/services/auth'
 import { computed, ref, watch } from 'vue'
 import { useErrorStore } from './errors'
 import type { User } from '@supabase/supabase-js'
+import { useLoadingState } from '@/composables/useLoading'
+import { useAvatarService } from '@/services/avatars'
+import { generateAvatarName } from '@/utils/generateAvatarName'
+import { useUserStore } from './user'
+
+export enum AuthLoading {
+  UPLOADING = 'uploading-user-avatar',
+  DELETING = 'deleting-user-avatar',
+  GETTING = 'getting-user-avatar',
+
+  GETTING_PROFILE = 'getting-user-profile',
+  UPDATING_PROFILE = 'updating-user-profile',
+}
 
 export const useAuthStore = defineStore(
   'auth',
@@ -14,6 +27,8 @@ export const useAuthStore = defineStore(
     const errors = ref<Record<string, string> | null>(null)
     const isAuthenticated = computed(() => user.value !== null)
     const userId = computed(() => (user.value ? user.value.id : null))
+    const { isLoading, begin, finish } = useLoadingState()
+    const userStore = useUserStore()
 
     const init = async () => {
       try {
@@ -160,15 +175,23 @@ export const useAuthStore = defineStore(
       }
     })
 
-
     //
 
     const ensureAuth = () => {
-      if(isAuthenticated.value){
+      if (isAuthenticated.value) {
         return true
       }
 
       throw new Error('User not authenticated')
+    }
+
+    const ensureProfile = () => {
+      ensureAuth()
+      if (profile.value) {
+        return true
+      }
+
+      throw new Error('No profile found')
     }
 
     /**
@@ -185,6 +208,7 @@ export const useAuthStore = defineStore(
         return null
       }
       try {
+        begin(AuthLoading.GETTING_PROFILE)
         const { data, error } = await AuthService.getProfile(userId.value)
         if (error) {
           handleError('Getting profile', error)
@@ -199,6 +223,8 @@ export const useAuthStore = defineStore(
         return false
       } catch (error) {
         handleError('Getting profile', error)
+      } finally {
+        finish(AuthLoading.GETTING_PROFILE)
       }
     }
 
@@ -208,82 +234,71 @@ export const useAuthStore = defineStore(
       }
       // update
       try {
+        begin(AuthLoading.UPDATING_PROFILE)
         const { status } = await AuthService.updateProfile(userId.value, form)
         if (status === 204) {
           profile.value = { ...profile.value, ...form }
-
           return true
         }
 
         return false
       } catch (error) {
         handleError('Updating profile', error)
+      } finally {
+        finish(AuthLoading.UPDATING_PROFILE)
       }
     }
 
-    const checkUsername = async (username: string) => {
-      try {
-        const { count, status } = await AuthService.checkUsername(username)
-        if (status !== 200) {
-          handleError('Checking username', 'Unknown error')
-        }
+    /**
+     * AVATARS
+     */
+    const avatarService = useAvatarService()
 
-        if (count && count === 0) {
+    const deleteAvatar = async () => {
+      ensureProfile()
+      try {
+        begin(AuthLoading.DELETING)
+        const path = profile.value?.avatar
+        if (!path) throw new Error('User profile has no avatar saved')
+        const { data, error } = await avatarService.deleteAvatar(path)
+        if (error) throw new Error(error.message)
+        if (data) {
+          profile.value = { ...profile.value!, avatar: null }
+          const form = profile.value as UserProfileForm
+          updateProfile({ ...form!, avatar: null })
           return true
         }
 
         return false
       } catch (error) {
-        handleError('Checking username', error)
+        handleError('Deleting user avatar', error)
       } finally {
+        finish(AuthLoading.DELETING)
       }
     }
 
-    /**
-     *
-     * USERS SERVICES
-     *
-     */
-
-    const queryUsers = async (query: string) => {
-      if (!userId.value) {
-        return
-      }
-
+    const uploadAvatar = async (file: File) => {
+      ensureProfile()
       try {
-        const { data, error } = await AuthService.queryUsers({ query })
-        if (error) {
-          handleError('Querying users', error.message)
-        }
-
+        begin(AuthLoading.UPLOADING)
+        // const name = profile.value?.id + file.name
+        const name = generateAvatarName(file.name, profile.value!.id)
+        const { data, error } = await avatarService.uploadAvatar(file, name)
+        if (error) throw new Error(error.message)
         if (data) {
-          return data.filter((u) => u.id !== userId.value && u.username !== null)
+          const { path: avatar } = data
+          // profile.value!.avatar = avatar
+          profile.value = { ...profile.value!, avatar }
+          const form = profile.value as UserProfileForm
+          await updateProfile({ ...form!, avatar })
+          return userStore.getAvatarLink(avatar)
         }
 
         return null
       } catch (error) {
-        handleError('Querying users', error)
-      }
-    }
-
-    const getProfiles = async (list: string[], column: 'id' | 'username' = 'id') => {
-      if (!userId.value) {
-        return
-      }
-
-      try {
-        const { error, data } = await AuthService.getProfiles(list, column)
-        if (error) {
-          handleError('Getting profiles', error.message)
-        }
-
-        if (data) {
-          return data
-        }
-
-        return null
-      } catch (error) {
-        handleError('Getting profiles', error)
+        handleError('Uploading user avatar', error)
+      } finally {
+        finish(AuthLoading.UPLOADING)
       }
     }
 
@@ -310,17 +325,16 @@ export const useAuthStore = defineStore(
       profile,
       hasProfile,
       getProfile,
-      getProfiles,
       updateProfile,
-      checkUsername,
+      //
+      ensureAuth,
 
-      //user
-      queryUsers,
+      // avatars
+      deleteAvatar,
+      uploadAvatar,
 
       //
-      ensureAuth
-
-
+      isLoading,
     }
   },
   {
@@ -337,22 +351,20 @@ if (import.meta.hot) {
 
 export type UserProfile = {
   id: string
-  email?: string
+  email: string
   username: string | null
   name: string | null
   phone?: string | null
   avatar?: string | null
-  avatar_url?: string | null
   created_at: string
 }
 
 export type UserProfileForm = {
   id: string
   name: string
-  email?: string
+  email: string
   username: string
   phone?: string | null
   avatar?: string | null
-  avatar_url?: string | null
   created_at: string
 }

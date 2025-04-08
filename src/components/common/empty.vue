@@ -1,8 +1,8 @@
 <template>
-  <div class="py-10 text-center border border-slate-300 rounded-xl">
+  <div class="py-10 text-center border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800/20 rounded-xl">
     <div class="space-y-2">
-      <h1 class="text-4xl font-medium">Empty</h1>
-      <p class="text-xl">{{ text }}</p>
+      <h1 class="text-4xl font-bold">{{ title }}</h1>
+      <p class="text-xl text-slate-600 dark:text-slate-400">{{ text }}</p>
     </div>
     <div class="flex justify-center">
       <slot />
@@ -11,8 +11,10 @@
 </template>
 <script lang="ts" setup>
 withDefaults(defineProps<{
+  title?: string
   text?: string
 }>(), {
+  title: 'Empty',
   text: 'Nothing in db. Nothing to show'
 })
 </script>

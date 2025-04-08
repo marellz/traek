@@ -34,19 +34,25 @@
             </p>
           </template>
         </div>
-        <div class="flex space-x-2 items-center text-slate-600 dark:text-slate-500">
-          <Users :size="20" />
-          <p class="text-sm">{{new Set(task.assignees.map(t => t.email)).size}} assignees</p>
+        <div class="flex space-x-1 mt-auto">
+          <div v-for="user in task.assignees" :key="user.id">
+            <base-popover popover-class="whitespace-nowrap" :text="user.name ?? `email: ${user.email}`">
+              <user-avatar size="h-8 w-8"
+                :border-class="user.id === task.creator.id ? '!border-green-500' : ''"
+                :avatar="user.avatar"></user-avatar>
+            </base-popover>
+          </div>
         </div>
       </div>
     </div>
   </RouterLink>
 </template>
 <script lang="ts" setup>
+import UserAvatar from '@/components/user/avatar.vue'
 import { TaskPriorityColors, TaskPriorityLabels } from '@/data/task-data';
 import type { TaskPriority } from '@/stores/task';
 import type { AssignedTask } from '@/views/tasks/index.vue';
-import { Calendar, CalendarCheck, FolderKanban, Users } from 'lucide-vue-next';
+import { Calendar, CalendarCheck, FolderKanban } from 'lucide-vue-next';
 
 import moment from 'moment';
 import { computed } from 'vue';

@@ -9,8 +9,8 @@ export const useProjectService = () => {
         `*,
         ...projects(
             *,
-            creator: created_by(id, name, email, username, avatar_url),
-            members: project_members(...users(id, name, email, username, avatar_url))
+            creator: created_by(id, name, email, username, avatar),
+            members: project_members(...users(id, name, email, username, avatar))
           )`,
       )
       .eq('user_id', user)
@@ -20,14 +20,14 @@ export const useProjectService = () => {
     return await supabase
       .from('projects')
       .select(`*,
-         creator: created_by(id, name, email, username, avatar_url),
-         members: project_members(...users(id, name, email, username, avatar_url))`,
+         creator: created_by(id, name, email, username, avatar),
+         members: project_members(...users(id, name, email, username, avatar))`,
       )
       .eq('id', id)
   }
 
   const create = async (form: ProjectForm) => {
-    return await supabase.from('projects').insert(form).select(`*, creator: created_by(id, name, email, username, avatar_url)`)
+    return await supabase.from('projects').insert(form).select(`*, creator: created_by(id, name, email, username, avatar)`)
   }
 
   const update = async (id: string, form: ProjectForm) => {
@@ -43,7 +43,7 @@ export const useProjectService = () => {
       .from('projects')
       .select(
         `*,
-        creator: created_by(id, name, email, username, avatar_url),
+        creator: created_by(id, name, email, username, avatar),
         tasks(count),
         events(count),
         project_members(count),
@@ -63,7 +63,7 @@ export const useProjectService = () => {
   const getMembers = async (project: string) => {
     return await supabase
       .from('project_members')
-      .select('joined_at: created_at, ...users(id, name, email, username, avatar_url) ')
+      .select('joined_at: created_at, ...users(id, name, email, username, avatar) ')
       .eq('project_id', project)
   }
 

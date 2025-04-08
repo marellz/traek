@@ -7,15 +7,15 @@
         class="flex flex-col text-sm"
         :class="{ 'font-medium': active === key }"
       >
-        <div class="mb-2 flex items-center space-x-2 pr-8 pl-2" :class="{ 'opacity-50': locked }">
+        <div class="mb-2 flex items-center space-x-2 pr-8 pl-2 text-slate-500" :class="{ 'opacity-50': locked,'text-white dark:text-slate-200': active===key }">
           <span class="">
             {{ label }}
           </span>
           <CheckCheck :size="16" v-if="completed" />
         </div>
         <span
-          class="h-1 w-full rounded-full bg-slate-100"
-          :class="{ '!bg-slate-900': completed, '!bg-slate-300': active === key }"
+          class="h-1 w-full rounded-full bg-slate-100 dark:bg-slate-600"
+          :class="{ '!bg-slate-900 dark:!bg-slate-400': completed, '!bg-slate-300 dark:!bg-slate-100': active === key }"
         ></span>
       </a>
     </li>
@@ -88,8 +88,6 @@ watch(
     router.push(route.path+`#${v}`)
 
     emit('update', model.value)
-
-    console.log('emitted update', model.value)
   },
   {
     deep: true,

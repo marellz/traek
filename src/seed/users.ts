@@ -12,7 +12,6 @@ const useUserSeeder = () => {
       username: faker.internet.username(),
       name: faker.person.fullName(),
       phone: faker.phone.number(),
-      avatar_url: faker.image.avatar(),
       created_at: new Date().toISOString(),
     }
 

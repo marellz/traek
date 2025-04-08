@@ -11,7 +11,7 @@ export interface ProjectUser {
   email: string;
   name: string | null;
   username: string | null;
-  avatar_url: string | null
+  avatar: string | null
 }
 
 export type Project = {

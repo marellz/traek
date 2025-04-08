@@ -19,9 +19,11 @@
     </div>
     <base-loader class="py-20" v-if="loading.gettingTasks"></base-loader>
     <template v-else-if="tasks.length">
-      <div></div>
+      <div class="mt-10">
+        <checkbox label="Show completed" v-model="showCompleted" />
+      </div>
       <ul class="mt-10 space-y-2">
-        <li v-for="task in tasks" :key="task.id">
+        <li v-for="task in filteredTasks" :key="task.id">
           <task-item :task @delete-task="deleteTask" @edit-task="editTask" />
         </li>
       </ul>
@@ -30,9 +32,10 @@
   </div>
 </template>
 <script lang="ts" setup>
+import checkbox from '@/components/form/checkbox.vue'
 import Empty from '@/components/common/empty.vue'
 import TaskItem from '@/components/task/item.vue'
-import { useTaskStore, type Task } from '@/stores/task'
+import { TaskStatusEnum, useTaskStore, type Task } from '@/stores/task'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -40,6 +43,8 @@ const route = useRoute()
 const id = computed(() => route.params.id as string)
 const tasksStore = useTaskStore()
 const tasks = ref<Task[]>([])
+const showCompleted = ref(false)
+const filteredTasks = computed(() => showCompleted.value? tasks.value : tasks.value.filter(t=>t.status !== TaskStatusEnum.COMPLETED))
 
 const loading = computed(() => ({
   gettingTasks: tasksStore.isLoading('getting-tasks'),

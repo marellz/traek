@@ -17,6 +17,7 @@
     "@faker-js/faker": "^9.5.0",
     "@supabase/supabase-js": "^2.48.1",
     "@vee-validate/yup": "^4.15.0",
+    "@vueup/vue-quill": "^1.2.0",
     "@vueuse/core": "^12.5.0",
     "appwrite": "^17.0.0",
     "lucide-vue-next": "^0.475.0",
