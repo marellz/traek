@@ -9,6 +9,9 @@
       </div>
     </div>
     <base-loader v-if="loading.getting"></base-loader>
+    <div class="mt-10" v-else-if="!hasTasks">
+      <Empty title="No tasks." text="You have not been assigned to any tasks" />
+    </div>
     <div v-else class="grid grid-cols-3 gap-4">
       <div v-for="({ tasks: items }, key) in tasks" :key class="h-full flex flex-col">
         <h1 class="font-bold mb-4">
@@ -32,6 +35,7 @@
   </layout-container>
 </template>
 <script lang="ts" setup>
+import Empty from '@/components/common/empty.vue'
 import TaskKanbanCard from '@/components/task/kanban-card.vue'
 import { TaskStatusLabels } from '@/data/task-data';
 import { useTaskStore, type Task, type TaskUser, type TaskStatus, TaskLoading } from '@/stores/task';
@@ -54,11 +58,12 @@ type Kanban = Record<TaskStatus, {
 }>
 
 const tasks = ref<Kanban>()
-
+const hasTasks = ref(true)
 const taskStore = useTaskStore()
 const loading = computed(() => ({
   getting: taskStore.isLoading(TaskLoading.GETTING_USER_TASKS)
 }))
+
 const mapTasks = (items: AssignedTask[]) => {
   const columns = Object.keys(TaskStatusLabels)
   tasks.value = columns.reduce((acc: Kanban, status: TaskStatus) => {
@@ -77,6 +82,7 @@ const mapTasks = (items: AssignedTask[]) => {
 const getTasks = async () => {
   const _tasks = await taskStore.getUserTasks()
   if (_tasks) {
+    hasTasks.value = _tasks.length > 0
     mapTasks(_tasks)
   }
 }

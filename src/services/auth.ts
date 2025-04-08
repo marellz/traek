@@ -40,7 +40,7 @@ const updatePassword = async (password: string) => {
 }
 
 const updateProfile = async (id: string, form: UserProfile) => {
-  return await supabase.from('users').update(form).eq('id', id)
+  return await supabase.from('users').upsert([form]).eq('id', id)
 }
 
 export default {
