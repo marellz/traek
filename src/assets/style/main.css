@@ -23,6 +23,9 @@ https://coolors.co/0b3c49-731963-fffdfd-cbd2d0-f0e100
   --color-primary-lighter: #5010e5;
   --color-primary-darker: #21075f;
   --color-sidebar-bg: #f3f6f7;
+  --font-primary: 'Victor Mono', monospace;
+  --font-sans: 'Inter', sans-serif;
+
   /* --color-mindaro: #c5d86dff;
   --color-licorice: #261c15ff;
   --color-baby-powder: #f7f7f2ff;
@@ -79,10 +82,10 @@ $chili-red: #d84727ff;
 }
 
 .member-table {
-  @apply w-full border-separate border-spacing-y-2 border-spacing-x-0;
+  @apply w-full border-separate border-spacing-x-0 border-spacing-y-2;
 }
 
-.member-table td.disabled td{
+.member-table td.disabled td {
   @apply bg-slate-100 dark:bg-slate-500;
 }
 
