@@ -1,26 +1,30 @@
 <template>
   <header class="py-4">
     <layout-container>
-      <ul class="flex space-x-2">
+      <ul class="flex items-center justify-center space-x-2">
         <li>
-          <router-link class="p-2 inline-block hover:underline" to="/">Home</router-link>
+          <header-link to="/">Home</header-link>
         </li>
         <template v-if="auth.isAuthenticated">
           <li>
-            <router-link :to="{ name: 'dashboard' }" class="p-2 inline-block hover:underline">
+            <header-link :to="{ name: 'dashboard' }">
               Dashboard
-            </router-link>
+            </header-link>
           </li>
-          <li class="!ml-auto">
-            <a class="p-2 inline-block hover:underline" href="#logout" @click.prevent="onLogout">Logout</a>
+          <li>
+            <header-link to="#logout" @click.prevent="onLogout">Logout</header-link>
           </li>
         </template>
         <template v-else>
-          <li class="!ml-auto">
-            <router-link class="p-2 inline-block hover:underline" to="/login">Login</router-link>
+          <li>
+            <header-link :to="{ name: 'login' }">
+              Login
+            </header-link>
           </li>
           <li>
-            <router-link class="p-2 inline-block hover:underline" to="/register">Register</router-link>
+            <router-link :to="{ name: 'register' }">
+              <base-button>Get started</base-button>
+            </router-link>
           </li>
         </template>
       </ul>
@@ -28,6 +32,7 @@
   </header>
 </template>
 <script lang="ts" setup>
+import HeaderLink from '@/components/partials/header/link.vue'
 import LayoutContainer from '@/components/layout/container.vue'
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
@@ -40,3 +45,9 @@ const onLogout = async () => {
 }
 
 </script>
+
+<style scoped>
+.link {
+  @apply flex;
+}
+</style>
