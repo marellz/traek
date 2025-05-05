@@ -16,7 +16,7 @@
           </div>
         </div>
 
-        <div class="text-sm">
+        <div v-if="auth.userId" class="text-sm">
           <router-link :to="{ name: 'view-profile', params: { id: auth.userId } }"
             class="block p-2 hover:bg-slate-100 dark:hover:bg-slate-600">
             Profile
