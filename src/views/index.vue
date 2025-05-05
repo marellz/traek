@@ -1,25 +1,25 @@
 <template>
-  <div class="py-10 mx-10">
-    <div class="rounded-[60px] bg-primary/10 border-primary py-20">
-      <div class="mx-auto max-w-4xl space-y-10">
+  <div class="py-4 md:py-10 mx-4 md:mx-10">
+    <div class="rounded-4xl md:rounded-[60px] bg-primary/10 border-primary py-10 md:py-20">
+      <div class="mx-auto max-w-4xl space-y-6 md:space-y-10 px-4">
         <div class="flex justify-center">
-          <div class="bg-white rounded-full p-4 flex items-center space-x-2"><span
+          <div class="bg-white rounded-full text-sm md:text-base p-2 md:p-4 flex items-center space-x-2"><span
               class="bg-primary h-4 w-4 rounded-full block"></span>
             <p>New updates in september</p>
             <Info :size="20" class="text-black/50" />
           </div>
         </div>
-        <h1 class="text-4xl font-semibold md:text-[80px] leading-tight text-center">
+        <h1 class="text-2xl md:text-4xl font-semibold md:text-[80px] leading-tight text-center">
           Transform your Workflow with <span class="text-primary">Traek!</span>
         </h1>
-        <p class="text-2xl text-black/50 text-center">
+        <p class="md:text-2xl text-black/50 text-center">
           A simple yet powerful project management tool for teams and individuals. Plan, collaborate,
           and track your progress—all in one place.
         </p>
-        <div class="flex items-center justify-center space-x-2 py-10">
+        <div class="flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-2 py-10">
           <template v-if="!auth.isAuthenticated">
             <router-link to="/register">
-              <base-button class="!text-xl !font-normal !py-4 !px-8">
+              <base-button class="md:!text-xl !font-normal !md:py-4 !md:px-8">
                 <span>Get started for free</span>
                 <MoveRight />
               </base-button>
@@ -37,9 +37,9 @@
         </div>
 
         <div class="border-2 border-primary/50 bg-white rounded-4xl p-8">
-          <div class="grid grid-cols-2 gap-10">
+          <div class="grid md:grid-cols-2 gap-10">
             <div v-for="(item, index) in features" :key="index"
-              class="flex flex-col items-center text-center border-r border-r-slate-200 last:border-r-0 pr-10">
+              class="flex flex-col items-center text-center md:border-r border-r-slate-200 last:border-r-0 nth-[2]:border-r-0 md:pr-10">
               <span class="px-10 py-4 border border-slate-200 rounded-full">
                 <component :is="item.icon" />
               </span>
@@ -51,15 +51,16 @@
       </div>
     </div>
     <div class="container mx-auto">
-      <div class="mt-20 grid grid-cols-3 gap-10 items-start">
+      <div class="mt-20 grid md:grid-cols-3 gap-10 items-start">
         <div v-for="(item, index) in testimonials" :key="index" class="border border-primary/50 rounded-xl p-4 ">
-          <p class="font-medium text-4xl">"{{ item.title }}"</p>
-          <p class="text-slate-500 mt-4">{{ item.content }}</p>
+          <p class="font-medium text-2xl md:text-4xl">"{{ item.title }}"</p>
+          <p class="text-slate-500 mt-4 text-sm md:text-base">{{ item.content }}</p>
           <div class="flex items-center space-x-2 mt-4">
-            <img :src="item.avatar" class="h-16 w-16 object-cover rounded-full border-2 border-black/30" alt="" />
-            <div>
-              <p class="font-medium"> {{ item.user }}</p>
-              <p> {{ item.role }}</p>
+            <img :src="item.avatar" class="h-12 w-12 md:h-16 md:w-16 object-cover rounded-full border-2 border-black/30"
+              alt="" />
+            <div class="space-y-0.5">
+              <p class="font-medium text-sm md:text-base "> {{ item.user }}</p>
+              <p class="text-slate-500 text-xs md:text-sm"> {{ item.role }}</p>
             </div>
           </div>
         </div>
