@@ -2,7 +2,7 @@ import { useActivityService } from '@/services/activity'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import { useLoadingState } from '@/composables/useLoading'
-import { AuthErrors, useAuthStore } from './auth'
+import { AuthErrors, useAuthStore } from '@/stores/auth'
 
 export enum ActivityTypes {
   TASK_CREATED = 'task-created', // done ✅
@@ -50,7 +50,7 @@ export interface ActivityForm {
   project_id: string
   type: ActivityType
   content?: string
-  is_private: boolean
+  is_private?: boolean
   task_id?: string
   note_id?: string
   event_id?: string
@@ -119,7 +119,7 @@ export const useActivityStore = defineStore(
           type,
           content = '',
           target_ids = [],
-          is_private,
+          is_private = false,
           task_id,
           note_id,
           event_id,
