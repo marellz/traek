@@ -3,6 +3,7 @@ import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import { useLoadingState } from '@/composables/useLoading'
 import { useAuthStore, type UserProfile } from './auth'
+import { ActivityTypes, useActivityStore } from './activity'
 export enum NotesLoading {
   GETTING = 'getting-notes',
   GETTING_ONE = 'getting-note',
@@ -17,6 +18,7 @@ export const useNotesStore = defineStore(
     const { handleError } = useErrorStore()
     const { begin, finish, isLoading } = useLoadingState()
     const auth = useAuthStore()
+    const activityStore = useActivityStore()
 
     //
 
@@ -53,7 +55,17 @@ export const useNotesStore = defineStore(
         const payload = { ...form, created_by: auth.userId!, created_at: new Date().toISOString() }
         const { data, error } = await service.create(payload)
         if (error) throw new Error(error.message)
-        if (data) return data[0]
+        if (data) {
+          await activityStore.logActivity({
+            project_id: form.project_id,
+            type: ActivityTypes.NOTE_CREATED,
+            note_id: data[0].id,
+            content: 'Created a note',
+            is_private: false,
+          })
+          return data[0]
+        }
+
         return null
       } catch (error) {
         handleError('Creating note', error)
@@ -113,7 +125,7 @@ export interface ProjectNote {
   content: string
   project_id: string
   created_at: string
-  created_by: UserProfile,
+  created_by: UserProfile
   updated_at: string | null
 }
 

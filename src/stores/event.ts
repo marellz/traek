@@ -107,7 +107,7 @@ export const useEventStore = defineStore(
             type: ActivityTypes.EVENT_CREATED,
             is_private: form.event_type !== EventTypeEnum.EVENT,
             event_id: id,
-            content: 'Event created',
+            content: 'Scheduled an event',
             target_ids: invitees,
           })
 
