@@ -151,6 +151,7 @@ export const useTaskStore = defineStore(
             task_id: id,
             content: 'Created a task',
             is_private: false,
+            target_user_ids: assignees
           })
 
           return data[0]
@@ -220,8 +221,6 @@ export const useTaskStore = defineStore(
           }
 
           const task = await get(id)
-
-          console.log(task)
 
           if(task){
             await activityStore.logActivity({

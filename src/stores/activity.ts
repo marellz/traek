@@ -2,14 +2,16 @@ import { useActivityService } from '@/services/activity'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { useErrorStore } from './errors'
 import { useLoadingState } from '@/composables/useLoading'
-import { AuthErrors, useAuthStore } from '@/stores/auth'
+import { AuthErrors, useAuthStore, type UserProfile } from '@/stores/auth'
+import type { TaskStatus } from './task'
+import { useUserStore } from './user'
 
 export enum ActivityTypes {
   TASK_CREATED = 'task-created', // done ✅
   TASK_STATUS_UPDATED = 'task-status-change', // done ✅
 
-  NOTE_CREATED = 'note-created',
-  EVENT_CREATED = 'event-created',
+  NOTE_CREATED = 'note-created', // done ✅
+  EVENT_CREATED = 'event-created', // done ✅
 
   MEMBERS_ADDED = 'member-added', // done ✅
 
@@ -20,31 +22,52 @@ export enum ActivityTypes {
 
 export type ActivityType = `${ActivityTypes}`
 
-export interface Activity {
-  id: string
+export interface NewActivity {
   user_id: string
   project_id: string
   task_id?: string | null
   note_id?: string | null
   event_id?: string | null
   content?: string | null
-  created_at: string
   is_private: boolean
-  target_ids: string[]
+  target_user_ids: string[]
   type: string
 }
-
 
 export enum ActivityLoading {
   GETTING_ACTIVITIES = 'getting-activity',
   LOGGING_ACTIVITY = 'logging-activity',
+  GETTING_USER_INFO = 'getting-activity-users',
 }
 
-
-export type NewActivity = Omit<
-  Activity,
-  'id' | 'created_at'
-> /*& { id?: string } & { created_at?} */
+export type Activity = NewActivity & {
+  id?: string
+  created_at?: string // populated
+  user: {
+    id: string
+    name: string | null
+    avatar: string | null
+  }
+  project: {
+    id: string
+    name: string
+  }
+  task: {
+    id: string
+    title: string
+    status: TaskStatus
+  } | null
+  event: {
+    id: string
+    title: string
+    datetime: string
+  } | null
+  note: {
+    id: string
+    title: string
+  } | null
+  target_users?: UserProfile[]
+}
 
 export interface ActivityForm {
   project_id: string
@@ -54,7 +77,7 @@ export interface ActivityForm {
   task_id?: string
   note_id?: string
   event_id?: string
-  target_ids?: string[]
+  target_user_ids?: string[]
 }
 
 export const useActivityStore = defineStore(
@@ -64,6 +87,7 @@ export const useActivityStore = defineStore(
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
     const service = useActivityService()
+    const userStore = useUserStore()
 
     const getProjectActivity = async (project_id: string) => {
       try {
@@ -109,8 +133,19 @@ export const useActivityStore = defineStore(
       }
     }
 
+    const getUserInformation = async (users: string[]) => {
+      try {
+        begin(ActivityLoading.GETTING_USER_INFO)
+        const data = await userStore.getProfiles(users)
+        return data
+      } catch (error) {
+        handleError('Getting user information', error)
+      } finally {
+        finish(ActivityLoading.GETTING_USER_INFO)
+      }
+    }
+
     const logActivity = async (payload: ActivityForm) => {
-      console.log(`logging ${payload}`)
       try {
         if (!auth.isAuthenticated || !auth.userId) throw new Error(AuthErrors.UNAUTHENCATED)
         begin(ActivityLoading.LOGGING_ACTIVITY)
@@ -118,7 +153,7 @@ export const useActivityStore = defineStore(
           project_id,
           type,
           content = '',
-          target_ids = [],
+          target_user_ids = [],
           is_private = false,
           task_id,
           note_id,
@@ -130,7 +165,7 @@ export const useActivityStore = defineStore(
           content,
           is_private,
           user_id: auth.userId,
-          target_ids,
+          target_user_ids,
           task_id,
           note_id,
           event_id,
@@ -142,8 +177,6 @@ export const useActivityStore = defineStore(
         return null
       } catch (error) {
         handleError('Logging activity', error)
-        console.log('failed to log')
-        console.log(payload)
       } finally {
         finish(ActivityLoading.LOGGING_ACTIVITY)
       }
@@ -154,6 +187,7 @@ export const useActivityStore = defineStore(
       getProjectActivity,
       getUserProjectsActivities,
       getUserActivity,
+      getUserInformation,
       logActivity,
     }
   },

@@ -250,7 +250,7 @@ export const useProjectStore = defineStore(
             type: ActivityTypes.MEMBERS_ADDED,
             content: `Added ${members.length} member${members.length > 1 ? 's' : ''}`,
             is_private: false,
-            target_ids: members,
+            target_user_ids: members,
           })
 
           return true

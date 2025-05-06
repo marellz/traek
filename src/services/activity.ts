@@ -6,7 +6,16 @@ export const useActivityService = () => {
   const getProjectActivity = async (project: string) => {
     return await supabase
       .from('activities')
-      .select('*')
+      .select(
+        `
+        *,
+        user: users(id,name, avatar),
+        task: tasks(id, title, status),
+        note: notes(id, title),
+        event: events(id, title, datetime),
+        project: projects(id, name)
+        `,
+      )
       .eq('project_id', project)
       .order('created_at', { ascending: false })
       .limit(10)
@@ -14,12 +23,25 @@ export const useActivityService = () => {
 
   // get activity from a users projects
   const getUserProjectsActivities = async (user: string) => {
-    return await supabase.from('activities').select('*').eq('user_id', user).range(0,9)
+    return await supabase.from('activities').select('*').eq('user_id', user).range(0, 9)
   }
 
   // get activity triggered by one single user
   const getUserActivity = async (user: string) => {
-    return await supabase.from('activities').select('*').eq('user_id', user).range(0,9)
+    return await supabase
+      .from('activities')
+      .select(
+        `
+        *,
+        user: users(id,name, avatar),
+        task: tasks(id, title, status),
+        note: notes(id, title),
+        event: events(id, title, datetime),
+        project: projects(id, name)
+        `,
+      )
+      .eq('user_id', user)
+      .range(0, 9)
   }
 
   // create a new activity based on other actions
