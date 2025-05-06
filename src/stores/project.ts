@@ -77,7 +77,7 @@ export const useProjectStore = defineStore(
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
     const { begin, finish, isLoading } = useLoadingState()
-    const notify = useNotificationStore()
+    const notifyService = useNotificationStore()
 
     const ensureAuth = (user_id?: string) => {
       if (!(auth.user && (user_id ? auth.user.id !== user_id : true))) {
@@ -268,7 +268,7 @@ export const useProjectStore = defineStore(
      */
 
     const notifyMemberAddition = (project: string, users: string[] = []) => {
-      notify.create(NotificationTypes.PROJECT_MEMBER_ADDED, project, users)
+      notifyService.create(NotificationTypes.PROJECT_MEMBER_ADDED, project, users)
     }
 
     return {
