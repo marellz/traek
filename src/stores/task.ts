@@ -4,6 +4,8 @@ import { useTaskService } from '@/services/tasks'
 import { useLoadingState } from '@/composables/useLoading'
 import { useAuthStore } from './auth'
 import { NotificationTypes, useNotificationStore } from './notifications'
+import { ActivityTypes, useActivityStore } from './activity'
+import { TaskStatusLabels } from '@/data/task-data'
 
 export enum TaskLoading {
   CREATING = 'creating-task',
@@ -99,6 +101,7 @@ export const useTaskStore = defineStore(
     const { begin, finish, isLoading } = useLoadingState()
     const auth = useAuthStore()
     const notificationStore = useNotificationStore()
+    const activityStore = useActivityStore()
 
     const list = async (project: string) => {
       begin(TaskLoading.GETTING_ALL)
@@ -139,7 +142,17 @@ export const useTaskStore = defineStore(
         const { data, error } = await service.create({ ...form, created_by: auth.userId! })
         if (error) throw new Error(error.message)
         if (data && data.length) {
-          await addAssignees(data[0].id, assignees)
+          const id = data[0].id
+          await addAssignees(id, assignees)
+
+          await activityStore.logActivity({
+            project_id: form.project_id,
+            type: ActivityTypes.TASK_CREATED,
+            task_id: id,
+            content: 'Created a task',
+            is_private: false,
+          })
+
           return data[0]
         }
 
@@ -205,6 +218,21 @@ export const useTaskStore = defineStore(
           } else {
             notifyStatusUpdate(id)
           }
+
+          const task = await get(id)
+
+          console.log(task)
+
+          if(task){
+            await activityStore.logActivity({
+              project_id: task.project_id,
+              type: ActivityTypes.TASK_STATUS_UPDATED,
+              content: `Updated task "${task.title}" to ${TaskStatusLabels[status]}`,
+              task_id: id,
+              is_private: false,
+            })
+          }
+
           return payload
         }
 
