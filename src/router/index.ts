@@ -179,7 +179,7 @@ const router = createRouter({
       component: () => import('@/views/events/form.vue')
     },
     {
-      path: "/event/creater/:project",
+      path: "/event/create/:project",
       name: "create-event",
       component: () => import('@/views/events/form.vue')
     },
