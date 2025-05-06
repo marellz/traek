@@ -15,7 +15,7 @@ import { useRoute, useRouter } from 'vue-router'
 const eventStore = useEventStore()
 const route = useRoute()
 const router = useRouter()
-const id = computed(() => route.params.id as string)
+const id = computed(() => route.params.project as string)
 const project = computed(() => route.params.project as string | null)
 const isEdit = computed(() => !!id.value && !project.value)
 const handleSubmit = (payload: EventFormPayload) => {
