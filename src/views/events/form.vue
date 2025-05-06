@@ -2,7 +2,7 @@
   <layout-container class="py-10">
     <h1 class="text-4xl">{{ isEdit ? 'Update event' : 'Create event' }}</h1>
     <div class="mt-10">
-      <event-form :project-id="id" :edit="id" @submit="handleSubmit"></event-form>
+      <event-form :projectId="project" :edit="id" @submit="handleSubmit"></event-form>
     </div>
   </layout-container>
 </template>
@@ -15,8 +15,8 @@ import { useRoute, useRouter } from 'vue-router'
 const eventStore = useEventStore()
 const route = useRoute()
 const router = useRouter()
-const id = computed(() => route.params.project as string)
-const project = computed(() => route.params.project as string | null)
+const id = computed(() => route.params.id as string)
+const project = computed(() => route.params.project as string)
 const isEdit = computed(() => !!id.value && !project.value)
 const handleSubmit = (payload: EventFormPayload) => {
   if (id.value) {

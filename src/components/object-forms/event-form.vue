@@ -77,13 +77,14 @@ import { useProjectStore, type ProjectMember } from '@/stores/project'
 import { useDebounceFn } from '@vueuse/core'
 
 const props = defineProps<{
-  projectId: string
+  projectId: string | null
   edit?: string | null
 }>()
-const emit = defineEmits(['submit'])
 
+const emit = defineEmits(['submit'])
 const eventStore = useEventStore()
 const projectStore = useProjectStore()
+const project = computed(() => props.projectId || eventData.value?.project_id)
 
 const editMode = computed(() => props.edit !== null || props.edit !== '')
 const loading = computed(() => ({
@@ -195,7 +196,8 @@ const searchUsers = useDebounceFn((query: string) => {
 }, 200)
 
 const getMembers = async () => {
-  const _users = await projectStore.getMembers(props.projectId)
+  if(!project.value) return
+  const _users = await projectStore.getMembers(project.value)
   if (_users) {
     projectMembers.value = _users
   }

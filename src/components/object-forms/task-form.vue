@@ -98,8 +98,10 @@ const getForm = async () => {
   }
 
   // get task
-  const _task = await tasksStore.get(props.edit as string)
-  if (_task) {
+  const _item = await tasksStore.get(props.edit as string)
+  if (_item) {
+    // task.created_by returns user
+    const _task = { ..._item, created_by: _item.created_by.id }
     _form.value = _task
 
     resetForm({
