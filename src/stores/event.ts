@@ -4,6 +4,7 @@ import { useErrorStore } from './errors'
 import { useEventService } from '@/services/events'
 import { useLoadingState } from '@/composables/useLoading'
 import { NotificationTypes, useNotificationStore } from './notifications'
+import { ActivityTypes, useActivityStore } from '@/stores/activity'
 
 export interface EventCancelPayload {
   cancelled_at: string
@@ -52,6 +53,7 @@ export const useEventStore = defineStore(
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
     const { begin, finish, isLoading } = useLoadingState()
+    const activityStore = useActivityStore()
 
     const getEvents = async (project: string) => {
       auth.ensureAuth()
@@ -96,7 +98,19 @@ export const useEventStore = defineStore(
         if (data) {
           // fix: add creator to invitees?
 
-          await addInvitees(data[0].id, invitees)
+          const id = data[0].id
+
+          await addInvitees(id, invitees)
+
+          await activityStore.logActivity({
+            project_id: form.project_id,
+            type: ActivityTypes.EVENT_CREATED,
+            is_private: form.event_type !== EventTypeEnum.EVENT,
+            event_id: id,
+            content: 'Event created',
+            target_ids: invitees,
+          })
+
           return data[0]
         }
 
