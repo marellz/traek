@@ -1,10 +1,53 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useAuthStore } from './auth'
-import { useErrorStore } from './errors'
+import { useAuthStore } from '@/stores/auth'
+import { useErrorStore } from '@/stores/errors'
 import { useEventService } from '@/services/events'
 import { useLoadingState } from '@/composables/useLoading'
-import { NotificationTypes, useNotificationStore } from './notifications'
+import { NotificationTypes, useNotificationStore } from '@/stores/notifications'
 import { ActivityTypes, useActivityStore } from '@/stores/activity'
+
+export interface EventUser {
+  id: string
+  email: string
+  name: string | null
+  username: string | null
+  avatar: string | null
+}
+
+export interface ProjectEvent {
+  id: string
+  project_id: string
+  title: string
+  description: string | null
+  created_at: string
+  created_by: EventUser
+  url: string | null
+  venue: string | null
+  event_type: string
+  status: string
+  datetime: string
+  duration_hours: number | null
+  updated_at: string | null
+  cancelled_at: string | null
+  event_invitees: EventUser[]
+}
+
+export interface ProjectEventForm {
+  id?: string
+  project_id: string
+  title: string
+  description?: string | null
+  created_at: string
+  created_by: string
+  url: string | null
+  venue?: string | null
+  event_type: string
+  status: string
+  datetime: string
+  duration_hours?: number | null
+  updated_at?: string | null
+  cancelled_at?: string | null
+}
 
 export interface EventCancelPayload {
   cancelled_at: string
@@ -30,6 +73,7 @@ export enum EventStatusEnum {
   PAST = 'past',
   CANCELLED = 'cancelled',
 }
+
 export enum EventTypeEnum {
   ONLINE = 'online',
   PHYSICAL = 'physical',
@@ -313,45 +357,3 @@ if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useEventStore, import.meta.hot))
 }
 
-export interface EventUser {
-  id: string
-  email: string
-  name: string | null
-  username: string | null
-  avatar: string | null
-}
-
-export interface ProjectEvent {
-  id: string
-  project_id: string
-  title: string
-  description: string | null
-  created_at: string
-  created_by: EventUser
-  url: string | null
-  venue: string | null
-  event_type: string
-  status: string
-  datetime: string
-  duration_hours: number | null
-  updated_at: string | null
-  cancelled_at: string | null
-  event_invitees: EventUser[]
-}
-
-export interface ProjectEventForm {
-  id?: string
-  project_id: string
-  title: string
-  description?: string | null
-  created_at: string
-  created_by: string
-  url: string | null
-  venue?: string | null
-  event_type: string
-  status: string
-  datetime: string
-  duration_hours?: number | null
-  updated_at?: string | null
-  cancelled_at?: string | null
-}

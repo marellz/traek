@@ -51,7 +51,6 @@ const getEvents = async () => {
   }
 }
 
-
 const showCancelled = ref(false)
 const filteredEvents = computed(() => showCancelled.value ? events.value : events.value.filter(e => e.cancelled_at === null))
 

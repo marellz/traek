@@ -1,7 +1,7 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useErrorStore } from './errors'
+import { useErrorStore } from '@/stores/errors'
 import { useUserService } from '@/services/user'
-import { useAuthStore } from './auth'
+import { useAuthStore } from '@/stores/auth'
 import { useLoadingState } from '@/composables/useLoading'
 import { useAvatarService } from '@/services/avatars'
 

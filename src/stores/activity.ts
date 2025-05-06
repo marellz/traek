@@ -1,10 +1,10 @@
 import { useActivityService } from '@/services/activity'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useErrorStore } from './errors'
+import { useErrorStore } from '@/stores/errors'
 import { useLoadingState } from '@/composables/useLoading'
 import { AuthErrors, useAuthStore, type UserProfile } from '@/stores/auth'
-import type { TaskStatus } from './task'
-import { useUserStore } from './user'
+import type { TaskStatus } from '@/stores/task'
+import { useUserStore } from '@/stores/user'
 
 export enum ActivityTypes {
   TASK_CREATED = 'task-created', // done ✅

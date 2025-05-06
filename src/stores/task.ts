@@ -1,10 +1,10 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useErrorStore } from './errors'
+import { useErrorStore } from '@/stores/errors'
 import { useTaskService } from '@/services/tasks'
+import { useAuthStore } from '@/stores/auth'
 import { useLoadingState } from '@/composables/useLoading'
-import { useAuthStore } from './auth'
-import { NotificationTypes, useNotificationStore } from './notifications'
-import { ActivityTypes, useActivityStore } from './activity'
+import { NotificationTypes, useNotificationStore } from '@/stores/notifications'
+import { ActivityTypes, useActivityStore } from '@/stores/activity'
 import { TaskStatusLabels } from '@/data/task-data'
 
 export enum TaskLoading {

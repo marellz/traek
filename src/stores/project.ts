@@ -1,11 +1,11 @@
 import { useProjectService } from '@/services/projects'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useErrorStore } from './errors'
-import { ref } from 'vue'
+import { useErrorStore } from '@/stores/errors'
 import { useAuthStore } from '@/stores/auth'
 import { useLoadingState } from '@/composables/useLoading'
-import { NotificationTypes, useNotificationStore } from './notifications'
-import { ActivityTypes, useActivityStore } from './activity'
+import { NotificationTypes, useNotificationStore } from '@/stores/notifications'
+import { ActivityTypes, useActivityStore } from '@/stores/activity'
+import { ref } from 'vue'
 
 export interface ProjectUser {
   id: string

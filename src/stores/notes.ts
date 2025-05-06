@@ -1,9 +1,30 @@
 import { useNotesService } from '@/services/notes'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useErrorStore } from './errors'
+import { useErrorStore } from '@/stores/errors'
 import { useLoadingState } from '@/composables/useLoading'
-import { useAuthStore, type UserProfile } from './auth'
-import { ActivityTypes, useActivityStore } from './activity'
+import { useAuthStore, type UserProfile } from '@/stores/auth'
+import { ActivityTypes, useActivityStore } from '@/stores/activity'
+
+export interface ProjectNote {
+  id: string
+  title: string
+  content: string
+  project_id: string
+  created_at: string
+  created_by: UserProfile
+  updated_at: string | null
+}
+
+export interface ProjectNoteForm {
+  id?: string
+  title: string
+  content: string
+  project_id: string
+  created_at?: string
+  created_by: string
+  updated_at?: string | null
+}
+
 export enum NotesLoading {
   GETTING = 'getting-notes',
   GETTING_ONE = 'getting-note',
@@ -117,24 +138,4 @@ export const useNotesStore = defineStore(
 
 if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useNotesStore, import.meta.hot))
-}
-
-export interface ProjectNote {
-  id: string
-  title: string
-  content: string
-  project_id: string
-  created_at: string
-  created_by: UserProfile
-  updated_at: string | null
-}
-
-export interface ProjectNoteForm {
-  id?: string
-  title: string
-  content: string
-  project_id: string
-  created_at?: string
-  created_by: string
-  updated_at?: string | null
 }
