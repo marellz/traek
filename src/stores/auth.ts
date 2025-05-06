@@ -17,6 +17,10 @@ export enum AuthLoading {
   UPDATING_PROFILE = 'updating-user-profile',
 }
 
+export enum AuthErrors {
+  UNAUTHENCATED = 'User not authenticated'
+}
+
 export const useAuthStore = defineStore(
   'auth',
   () => {
