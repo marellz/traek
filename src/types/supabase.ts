@@ -18,9 +18,10 @@ export type Database = {
           is_private: boolean
           note_id: string | null
           project_id: string
+          target_ids: string[]
           task_id: string | null
           type: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           content?: string | null
@@ -29,10 +30,11 @@ export type Database = {
           id?: string
           is_private?: boolean
           note_id?: string | null
-          project_id?: string
+          project_id: string
+          target_ids: string[]
           task_id?: string | null
           type: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           content?: string | null
@@ -42,9 +44,10 @@ export type Database = {
           is_private?: boolean
           note_id?: string | null
           project_id?: string
+          target_ids?: string[]
           task_id?: string | null
           type?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
