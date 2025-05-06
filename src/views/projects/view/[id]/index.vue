@@ -43,18 +43,8 @@
             </div>
           </router-link>
         </layout-card>
-        <div class="mt-5 space-y-4">
-          <h2 class="text-2xl">Project activity</h2>
-          <base-loader v-if="loadingActivity"></base-loader>
-          <ul v-if="projectActivities.length" class="space-y-2">
-            <li v-for="item in projectActivities" :key="item.id">
-              <project-activity :item />
-            </li>
-          </ul>
-          <div v-else>
-            <h1 class="font-medium">Empty.</h1>
-            <p class="text-slate-400 text-sm">No activity yet.</p>
-          </div>
+        <div class="grid grid-cols-2">
+          <activity-list title="Project activity" :project="id"></activity-list>
         </div>
       </div>
     </template>
@@ -72,9 +62,7 @@ import moment from 'moment'
 import { onMounted, ref } from 'vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import ProjectActivity from '@/components/activity/item.vue'
-import { ActivityLoading, useActivityStore, type Activity } from '@/stores/activity'
-
+import ActivityList from '@/components/activity/list.vue'
 const route = useRoute()
 const auth = useAuthStore()
 const id = computed(() => route.params.id as string)
@@ -96,18 +84,7 @@ const getProject = async () => {
   }
 }
 
-const activityStore = useActivityStore()
-const projectActivities = ref<Activity[]>([])
-const loadingActivity = computed(() => activityStore.isLoading(ActivityLoading.GETTING_ACTIVITIES))
-const getProjectActivities = async () => {
-  const _items = await activityStore.getProjectActivity(id.value)
-  if (_items) {
-    projectActivities.value = _items
-  }
-}
-
 onMounted(() => {
   getProject()
-  getProjectActivities()
 })
 </script>
