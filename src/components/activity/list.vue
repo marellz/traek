@@ -40,7 +40,7 @@
 </template>
 <script lang="ts" setup>
 import { ActivityLoading, useActivityStore, type Activity } from '@/stores/activity'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import ProjectActivity from '@/components/activity/item.vue'
 import { ListEnd, ListStart, RefreshCcwDot } from 'lucide-vue-next';
 enum ActivityTypes {
@@ -86,6 +86,7 @@ const fetch = async () => {
       activities.value = [..._items]
     } else {
       activityStore.markRangeLimit(true)
+      activityStore.previousRange(() => {})
     }
   }
 }
@@ -118,5 +119,9 @@ const rangeIsAtLimit = computed(() => activityStore.rangeLimit)
 
 onMounted(() => {
   fetch()
+})
+
+onUnmounted(() => {
+  activityStore.resetRange()
 })
 </script>
