@@ -18,7 +18,7 @@
         </p>
         <div class="flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-2 py-10">
           <template v-if="!auth.isAuthenticated">
-            <router-link to="/register">
+            <router-link to="/onboarding">
               <base-button class="md:!text-xl !font-normal !md:py-4 !md:px-8">
                 <span>Get started for free</span>
                 <MoveRight />

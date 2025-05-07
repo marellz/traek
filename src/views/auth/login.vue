@@ -28,7 +28,7 @@
         <div class="space-y-2">
           <p class="text-gray-600 text-center">
             Dont have an account?
-            <router-link class="text-primary dark:text-indigo-400 font-medium" to="/register">Register</router-link>
+            <router-link class="text-primary dark:text-indigo-400 font-medium" to="/onboarding">Register</router-link>
           </p>
         </div>
       </div>

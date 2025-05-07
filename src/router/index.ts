@@ -30,6 +30,7 @@ const router = createRouter({
         layout: 'auth',
       },
     },
+    /*
     {
       path: '/register',
       name: 'register',
@@ -38,6 +39,7 @@ const router = createRouter({
         layout: 'auth',
       },
     },
+    */
     {
       path: '/forgot-password',
       name: 'forgot-password',
@@ -52,6 +54,47 @@ const router = createRouter({
       component: () => import('@/views/auth/reset-password.vue'),
       meta: {
         layout: 'auth',
+      },
+    },
+
+    /**
+     *
+     *
+     * ONBOARDING
+     *
+     *
+     */
+
+    {
+      path: '/onboarding',
+      name: 'onboarding',
+      component: () => import('@/views/onboarding/register.vue'),
+      meta: {
+        layout: 'onboarding',
+      },
+    },
+    {
+      path: '/onboarding/profile',
+      name: 'onboarding-profile',
+      component: () => import('@/views/onboarding/profile.vue'),
+      meta: {
+        layout: 'onboarding',
+      },
+    },
+    {
+      path: '/onboarding/projects',
+      name: 'onboarding-projects',
+      component: () => import('@/views/onboarding/project.vue'),
+      meta: {
+        layout: 'onboarding',
+      },
+    },
+    {
+      path: '/onboarding/finish',
+      name: 'onboarding-finish',
+      component: () => import('@/views/onboarding/finish.vue'),
+      meta: {
+        layout: 'onboarding',
       },
     },
 
@@ -146,19 +189,19 @@ const router = createRouter({
      */
 
     {
-      path: "/tasks/view/:id",
-      name: "task",
-      component: () => import('@/views/tasks/view.vue')
+      path: '/tasks/view/:id',
+      name: 'task',
+      component: () => import('@/views/tasks/view.vue'),
     },
     {
-      path: "/tasks/edit/:id",
+      path: '/tasks/edit/:id',
       name: 'edit-task',
-      component: () => import('@/views/tasks/form.vue')
+      component: () => import('@/views/tasks/form.vue'),
     },
     {
-      path: "/tasks/new/:project",
+      path: '/tasks/new/:project',
       name: 'create-task',
-      component: () => import('@/views/tasks/form.vue')
+      component: () => import('@/views/tasks/form.vue'),
     },
 
     /**
@@ -169,19 +212,19 @@ const router = createRouter({
      *
      */
     {
-      path: "/event/view/:id",
-      name: "event",
-      component: () => import('@/views/events/view.vue')
+      path: '/event/view/:id',
+      name: 'event',
+      component: () => import('@/views/events/view.vue'),
     },
     {
-      path: "/event/edit/:id",
-      name: "edit-event",
-      component: () => import('@/views/events/form.vue')
+      path: '/event/edit/:id',
+      name: 'edit-event',
+      component: () => import('@/views/events/form.vue'),
     },
     {
-      path: "/event/create/:project",
-      name: "create-event",
-      component: () => import('@/views/events/form.vue')
+      path: '/event/create/:project',
+      name: 'create-event',
+      component: () => import('@/views/events/form.vue'),
     },
 
     /**
@@ -200,7 +243,7 @@ const router = createRouter({
     {
       name: 'edit-profile',
       path: '/update-profile',
-      component: () => import('@/views/user/profile/update.vue')
+      component: () => import('@/views/user/profile/update.vue'),
     },
   ],
 })
@@ -211,6 +254,7 @@ router.beforeEach((to, from, next) => {
     'login',
     'forgot-password',
     'update-password',
+    'onboarding',
   ]
   const noAuthRoutes: RouteRecordNameGeneric[] = ['home', 'register', ...guestOnlyRoutes]
 

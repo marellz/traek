@@ -22,7 +22,7 @@
             </header-link>
           </li>
           <li>
-            <router-link :to="{ name: 'register' }">
+            <router-link :to="{ name: 'onboarding' }">
               <base-button>Get started</base-button>
             </router-link>
           </li>
