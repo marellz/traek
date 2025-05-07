@@ -22,6 +22,12 @@ export enum ActivityTypes {
   PROJECT_UPDATED = 'project-updated',
 }
 
+export enum ActivityListTypes {
+  PROJECT = 'project-activities',
+  USER_PROJECTS = 'user-projects',
+  USER = 'user-activities',
+}
+
 export type ActivityType = `${ActivityTypes}`
 
 export interface NewActivity {

@@ -30,7 +30,28 @@ export const useActivityService = () => {
     user: string,
     { start, end }: PaginationRange = { start: 0, end: 9 },
   ) => {
-    return await supabase.from('activities').select('*').eq('user_id', user).range(start, end)
+    const { data, error } = await supabase
+      .from('project_members')
+      .select('project_id')
+      .eq('user_id', user)
+    if (error) throw new Error(error.message)
+    if(data.length === 0) return { data: [], error: null }
+    const projects = data.map((project) => project.project_id)
+    return await supabase
+      .from('activities')
+      .select(
+        `
+        *,
+        user: users(id,name, avatar),
+        task: tasks(id, title, status),
+        note: notes(id, title),
+        event: events(id, title, datetime),
+        project: projects(id, name)
+        `,
+      )
+      .in('project_id', projects)
+      .order('created_at', { ascending: false })
+      .range(start, end)
   }
 
   // get activity triggered by one single user
@@ -51,6 +72,7 @@ export const useActivityService = () => {
         `,
       )
       .eq('user_id', user)
+      .order('created_at', { ascending: false })
       .range(start, end)
   }
 
@@ -65,7 +87,6 @@ export const useActivityService = () => {
     if (event_id) query.eq('event_id', event_id)
 
     query.eq('type', type)
-    query.order('created_at', { ascending: false })
 
     // the activity happened in the last 4 hours
     if (recent) {
@@ -74,6 +95,8 @@ export const useActivityService = () => {
       query.gte('created_at', yesterday.toISOString())
       query.lte('created_at', now.toISOString()).limit(1).single()
     }
+
+    query.order('created_at', { ascending: false })
 
     return await query
   }
