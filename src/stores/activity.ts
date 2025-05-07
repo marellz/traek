@@ -37,14 +37,17 @@ export interface NewActivity {
 }
 
 export enum ActivityLoading {
-  GETTING_ACTIVITIES = 'getting-activity',
+  GETTING_ACTIVITIES = 'getting-activities',
   LOGGING_ACTIVITY = 'logging-activity',
   GETTING_USER_INFO = 'getting-activity-users',
+  UPDATING_ACTIVITY = 'updating-activity',
+  GETTING_ACTIVITY = 'getting-activity',
 }
 
 export type Activity = NewActivity & {
   id?: string
   created_at?: string // populated
+  updated_at?: string | null
   user: {
     id: string
     name: string | null
@@ -81,6 +84,13 @@ export interface ActivityForm {
   event_id?: string
   target_user_ids?: string[]
   meta?: Json | null
+}
+
+export interface ActivityQuery {
+  task_id?: string | null
+  note_id?: string | null
+  event_id?: string | null
+  type: ActivityType | string
 }
 
 export const useActivityStore = defineStore(
@@ -148,6 +158,44 @@ export const useActivityStore = defineStore(
       }
     }
 
+    const updateIfAlreadyLogged = async (activity: Activity) => {
+      try {
+        begin(ActivityLoading.UPDATING_ACTIVITY)
+
+        const { type, task_id, note_id, event_id } = activity
+        const exists = await getActivity({ type, task_id, note_id, event_id }, true)
+
+        if (exists) {
+          if (!auth.isAuthenticated || !auth.userId) throw new Error(AuthErrors.UNAUTHENCATED)
+          const { status, error } = await service.updateActivity(exists[0].id, activity)
+          if (error || status !== 200) throw new Error(error?.message || 'Error updating activity')
+          return true
+        } else {
+          return logActivity(activity as ActivityForm)
+        }
+      } catch (error) {
+        handleError('Updating activity', error)
+        return false
+      } finally {
+        finish(ActivityLoading.UPDATING_ACTIVITY)
+      }
+    }
+
+    const getActivity = async (query: ActivityQuery, recent: boolean = true) => {
+      try {
+        begin(ActivityLoading.GETTING_ACTIVITY)
+        const { data, error } = await service.getActivity(query, recent)
+        if (error) throw new Error(error.message)
+        if (data) return data
+        return null
+      } catch (error) {
+        handleError('Getting activity', error)
+        return null
+      } finally {
+        finish(ActivityLoading.GETTING_ACTIVITY)
+      }
+    }
+
     const logActivity = async (payload: ActivityForm) => {
       try {
         if (!auth.isAuthenticated || !auth.userId) throw new Error(AuthErrors.UNAUTHENCATED)
@@ -191,6 +239,8 @@ export const useActivityStore = defineStore(
       isLoading,
       getProjectActivity,
       getUserProjectsActivities,
+      updateIfAlreadyLogged,
+      getActivity,
       getUserActivity,
       getUserInformation,
       logActivity,
