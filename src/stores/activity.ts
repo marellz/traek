@@ -32,7 +32,7 @@ export interface NewActivity {
   content?: string | null
   is_private: boolean
   target_user_ids: string[]
-  meta: Json | null
+  meta: any
   type: string
 }
 
