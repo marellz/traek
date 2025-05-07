@@ -269,8 +269,9 @@ export const useAuthStore = defineStore(
       // update
       try {
         begin(AuthLoading.UPDATING_PROFILE)
-        const { status } = await AuthService.updateProfile(userId.value, form)
-        if (status === 204) {
+        const { status, error } = await AuthService.updateProfile(userId.value, form)
+        if(error) throw new Error(error.message)
+        if (status === 200) {
           profile.value = { ...profile.value, ...form }
           return true
         }
@@ -278,6 +279,7 @@ export const useAuthStore = defineStore(
         return false
       } catch (error) {
         handleError('Updating profile', error)
+        return false
       } finally {
         finish(AuthLoading.UPDATING_PROFILE)
       }
