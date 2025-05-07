@@ -5,6 +5,7 @@ import { useLoadingState } from '@/composables/useLoading'
 import { AuthErrors, useAuthStore, type UserProfile } from '@/stores/auth'
 import type { TaskStatus } from '@/stores/task'
 import { useUserStore } from '@/stores/user'
+import type { Json } from '@/types/supabase'
 
 export enum ActivityTypes {
   TASK_CREATED = 'task-created', // done ✅
@@ -31,6 +32,7 @@ export interface NewActivity {
   content?: string | null
   is_private: boolean
   target_user_ids: string[]
+  meta: Json | null
   type: string
 }
 
@@ -78,6 +80,7 @@ export interface ActivityForm {
   note_id?: string
   event_id?: string
   target_user_ids?: string[]
+  meta?: Json | null
 }
 
 export const useActivityStore = defineStore(
@@ -158,6 +161,7 @@ export const useActivityStore = defineStore(
           task_id,
           note_id,
           event_id,
+          meta = null,
         } = payload
         const _activity: NewActivity = {
           project_id,
@@ -169,6 +173,7 @@ export const useActivityStore = defineStore(
           task_id,
           note_id,
           event_id,
+          meta,
         }
 
         const { data, error } = await service.logActivity(_activity)

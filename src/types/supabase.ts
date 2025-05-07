@@ -16,6 +16,7 @@ export type Database = {
           event_id: string | null
           id: string
           is_private: boolean
+          meta: Json | null
           note_id: string | null
           project_id: string
           target_user_ids: string[]
@@ -30,6 +31,7 @@ export type Database = {
           event_id?: string | null
           id?: string
           is_private?: boolean
+          meta?: Json | null
           note_id?: string | null
           project_id: string
           target_user_ids: string[]
@@ -44,6 +46,7 @@ export type Database = {
           event_id?: string | null
           id?: string
           is_private?: boolean
+          meta?: Json | null
           note_id?: string | null
           project_id?: string
           target_user_ids?: string[]
