@@ -12,16 +12,17 @@
 <script lang="ts" setup>
 import BaseLoader from '@/components/base/loader.vue'
 import ToastsWrapper from '@/components/toast/wrapper.vue'
-import { computed, onMounted, type Component } from 'vue';
-import { useRoute } from 'vue-router';
 import DefaultLayout from '@/layouts/default.vue'
 import AuthLayout from '@/layouts/auth.vue'
 import HomeLayout from '@/layouts/home.vue'
 import BlankLayout from '@/layouts/blank.vue'
+import OnboardingLayout from '@/layouts/onboarding.vue';
 import { useAuthStore } from '@/stores/auth';
+import { useRoute } from 'vue-router';
 import { useDark } from '@vueuse/core';
+import { computed, onMounted, type Component } from 'vue';
 
-type LayoutNames = "default" | "auth" | "home" | "blank"
+type LayoutNames = "default" | "auth" | "home" | "blank" | "onboarding"
 
 const layouts: {
   [key in LayoutNames]: Component
@@ -29,7 +30,8 @@ const layouts: {
   default: DefaultLayout,
   auth: AuthLayout,
   home: HomeLayout,
-  blank: BlankLayout
+  blank: BlankLayout,
+  onboarding: OnboardingLayout
 }
 
 const route = useRoute()
