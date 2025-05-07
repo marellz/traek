@@ -17,7 +17,7 @@ export enum TaskLoading {
   ADDING_ASSIGNEES = 'adding-assignees',
   REMOVING_ASSIGNEE = 'removing assignee',
   GETTING_ASSIGNEES = 'getting-assignees',
-  GETTING_USER_TASKS = 'getting-user-tasks'
+  GETTING_USER_TASKS = 'getting-user-tasks',
 }
 
 export enum TaskStatusEnum {
@@ -37,8 +37,8 @@ export type TaskStatus = `${TaskStatusEnum}` | string
 export type TaskPriority = 'high' | 'medium' | 'low'
 
 export interface TaskDateRange {
-  start_date: string;
-  end_date: string;
+  start_date: string
+  end_date: string
 }
 
 export type TaskUser = {
@@ -151,7 +151,7 @@ export const useTaskStore = defineStore(
             task_id: id,
             content: 'Created a task',
             is_private: false,
-            target_user_ids: assignees
+            target_user_ids: assignees,
           })
 
           return data[0]
@@ -194,8 +194,10 @@ export const useTaskStore = defineStore(
 
         const now = new Date().toISOString()
 
-        switch (status) {
+        const task = await get(id)
+        if(!task) throw new Error('Task not found')
 
+        switch (status) {
           case TaskStatusEnum.COMPLETED:
             payload.end_date = now
             break
@@ -220,17 +222,22 @@ export const useTaskStore = defineStore(
             notifyStatusUpdate(id)
           }
 
-          const task = await get(id)
+          await activityStore.logActivity({
+            project_id: task.project_id,
+            type: ActivityTypes.TASK_STATUS_UPDATED,
+            content: `Updated task "${task.title}" to ${TaskStatusLabels[status]}`,
+            task_id: id,
+            is_private: false,
 
-          if(task){
-            await activityStore.logActivity({
-              project_id: task.project_id,
-              type: ActivityTypes.TASK_STATUS_UPDATED,
-              content: `Updated task "${task.title}" to ${TaskStatusLabels[status]}`,
-              task_id: id,
-              is_private: false,
-            })
-          }
+            // todo:🤔 maybe make this an array to record all changes?
+
+            meta: {
+              user_id: auth.userId,
+              from: task.status,
+              to: status,
+              date_changed: new Date().toISOString(),
+            },
+          })
 
           return payload
         }
@@ -315,10 +322,10 @@ export const useTaskStore = defineStore(
         begin(TaskLoading.GETTING_USER_TASKS)
         const { data, error } = await service.getMyTasks(auth.userId!)
         if (error) throw new Error(error.message)
-          return data
+        return data
       } catch (error) {
         handleError('Getting my tasks', error)
-      } finally{
+      } finally {
         finish(TaskLoading.GETTING_USER_TASKS)
       }
     }
@@ -329,7 +336,7 @@ export const useTaskStore = defineStore(
         begin(TaskLoading.GETTING_USER_TASKS)
         const { data, error } = await service.getUserTasks(auth.userId!, dateRange)
         if (error) throw new Error(error.message)
-          return data
+        return data
       } catch (error) {
         handleError('Getting user tasks', error)
       } finally {
