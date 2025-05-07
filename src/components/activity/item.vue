@@ -1,13 +1,13 @@
 <template>
   <div class="flex items-start space-x-2 relative">
-    <span class="border bg-white border-slate-200 dark:border-slate-600 p-3 rounded-full flex-none relative z-[2]">
+    <span class="border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-600 p-3 rounded-full flex-none relative z-[2]">
       <component :is="icon" :size="20"></component>
     </span>
     <div
-      class="group-last:before:hidden before:block before:h-full before:absolute before:w-0 before:border-l before:border-l-slate-200 before:left-0 before:top-0 before:translate-x-5.5 before:translate-y-5">
+      class="group-last:before:hidden before:block before:h-full before:absolute before:w-0 before:border-l before:border-l-slate-200 dark:before:border-l-slate-700 before:left-0 before:top-0 before:translate-x-5.5 before:translate-y-5">
       <div>
         <router-link v-if="multipleProjects" :to="{ name: 'project', params: { id: item.project_id } }"
-          class="bg-slate-100 inline-block rounded px-2 text-xs font-medium py-1 mb-1">{{
+          class="bg-slate-100 dark:bg-slate-800 inline-block rounded px-2 text-xs font-medium py-1 mb-1">{{
             item.project.name }}</router-link>
         <div class=" pt-1">
           <p v-html="title"></p>

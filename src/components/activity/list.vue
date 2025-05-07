@@ -4,12 +4,14 @@
       <h2 class="text-2xl">{{ title }}</h2>
       <base-action class="ml-4" @click="fetch"><span>Refresh</span></base-action>
     </div>
-    <base-loader v-if="loadingActivity"></base-loader>
+    <div v-if="loadingActivity" class="flex pl-16 py-4">
+      <base-loader></base-loader>
+    </div>
     <ul v-else-if="activities.length" class="space-y-2">
       <li>
         <div class="pl-12">
           <button v-if="!rangeIsAtStart" type="button"
-            class="inline-flex justify-center items-center space-x-2 text-sm font-medium rounded py-2 px-4 hover:bg-slate-100 dark:hover:bg-slate-600"
+            class="inline-flex justify-center items-center space-x-2 text-sm font-medium rounded py-2 px-4 hover:bg-slate-100 dark:hover:bg-slate-800"
             @click="prevPage">
             <ListStart :size="16" />
             <span>Load newer</span>
@@ -22,13 +24,13 @@
       <li>
         <div class="pl-12 py-4">
           <button type="button"
-            class="inline-flex justify-center items-center space-x-2 text-sm font-medium rounded py-2 px-4 hover:bg-slate-100 dark:hover:bg-slate-600"
+            class="inline-flex justify-center items-center space-x-2 text-sm font-medium rounded py-2 px-4 hover:bg-slate-100 dark:hover:bg-slate-800"
             v-if="!rangeIsAtLimit" @click="nextPage">
             <ListEnd :size="16" />
             <span>Load older</span>
           </button>
           <button type="button"
-            class="inline-flex justify-center items-center space-x-2 text-sm font-medium rounded py-2 px-4 hover:bg-slate-100 dark:hover:bg-slate-600"
+            class="inline-flex justify-center items-center space-x-2 text-sm font-medium rounded py-2 px-4 hover:bg-slate-100 dark:hover:bg-slate-800"
             v-else @click="resetRange">
             <RefreshCcwDot :size="16" />
             <span>Reset</span>
