@@ -6,6 +6,7 @@ import { AuthErrors, useAuthStore, type UserProfile } from '@/stores/auth'
 import type { TaskStatus } from '@/stores/task'
 import { useUserStore } from '@/stores/user'
 import type { Json } from '@/types/supabase'
+import { usePagination } from '@/composables/usePagination'
 
 export enum ActivityTypes {
   TASK_CREATED = 'task-created', // done ✅
@@ -102,10 +103,13 @@ export const useActivityStore = defineStore(
     const service = useActivityService()
     const userStore = useUserStore()
 
+    const { range, nextRange, previousRange, markRangeLimit, resetRange, rangeLimit } =
+      usePagination()
+
     const getProjectActivity = async (project_id: string) => {
       try {
         begin(ActivityLoading.GETTING_ACTIVITIES)
-        const { data, error } = await service.getProjectActivity(project_id)
+        const { data, error } = await service.getProjectActivity(project_id, range.value)
         if (error) throw new Error(error.message)
         if (data) return data
         return
@@ -120,7 +124,7 @@ export const useActivityStore = defineStore(
       try {
         begin(ActivityLoading.GETTING_ACTIVITIES)
         if (!auth.userId) throw new Error(AuthErrors.UNAUTHENCATED)
-        const { data, error } = await service.getUserProjectsActivities(auth.userId)
+        const { data, error } = await service.getUserProjectsActivities(auth.userId, range.value)
         if (error) throw new Error(error.message)
         if (data) return data
         return null
@@ -135,7 +139,7 @@ export const useActivityStore = defineStore(
       try {
         begin(ActivityLoading.GETTING_ACTIVITIES)
         if (!auth.userId) throw new Error(AuthErrors.UNAUTHENCATED)
-        const { data, error } = await service.getUserActivity(auth.userId)
+        const { data, error } = await service.getUserActivity(auth.userId, range.value)
         if (error) throw new Error(error.message)
         if (data) return data
         return null
@@ -244,6 +248,14 @@ export const useActivityStore = defineStore(
       getUserActivity,
       getUserInformation,
       logActivity,
+
+      //pagination
+      range,
+      nextRange,
+      rangeLimit,
+      previousRange,
+      markRangeLimit,
+      resetRange,
     }
   },
   {

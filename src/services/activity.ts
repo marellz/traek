@@ -1,9 +1,13 @@
+import type { PaginationRange } from '@/composables/usePagination'
 import { supabase } from '@/database/supabase'
 import type { Activity, ActivityQuery, NewActivity } from '@/stores/activity'
 
 export const useActivityService = () => {
   // get activity for a single project
-  const getProjectActivity = async (project: string) => {
+  const getProjectActivity = async (
+    project: string,
+    { start, end }: PaginationRange = { start: 0, end: 9 },
+  ) => {
     return await supabase
       .from('activities')
       .select(
@@ -18,16 +22,22 @@ export const useActivityService = () => {
       )
       .eq('project_id', project)
       .order('created_at', { ascending: false })
-      .limit(10)
+      .range(start, end)
   }
 
   // get activity from a users projects
-  const getUserProjectsActivities = async (user: string) => {
-    return await supabase.from('activities').select('*').eq('user_id', user).range(0, 9)
+  const getUserProjectsActivities = async (
+    user: string,
+    { start, end }: PaginationRange = { start: 0, end: 9 },
+  ) => {
+    return await supabase.from('activities').select('*').eq('user_id', user).range(start, end)
   }
 
   // get activity triggered by one single user
-  const getUserActivity = async (user: string) => {
+  const getUserActivity = async (
+    user: string,
+    { start, end }: PaginationRange = { start: 0, end: 9 },
+  ) => {
     return await supabase
       .from('activities')
       .select(
@@ -41,7 +51,7 @@ export const useActivityService = () => {
         `,
       )
       .eq('user_id', user)
-      .range(0, 9)
+      .range(start, end)
   }
 
   const getActivity = async (
@@ -69,10 +79,7 @@ export const useActivityService = () => {
   }
 
   const updateActivity = async (id: string, _activity: Activity) => {
-    return supabase
-      .from('activities')
-      .update(_activity)
-      .eq('id', id)
+    return supabase.from('activities').update(_activity).eq('id', id)
   }
 
   // create a new activity based on other actions

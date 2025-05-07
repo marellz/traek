@@ -1,7 +1,12 @@
 import { ref } from 'vue'
 
+export interface PaginationRange {
+  start: number
+  end: number
+}
+
 export const usePagination = () => {
-  const range = ref({ start: 0, end: 9 })
+  const range = ref<PaginationRange>({ start: 0, end: 9 })
   const rangeLimit = ref(false)
 
   const markRangeLimit = (limit: boolean) => {

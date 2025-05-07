@@ -6,8 +6,30 @@
     </div>
     <base-loader v-if="loadingActivity"></base-loader>
     <ul v-else-if="activities.length" class="space-y-2">
+      <li>
+        <div class="pl-12">
+          <button v-if="!rangeIsAtStart" type="button" class="inline-flex justify-center items-center space-x-2 text-sm font-medium rounded py-2 px-4 hover:bg-slate-100 dark:hover:bg-slate-600"  @click="prevPage">
+            <ListStart :size="16"/>
+            <span>Load newer</span>
+          </button>
+        </div>
+      </li>
       <li v-for="item in activities" :key="item.id" class="group">
         <project-activity :item />
+      </li>
+      <li>
+        <div class="pl-12 py-4">
+          <button type="button" class="inline-flex justify-center items-center space-x-2 text-sm font-medium rounded py-2 px-4 hover:bg-slate-100 dark:hover:bg-slate-600"
+            v-if="!rangeIsAtLimit" @click="nextPage">
+            <ListEnd :size="16" />
+            <span>Load older</span>
+          </button>
+          <button type="button" class="inline-flex justify-center items-center space-x-2 text-sm font-medium rounded py-2 px-4 hover:bg-slate-100 dark:hover:bg-slate-600" v-else
+            @click="resetRange">
+            <RefreshCcwDot :size="16" />
+            <span>Reset</span>
+          </button>
+        </div>
       </li>
     </ul>
     <div v-else>
@@ -20,6 +42,7 @@
 import { ActivityLoading, useActivityStore, type Activity } from '@/stores/activity'
 import { computed, onMounted, ref } from 'vue'
 import ProjectActivity from '@/components/activity/item.vue'
+import { ListEnd, ListStart, RefreshCcwDot } from 'lucide-vue-next';
 enum ActivityTypes {
   PROJECT = 'project-activities',
   USER = 'user-activities'
@@ -59,9 +82,40 @@ const fetch = async () => {
       target_users: profiles?.filter(u => users.includes(u.id)) || []
     }))
 
-    activities.value = [..._items]
+    if (_items.length) {
+      activities.value = [..._items]
+    } else {
+      activityStore.markRangeLimit(true)
+    }
   }
 }
+
+
+const nextPage = async () => {
+  activityStore.nextRange(fetch)
+
+  if (activities.value.length < 10) {
+    activityStore.markRangeLimit(true)
+  }
+}
+
+const prevPage = async () => {
+  activityStore.previousRange(fetch)
+
+  if (activities.value.length >= 10) {
+    activityStore.markRangeLimit(false)
+  }
+}
+
+const resetRange = async () => {
+  activityStore.resetRange()
+  activities.value = []
+  await fetch()
+}
+
+const rangeIsAtStart = computed(() => activityStore.range.start === 0)
+const rangeIsAtLimit = computed(() => activityStore.rangeLimit)
+
 onMounted(() => {
   fetch()
 })
