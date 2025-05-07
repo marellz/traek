@@ -1,0 +1,79 @@
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { ref } from 'vue'
+import { useAuthStore } from './auth'
+import { useProjectStore } from './project'
+
+export enum OnboardingSteps {
+  REGISTER = 'register',
+  PROFILE = 'profile',
+  PROJECTS = 'projects',
+  FINISH = 'finish',
+}
+
+export const onboardingLinks = {
+  [OnboardingSteps.REGISTER]: '/onboarding/',
+  [OnboardingSteps.PROFILE]: '/onboarding/profile',
+  [OnboardingSteps.PROJECTS]: '/onboarding/projects',
+  [OnboardingSteps.FINISH]: '/onboarding/finish',
+}
+
+export type OnboardingStep = `${OnboardingSteps}`
+
+export const useOnboardingStore = defineStore(
+  'onboarding',
+  () => {
+    const auth = useAuthStore()
+    const projectStore = useProjectStore()
+    const stage = ref<OnboardingStep | null>(null)
+    const setStage = (newStage: OnboardingStep) => {
+      console.log({new: newStage})
+      stage.value = newStage
+    }
+
+    const nextStage = () => {
+      console.log('called')
+      const steps = ['register', 'profile', 'projects', 'finish'] as OnboardingStep[]
+      const maxIndex = steps.length - 1
+      const currentIndex = stage.value ? steps.indexOf(stage.value) : 0
+
+      if (currentIndex === -1 || currentIndex >= maxIndex) {
+        stage.value = null
+        console.log('not moving')
+        return null
+      }
+
+      console.log({ current: stage.value })
+
+      setStage(steps[currentIndex + 1])
+    }
+
+    const evaluateCompletion = async () => {
+      const isAuthenticated = auth.isAuthenticated
+      if (isAuthenticated) await projectStore.getUserProjects()
+      const userHasNameAndUserName = isAuthenticated && auth.profile?.username && auth.profile?.name
+      const userBelongsToAProject = projectStore.projects
+      if (!isAuthenticated) stage.value = null
+      else if (!userHasNameAndUserName) stage.value = OnboardingSteps.PROFILE
+      else if (!userBelongsToAProject) stage.value = OnboardingSteps.PROJECTS
+      else return null
+    }
+
+    return {
+      stage,
+      setStage,
+      nextStage,
+
+      evaluateCompletion,
+    }
+  },
+  {
+    persist: {
+      storage: localStorage,
+      pick: ['stage'],
+    },
+  },
+)
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useOnboardingStore, import.meta.hot))
+}
