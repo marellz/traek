@@ -17,7 +17,7 @@
           <router-link class="text-primary dark:text-indigo-400 font-medium" to="/forgot-password">Forgot password?
           </router-link>
         </div>
-        <base-button class="w-full" :loading="auth.loading">
+        <base-button class="w-full" :loading>
           <span>Login</span>
         </base-button>
         <base-alert v-if="auth.errors" variant="error" title="Authentication error">
@@ -42,13 +42,14 @@ import FormInput from "@/components/form/input.vue"
 import FormCheckbox from "@/components/form/checkbox.vue"
 import BaseButton from "@/components/base/button.vue"
 import BaseAlert from "@/components/base/alert.vue"
-import { onMounted, ref } from "vue"
-import { useAuthStore } from "@/stores/auth"
+import { computed, onMounted, ref } from "vue"
+import { AuthLoading, useAuthStore } from "@/stores/auth"
 import { Form, useForm } from "vee-validate"
 import * as yup from "yup"
 import { useRouter } from 'vue-router'
 
 const auth = useAuthStore()
+const loading = computed(() => auth.isLoading(AuthLoading.LOGGING_IN))
 
 const { errors, defineField, handleSubmit, resetForm } = useForm({
   validationSchema: yup.object({

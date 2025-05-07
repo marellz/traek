@@ -35,7 +35,7 @@
 import FormInput from '@/components/form/input.vue'
 import BaseAlert from '@/components/base/alert.vue'
 import BaseButton from '@/components/base/button.vue'
-import { useAuthStore } from '@/stores/auth'
+import { AuthLoading, useAuthStore } from '@/stores/auth'
 import { computed, onMounted, ref, watch } from 'vue'
 import * as yup from 'yup'
 import { Form, useForm } from 'vee-validate'
@@ -43,7 +43,7 @@ import { Form, useForm } from 'vee-validate'
 const auth = useAuthStore()
 const emit = defineEmits(['complete'])
 
-const loading = computed(() => auth.loading)
+const loading = computed(() => auth.isLoading(AuthLoading.UPDATING_PROFILE))
 const user = computed(() => auth.user)
 const error = ref('')
 

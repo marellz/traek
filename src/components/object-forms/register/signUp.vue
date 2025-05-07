@@ -65,10 +65,10 @@ import BaseButton from '@/components/base/button.vue'
 import * as yup from 'yup'
 import { Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { AuthLoading, useAuthStore } from '@/stores/auth'
 import { faker } from '@faker-js/faker'
 
-const loading = computed(() => auth.loading)
+const loading = computed(() => auth.isLoading(AuthLoading.REGISTERING))
 
 const auth = useAuthStore()
 

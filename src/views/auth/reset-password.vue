@@ -34,7 +34,7 @@
           allow-password-toggle required></form-input>
         <form-input label="Confirm password" v-model="confirmPassword" type="password"
           :error="errors.password_confirmation" required></form-input>
-        <base-button type="submit" class="w-full" :loading="auth.loading">
+        <base-button type="submit" class="w-full" :loading>
           <span>Update password</span>
         </base-button>
       </div>
@@ -66,16 +66,16 @@ import FormInput from "@/components/form/input.vue"
 import BaseButton from "@/components/base/button.vue"
 // import BaseAlert from "@/components/base/alert.vue"
 // import BaseLoader from "@/components/base/loader.vue"
-import { useAuthStore } from "@/stores/auth"
+import { AuthLoading, useAuthStore } from "@/stores/auth"
 import { Form, useForm } from "vee-validate"
 import * as yup from "yup"
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 // import { AlertCircle, MoveRight } from "lucide-vue-next"
 
 const auth = useAuthStore()
 const router = useRouter()
-
+const loading = computed(() => auth.isLoading(AuthLoading.UPDATING_PASSWORD))
 const schema = yup.object({
   password: yup.string().min(6).required("Password is required"),
   password_confirmation: yup
