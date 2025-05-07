@@ -12,12 +12,13 @@
             <li>Task</li>
           </ul>
         </div>
-        <activity-list title="Your activity" type="user-activities"></activity-list>
+        <activity-list title="Activity on your projects" :type="ActivityListTypes.USER_PROJECTS"></activity-list>
       </div>
     </layout-container>
   </div>
 </template>
 <script lang="ts" setup>
 import ActivityList from '@/components/activity/list.vue';
+import { ActivityListTypes } from '@/stores/activity';
 
 </script>
