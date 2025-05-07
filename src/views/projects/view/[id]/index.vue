@@ -32,11 +32,7 @@
       </layout-card>
       <div class="mt-5">
         <layout-card class="grid grid-cols-8 !p-4">
-          <router-link
-            :to="{ name: section.pathName, params: { id } }"
-            v-for="section in sections"
-            :key="section.key"
-          >
+          <router-link :to="{ name: section.pathName, params: { id } }" v-for="section in sections" :key="section.key">
             <div class="border-r border-r-slate-300 pl-4 hover:bg-midnight-green/10 py-2 px-4">
               <div class="mt-4 text-4xl font-medium">
                 {{ project[section.key][0].count }}
@@ -47,6 +43,9 @@
             </div>
           </router-link>
         </layout-card>
+        <div class="grid grid-cols-2">
+          <activity-list title="Project activity" :project="id"></activity-list>
+        </div>
       </div>
     </template>
   </div>
@@ -63,7 +62,7 @@ import moment from 'moment'
 import { onMounted, ref } from 'vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-
+import ActivityList from '@/components/activity/list.vue'
 const route = useRoute()
 const auth = useAuthStore()
 const id = computed(() => route.params.id as string)

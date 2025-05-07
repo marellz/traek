@@ -1,7 +1,7 @@
 import { useLoadingState } from '@/composables/useLoading'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useAuthStore } from './auth'
-import { useErrorStore } from './errors'
+import { useAuthStore } from '@/stores/auth'
+import { useErrorStore } from '@/stores/errors'
 import { useNotificationsService, useNotificationBuilder } from '@/services/notifications'
 import { computed, ref } from 'vue'
 

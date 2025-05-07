@@ -1,9 +1,11 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useErrorStore } from './errors'
+import { useErrorStore } from '@/stores/errors'
 import { useTaskService } from '@/services/tasks'
+import { useAuthStore } from '@/stores/auth'
 import { useLoadingState } from '@/composables/useLoading'
-import { useAuthStore } from './auth'
-import { NotificationTypes, useNotificationStore } from './notifications'
+import { NotificationTypes, useNotificationStore } from '@/stores/notifications'
+import { ActivityTypes, useActivityStore } from '@/stores/activity'
+import { TaskStatusLabels } from '@/data/task-data'
 
 export enum TaskLoading {
   CREATING = 'creating-task',
@@ -15,7 +17,7 @@ export enum TaskLoading {
   ADDING_ASSIGNEES = 'adding-assignees',
   REMOVING_ASSIGNEE = 'removing assignee',
   GETTING_ASSIGNEES = 'getting-assignees',
-  GETTING_USER_TASKS = 'getting-user-tasks'
+  GETTING_USER_TASKS = 'getting-user-tasks',
 }
 
 export enum TaskStatusEnum {
@@ -35,8 +37,8 @@ export type TaskStatus = `${TaskStatusEnum}` | string
 export type TaskPriority = 'high' | 'medium' | 'low'
 
 export interface TaskDateRange {
-  start_date: string;
-  end_date: string;
+  start_date: string
+  end_date: string
 }
 
 export type TaskUser = {
@@ -99,6 +101,7 @@ export const useTaskStore = defineStore(
     const { begin, finish, isLoading } = useLoadingState()
     const auth = useAuthStore()
     const notificationStore = useNotificationStore()
+    const activityStore = useActivityStore()
 
     const list = async (project: string) => {
       begin(TaskLoading.GETTING_ALL)
@@ -139,7 +142,18 @@ export const useTaskStore = defineStore(
         const { data, error } = await service.create({ ...form, created_by: auth.userId! })
         if (error) throw new Error(error.message)
         if (data && data.length) {
-          await addAssignees(data[0].id, assignees)
+          const id = data[0].id
+          await addAssignees(id, assignees)
+
+          await activityStore.logActivity({
+            project_id: form.project_id,
+            type: ActivityTypes.TASK_CREATED,
+            task_id: id,
+            content: 'Created a task',
+            is_private: false,
+            target_user_ids: assignees,
+          })
+
           return data[0]
         }
 
@@ -180,8 +194,10 @@ export const useTaskStore = defineStore(
 
         const now = new Date().toISOString()
 
-        switch (status) {
+        const task = await get(id)
+        if(!task) throw new Error('Task not found')
 
+        switch (status) {
           case TaskStatusEnum.COMPLETED:
             payload.end_date = now
             break
@@ -205,6 +221,24 @@ export const useTaskStore = defineStore(
           } else {
             notifyStatusUpdate(id)
           }
+
+          await activityStore.logActivity({
+            project_id: task.project_id,
+            type: ActivityTypes.TASK_STATUS_UPDATED,
+            content: `Updated task "${task.title}" to ${TaskStatusLabels[status]}`,
+            task_id: id,
+            is_private: false,
+
+            // todo:🤔 maybe make this an array to record all changes?
+
+            meta: {
+              user_id: auth.userId,
+              from: task.status,
+              to: status,
+              date_changed: new Date().toISOString(),
+            },
+          })
+
           return payload
         }
 
@@ -288,10 +322,10 @@ export const useTaskStore = defineStore(
         begin(TaskLoading.GETTING_USER_TASKS)
         const { data, error } = await service.getMyTasks(auth.userId!)
         if (error) throw new Error(error.message)
-          return data
+        return data
       } catch (error) {
         handleError('Getting my tasks', error)
-      } finally{
+      } finally {
         finish(TaskLoading.GETTING_USER_TASKS)
       }
     }
@@ -302,7 +336,7 @@ export const useTaskStore = defineStore(
         begin(TaskLoading.GETTING_USER_TASKS)
         const { data, error } = await service.getUserTasks(auth.userId!, dateRange)
         if (error) throw new Error(error.message)
-          return data
+        return data
       } catch (error) {
         handleError('Getting user tasks', error)
       } finally {

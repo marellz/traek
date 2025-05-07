@@ -1,12 +1,32 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import AuthService, { type AuthPayload } from '@/services/auth'
 import { computed, ref, watch } from 'vue'
-import { useErrorStore } from './errors'
+import { useErrorStore } from '@/stores/errors'
 import type { User } from '@supabase/supabase-js'
 import { useLoadingState } from '@/composables/useLoading'
 import { useAvatarService } from '@/services/avatars'
 import { generateAvatarName } from '@/utils/generateAvatarName'
-import { useUserStore } from './user'
+import { useUserStore } from '@/stores/user'
+
+export type UserProfile = {
+  id: string
+  email: string
+  username: string | null
+  name: string | null
+  phone?: string | null
+  avatar?: string | null
+  created_at: string
+}
+
+export type UserProfileForm = {
+  id: string
+  name: string
+  email: string
+  username: string
+  phone?: string | null
+  avatar?: string | null
+  created_at: string
+}
 
 export enum AuthLoading {
   UPLOADING = 'uploading-user-avatar',
@@ -15,6 +35,10 @@ export enum AuthLoading {
 
   GETTING_PROFILE = 'getting-user-profile',
   UPDATING_PROFILE = 'updating-user-profile',
+}
+
+export enum AuthErrors {
+  UNAUTHENCATED = 'User not authenticated'
 }
 
 export const useAuthStore = defineStore(
@@ -347,24 +371,4 @@ export const useAuthStore = defineStore(
 
 if (import.meta.hot) {
   import.meta.hot.accept(acceptHMRUpdate(useAuthStore, import.meta.hot))
-}
-
-export type UserProfile = {
-  id: string
-  email: string
-  username: string | null
-  name: string | null
-  phone?: string | null
-  avatar?: string | null
-  created_at: string
-}
-
-export type UserProfileForm = {
-  id: string
-  name: string
-  email: string
-  username: string
-  phone?: string | null
-  avatar?: string | null
-  created_at: string
 }

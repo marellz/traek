@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useToastsStore } from './toasts'
+import { useToastsStore } from '@/stores/toasts'
 import { ref } from 'vue'
 
 export const useErrorStore = defineStore(

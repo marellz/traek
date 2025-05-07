@@ -1,9 +1,9 @@
 <template>
   <!-- dashboard -->
   <div class="h-full flex flex-col min-h-screen dark:bg-slate-900 dark:text-white">
-    <div class="container flex-auto mx-auto flex space-x-2">
+    <div class="container flex-auto mx-auto flex space-x-2 h-full max-h-screen">
       <partials-nav />
-      <div class="flex-auto flex flex-col">
+      <div class="flex-auto flex flex-col overflow-auto">
         <partials-header />
         <main class="flex-auto">
           <slot />

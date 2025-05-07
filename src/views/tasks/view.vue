@@ -32,7 +32,7 @@
           <Calendar :size="24" :stroke-width="1.5"></Calendar>
           <div class="space-y-1 text-sm text-slate-500">
             <p>
-              {{ task.updated_at ? 'Updated at' : 'Created on' }} {{ parseDate(task.updated_at ?? task.created_at, 'Do MMM YYYY, h:mm A') }}
+              {{ task.updated_at ? 'Updated at' : 'Created on' }} {{ date }}
             </p>
             <template v-if="task.start_date">
               <p>Started on {{ parseDate(task.start_date, 'Do MMM YYYY, h:mm A') }} </p>
@@ -45,11 +45,13 @@
           </div>
           <div v-if="task.created_by.id === auth.userId" class="ml-auto flex items-center space-x-2">
             <task-status-switch v-model="task.status" @switch="updateTaskStatus"></task-status-switch>
-            <base-action class="!border-amber-600 !text-amber-600" @click="editTask">
-              <span>
-                Edit task
-              </span>
-            </base-action>
+            <router-link :to="{ name: 'edit-task', params: { id } }">
+              <base-action class="!border-amber-600 !text-amber-600">
+                <span>
+                  Edit task
+                </span>
+              </base-action>
+            </router-link>
             <base-action class="!border-red-500 !text-red-500" confirm @confirm="deleteTask">
               <span>
                 Delete task
@@ -136,11 +138,8 @@ const isOverdue = computed(() => {
   return moment(task.value.due_date).isAfter(moment()) && inComplete.value
 })
 
-const editTask = async () => {
-  if (!task.value?.id) {
-    return
-  }
-}
+const date = computed(() => task.value ? parseDate(task.value.updated_at ?? task.value.created_at, 'Do MMM YYYY, h:mm A') : null)
+
 const deleteTask = async () => {
   if (!task.value?.id) {
     return
@@ -157,8 +156,8 @@ const deleteTask = async () => {
 
 const updateTaskStatus = async (status: TaskStatus) => {
   const success = await taskStore.updateStatus(id.value, status)
-  if(success && task.value){
-    task.value = {...task.value, ...success}
+  if (success && task.value) {
+    task.value = { ...task.value, ...success }
   }
 }
 

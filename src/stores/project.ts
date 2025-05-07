@@ -1,16 +1,17 @@
 import { useProjectService } from '@/services/projects'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { useErrorStore } from './errors'
-import { ref } from 'vue'
+import { useErrorStore } from '@/stores/errors'
 import { useAuthStore } from '@/stores/auth'
 import { useLoadingState } from '@/composables/useLoading'
-import { NotificationTypes, useNotificationStore } from './notifications'
+import { NotificationTypes, useNotificationStore } from '@/stores/notifications'
+import { ActivityTypes, useActivityStore } from '@/stores/activity'
+import { ref } from 'vue'
 
 export interface ProjectUser {
-  id: string;
-  email: string;
-  name: string | null;
-  username: string | null;
+  id: string
+  email: string
+  name: string | null
+  username: string | null
   avatar: string | null
 }
 
@@ -77,7 +78,8 @@ export const useProjectStore = defineStore(
     const auth = useAuthStore()
     const { handleError } = useErrorStore()
     const { begin, finish, isLoading } = useLoadingState()
-    const notify = useNotificationStore()
+    const notifyService = useNotificationStore()
+    const activityService = useActivityStore()
 
     const ensureAuth = (user_id?: string) => {
       if (!(auth.user && (user_id ? auth.user.id !== user_id : true))) {
@@ -151,7 +153,16 @@ export const useProjectStore = defineStore(
           // projects.value = _projects
           // _projects.push(data[0])
 
-          await addMembers(data[0].id, [...members, auth.userId!])
+          const id = data[0].id
+
+          await activityService.logActivity({
+            project_id: id,
+            type: ActivityTypes.PROJECT_CREATED,
+            content: 'Project was created',
+            is_private: false,
+          })
+
+          await addMembers(id, [...members, auth.userId!])
 
           await getUserProjects()
 
@@ -204,6 +215,12 @@ export const useProjectStore = defineStore(
         if (error) throw new Error(error.message)
         if (status === 204) {
           form.closed_at = closed_at
+          await activityService.logActivity({
+            project_id: id,
+            type: ActivityTypes.PROJECT_CLOSED,
+            content: 'Project was closed.',
+            is_private: false,
+          })
           return true
         }
 
@@ -225,8 +242,17 @@ export const useProjectStore = defineStore(
         const payload = members.map((user_id) => ({ user_id, project_id: project }))
         const { status, error } = await service.addMembers(payload)
         if (error) throw new Error(error.message)
-        if(status === 201){
+        if (status === 201) {
           notifyMemberAddition(project, members)
+
+          await activityService.logActivity({
+            project_id: project,
+            type: ActivityTypes.MEMBERS_ADDED,
+            content: `Added ${members.length} member${members.length > 1 ? 's' : ''}`,
+            is_private: false,
+            target_user_ids: members,
+          })
+
           return true
         }
         return false
@@ -268,7 +294,7 @@ export const useProjectStore = defineStore(
      */
 
     const notifyMemberAddition = (project: string, users: string[] = []) => {
-      notify.create(NotificationTypes.PROJECT_MEMBER_ADDED, project, users)
+      notifyService.create(NotificationTypes.PROJECT_MEMBER_ADDED, project, users)
     }
 
     return {
