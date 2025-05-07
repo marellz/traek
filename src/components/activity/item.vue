@@ -1,6 +1,7 @@
 <template>
   <div class="flex items-start space-x-2 relative">
-    <span class="border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-600 p-3 rounded-full flex-none relative z-[2]">
+    <span
+      class="border bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-600 p-3 rounded-full flex-none relative z-[2]">
       <component :is="icon" :size="20"></component>
     </span>
     <div
@@ -11,7 +12,6 @@
             item.project.name }}</router-link>
         <div class=" pt-1">
           <p v-html="title"></p>
-          <!-- <p v-if="item.content">{{ item.content }}</p> -->
         </div>
         <p v-if="item.created_at" class="text-xs text-slate-400 dark:text-slate-500 mt-1">{{
           parseDate(item.created_at, `Mo MMMYYYY, hh: mm A`) }}</p>
@@ -19,9 +19,10 @@
           <ul class="flex space-x-2">
             <li v-for="user in item.target_users" :key="user.id">
               <div class="flex items-center space-x-2">
-                <!-- todo: use popovers for name/email -->
-                <UserAvatar :avatar="user.avatar" size="w-12 h-12"
-                  :title="`${user.name ?? '[no name]'} | ${user.email}`" />
+                <base-popover popover-class="whitespace-nowrap" :text="user.name ?? `email: ${user.email}`">
+                  <UserAvatar :avatar="user.avatar" size="w-12 h-12"
+                    :title="`${user.name ?? '[no name]'} | ${user.email}`" />
+                </base-popover>
               </div>
             </li>
           </ul>
