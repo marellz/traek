@@ -38,10 +38,10 @@ import FormCheckbox from "@/components/form/checkbox.vue"
 import BaseButton from "@/components/base/button.vue"
 import { computed, onMounted, ref, watch } from "vue"
 import { AuthLoading, useAuthStore } from "@/stores/auth"
+import { OnboardingSteps, useOnboardingStore } from '@/stores/onboarding'
 import { Form, useForm } from "vee-validate"
 import * as yup from "yup"
 import { useRouter } from 'vue-router'
-import { useOnboardingStore } from '@/stores/onboarding'
 
 const auth = useAuthStore()
 const loading = computed(() => auth.isLoading(AuthLoading.LOGGING_IN))
@@ -88,7 +88,7 @@ const onboardingStore = useOnboardingStore()
 const getProfile = async () => {
   await auth.getProfile()
   await onboardingStore.evaluateCompletion()
-  if (onboardingStore.stage) {
+  if (onboardingStore.stage && onboardingStore.stage !== OnboardingSteps.FINISH) {
     router.push(`/onboarding/${onboardingStore.stage}`)
   } else {
     router.push({ name: "dashboard" })

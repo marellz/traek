@@ -1,5 +1,5 @@
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useAuthStore } from './auth'
 import { useProjectStore } from './project'
 
@@ -59,10 +59,19 @@ export const useOnboardingStore = defineStore(
         stage.value = OnboardingSteps.PROFILE
       } else if (!userBelongsToAProject) {
         stage.value = OnboardingSteps.PROJECTS
+      } else {
+        stage.value = OnboardingSteps.FINISH
       }
 
       return null
     }
+
+    watch(() => auth.isAuthenticated, (hasAuth) => {
+      // if user logs out their onboarding status is returned to null
+      if(!hasAuth){
+        stage.value = null
+      }
+    })
 
     return {
       stage,
