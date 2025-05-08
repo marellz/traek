@@ -41,6 +41,7 @@ import { AuthLoading, useAuthStore } from "@/stores/auth"
 import { Form, useForm } from "vee-validate"
 import * as yup from "yup"
 import { useRouter } from 'vue-router'
+import { useOnboardingStore } from '@/stores/onboarding'
 
 const auth = useAuthStore()
 const loading = computed(() => auth.isLoading(AuthLoading.LOGGING_IN))
@@ -84,15 +85,14 @@ const login = handleSubmit(async (values) => {
   await getProfile()
 })
 
+const onboardingStore = useOnboardingStore()
 const getProfile = async () => {
-  const _profile = await auth.getProfile()
-
-   if (_profile && auth.hasProfile) {
-    router.push({ name: "dashboard" })
+  await auth.getProfile()
+  await onboardingStore.evaluateCompletion()
+  if (onboardingStore.stage) {
+    router.push(`/onboarding/${onboardingStore.stage}`)
   } else {
-    if (auth.user) router.push('/onboarding/profile')
-    else console.log('di')
-
+    router.push({ name: "dashboard" })
   }
 }
 

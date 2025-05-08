@@ -48,7 +48,7 @@ import { Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
 import { AuthLoading, useAuthStore } from '@/stores/auth'
 import { faker } from '@faker-js/faker'
-import { useOnboardingStore } from '@/stores/onboarding'
+import { OnboardingSteps, useOnboardingStore } from '@/stores/onboarding'
 
 const loading = computed(() => auth.isLoading(AuthLoading.REGISTERING))
 
@@ -100,5 +100,6 @@ const register = handleSubmit(async (values) => {
 
 onMounted(() => {
   auth.resetErrors()
+  if(onboardingStore.stage === null) onboardingStore.setStage(OnboardingSteps.REGISTER)
 })
 </script>

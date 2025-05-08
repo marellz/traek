@@ -22,13 +22,13 @@
           </button>
         </nav>
         <div class="mt-auto">
-          <div class="flex justify-between py-4">
+          <div class="flex py-4">
             <router-link :to="{ name: 'home' }"
               class="flex items-center space-x-2 text-sm font-medium text-gray-500 hover:text-black">
               <ArrowLeft :size="20" />
               <span>Back to home</span>
             </router-link>
-            <router-link :to="{ name: 'login' }" class=" text-sm font-medium text-gray-500 hover:text-black">
+            <router-link v-if="!auth.isAuthenticated" :to="{ name: 'login' }" class="ml-auto text-sm font-medium text-gray-500 hover:text-black">
               <span>Login</span>
             </router-link>
           </div>
@@ -37,9 +37,9 @@
     </header>
     <main class="overflow-auto flex-auto max-w-4xl xl:max-w-2/3 flex flex-col">
       <div class="container mx-auto max-w-md py-12 space-y-8 flex-auto flex flex-col">
-        <div class="py-4 space-y-1 text-center">
-          <auth-title>Create account</auth-title>
-          <auth-subtitle>Sign up with a free account</auth-subtitle>
+        <div class="py-4 space-y-1 tutext-center">
+          <auth-title>{{ bannerText.title }}</auth-title>
+          <auth-subtitle>{{ bannerText.text }}</auth-subtitle>
         </div>
         <div class="space-y-4">
           <slot />
@@ -93,10 +93,14 @@ const onboardingStore = useOnboardingStore()
 const steps = computed(() => Object.values(OnboardingSteps))
 const stage = computed(() => onboardingStore.stage)
 const indexOfCurrentStep = computed(() => steps.value.indexOf(stage.value as OnboardingSteps))
+const bannerText = computed(() => {
+  const _stage = stage.value !== null ? stage.value : OnboardingSteps.REGISTER
+  return onboardingText[_stage]
+})
+
 const router = useRouter()
 
 const setStage = (_step: OnboardingStep) => {
-  console.log({ _step })
   onboardingStore.setStage(_step)
   router.push(onboardingLinks[_step])
 }
@@ -108,14 +112,10 @@ onMounted(async () => {
     router.push(onboardingLinks[stage.value])
   }
 
-  // if (stage.value && auth.isAuthenticated) {
-  //   const appropriateStage = onboardingStore.placement()
-  //   // router.push(onboardingLinks[stage.value])
-  // }
-
 })
 
 watch(() => stage.value, (value) => {
+  if(!auth.isAuthenticated) return
   if (!value) {
     router.push({ name: 'dashboard' })
   } else {

@@ -24,25 +24,20 @@ export const useOnboardingStore = defineStore(
   () => {
     const auth = useAuthStore()
     const projectStore = useProjectStore()
-    const stage = ref<OnboardingStep | null>(null)
+    const stage = ref<OnboardingStep | null>(OnboardingSteps.PROFILE)
     const setStage = (newStage: OnboardingStep) => {
-      console.log({new: newStage})
       stage.value = newStage
     }
 
     const nextStage = () => {
-      console.log('called')
       const steps = ['register', 'profile', 'projects', 'finish'] as OnboardingStep[]
       const maxIndex = steps.length - 1
       const currentIndex = stage.value ? steps.indexOf(stage.value) : 0
 
       if (currentIndex === -1 || currentIndex >= maxIndex) {
         stage.value = null
-        console.log('not moving')
         return null
       }
-
-      console.log({ current: stage.value })
 
       setStage(steps[currentIndex + 1])
     }
@@ -50,12 +45,23 @@ export const useOnboardingStore = defineStore(
     const evaluateCompletion = async () => {
       const isAuthenticated = auth.isAuthenticated
       if (isAuthenticated) await projectStore.getUserProjects()
-      const userHasNameAndUserName = isAuthenticated && auth.profile?.username && auth.profile?.name
-      const userBelongsToAProject = projectStore.projects
-      if (!isAuthenticated) stage.value = null
-      else if (!userHasNameAndUserName) stage.value = OnboardingSteps.PROFILE
-      else if (!userBelongsToAProject) stage.value = OnboardingSteps.PROJECTS
-      else return null
+      const userHasNameAndUserName =
+        isAuthenticated && auth.profile?.username !== null && auth.profile?.name !== null
+      const userBelongsToAProject = projectStore.projects.length > 0
+
+      console.log({
+        userHasNameAndUserName,
+        userBelongsToAProject,
+      })
+      if (!isAuthenticated) {
+        stage.value = null
+      } else if (!userHasNameAndUserName) {
+        stage.value = OnboardingSteps.PROFILE
+      } else if (!userBelongsToAProject) {
+        stage.value = OnboardingSteps.PROJECTS
+      }
+
+      return null
     }
 
     return {
