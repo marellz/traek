@@ -1,6 +1,6 @@
 <template>
   <button type="button" class="p-1" @click="toggleDarkMode()">
-    <Sun v-if="isDark" />
+    <Sun v-if="isDark" class="text-white" />
     <Moon v-else />
   </button>
 </template>
