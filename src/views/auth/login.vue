@@ -61,9 +61,8 @@ const router = useRouter()
 
 const stack = ref('')
 
-watch(()=>auth.errors, (v) => {
-  if(v){
-    console.log(v.login)
+watch(() => auth.errors, (v) => {
+  if (v) {
     setErrors({
       email: v.login
     })
