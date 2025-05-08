@@ -87,7 +87,7 @@ export const useAuthStore = defineStore(
         } = await AuthService.login(payload)
         if (error) {
           errors.value = {
-            Login: error.message,
+            login: error.message,
           }
         }
 
