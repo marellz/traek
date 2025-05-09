@@ -11,7 +11,8 @@
             class="group py-1 disabled:text-slate-400 dark:disabled:text-slate-600 w-full text-left text-slate-400 dark:text-slate-600 relative before:absolute before:h-full before:w-0 before:border-l-2 before:border-l-slate-200 before:left-0 before:top-0 before:translate-x-4.5 before:translate-y-6 last:before:hidden before:z-[-1]"
             :class="{ '!text-black dark:!text-white': stage === item }">
             <div class="flex space-x-2 items-start">
-              <span class="p-2 border border-slate-200 dark:border-slate-800 rounded bg-white shadow dark:bg-black group-disabled:bg-gray-100 dark:group-disabled:bg-black dark:group-disabled:text-slate-600">
+              <span
+                class="p-2 border border-slate-200 dark:border-slate-800 rounded bg-white shadow dark:bg-black group-disabled:bg-gray-100 dark:group-disabled:bg-black dark:group-disabled:text-slate-600">
                 <component :is="onboardingIcons[item]" :size="20" stroke-width="1.5"></component>
               </span>
               <div>

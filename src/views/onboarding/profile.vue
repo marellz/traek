@@ -74,9 +74,6 @@ const update = handleSubmit(async (values) => {
 
   if (success) {
     onboardingStore.nextStage()
-  } else {
-    console.log('no success');
-
   }
 })
 
