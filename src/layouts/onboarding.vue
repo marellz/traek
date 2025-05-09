@@ -1,17 +1,17 @@
 <template>
-  <div class="h-screen min-h-screen flex">
+  <div class="h-screen min-h-screen flex dark:bg-black dark:text-white" :class="{ 'dark': isDark }">
     <header class="w-96 flex-none p-4">
-      <div class="space-y-8 pt-8 px-4 bg-gray-900/5 h-full flex flex-col rounded-lg">
+      <div class="space-y-8 pt-8 px-4 bg-gray-900/5 dark:bg-white/5 h-full flex flex-col rounded-lg">
         <div class="py-4">
-          <img src="@/assets/images/logo.svg" alt="" class="h-8" />
+          <Logo class="h-8" />
         </div>
         <nav class="flex flex-col space-y-4">
           <button type="button" v-for="item in steps" @click="setStage(item)" :key="item"
             :disabled="item === OnboardingSteps.REGISTER && auth.isAuthenticated || item !== OnboardingSteps.REGISTER && !auth.isAuthenticated"
-            class="group py-1 disabled:text-slate-400 w-full text-left text-slate-400 relative before:absolute before:h-full before:w-0 before:border-l-2 before:border-l-slate-200 before:left-0 before:top-0 before:translate-x-4.5 before:translate-y-6 last:before:hidden before:z-[-1]"
-            :class="{ '!text-black': stage === item }">
+            class="group py-1 disabled:text-slate-400 dark:disabled:text-slate-600 w-full text-left text-slate-400 dark:text-slate-600 relative before:absolute before:h-full before:w-0 before:border-l-2 before:border-l-slate-200 before:left-0 before:top-0 before:translate-x-4.5 before:translate-y-6 last:before:hidden before:z-[-1]"
+            :class="{ '!text-black dark:!text-white': stage === item }">
             <div class="flex space-x-2 items-start">
-              <span class="p-2 border border-slate-200 rounded bg-white shadow group-disabled:bg-gray-100">
+              <span class="p-2 border border-slate-200 dark:border-slate-800 rounded bg-white shadow dark:bg-black group-disabled:bg-gray-100 dark:group-disabled:bg-black dark:group-disabled:text-slate-600">
                 <component :is="onboardingIcons[item]" :size="20" stroke-width="1.5"></component>
               </span>
               <div>
@@ -28,7 +28,8 @@
               <ArrowLeft :size="20" />
               <span>Back to home</span>
             </router-link>
-            <router-link v-if="!auth.isAuthenticated" :to="{ name: 'login' }" class="ml-auto text-sm font-medium text-gray-500 hover:text-black">
+            <router-link v-if="!auth.isAuthenticated" :to="{ name: 'login' }"
+              class="ml-auto text-sm font-medium text-gray-500 hover:text-black">
               <span>Login</span>
             </router-link>
           </div>
@@ -36,7 +37,10 @@
       </div>
     </header>
     <main class="overflow-auto flex-auto max-w-4xl xl:max-w-2/3 flex flex-col">
-      <div class="container mx-auto max-w-md py-12 space-y-8 flex-auto flex flex-col">
+      <div class="flex justify-end py-4">
+        <dark-mode></dark-mode>
+      </div>
+      <div class="container mx-auto max-w-md py-8 space-y-8 flex-auto flex flex-col">
         <div class="py-4 space-y-1 tutext-center">
           <auth-title>{{ bannerText.title }}</auth-title>
           <auth-subtitle>{{ bannerText.text }}</auth-subtitle>
@@ -61,6 +65,10 @@ import { onboardingLinks, OnboardingSteps, useOnboardingStore, type OnboardingSt
 import { ArrowLeft, Contact, FolderPlus, UserCheck, UserPlus } from 'lucide-vue-next';
 import { computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useDark } from '@vueuse/core';
+import DarkMode from '@/components/app/dark-mode.vue';
+import Logo from '@/assets/images/logo.vue';
+const isDark = useDark()
 
 const onboardingIcons = {
   [OnboardingSteps.REGISTER]: UserPlus,
@@ -108,14 +116,14 @@ const setStage = (_step: OnboardingStep) => {
 onMounted(async () => {
   await onboardingStore.evaluateCompletion()
 
-  if(stage.value){
+  if (stage.value) {
     router.push(onboardingLinks[stage.value])
   }
 
 })
 
 watch(() => stage.value, (value) => {
-  if(!auth.isAuthenticated) return
+  if (!auth.isAuthenticated) return
   if (!value) {
     router.push({ name: 'dashboard' })
   } else {
