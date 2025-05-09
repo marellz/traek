@@ -43,35 +43,40 @@ export const useOnboardingStore = defineStore(
     }
 
     const evaluateCompletion = async () => {
+      // 1. if user is not authenticated, send to register
       const isAuthenticated = auth.isAuthenticated
-      if (isAuthenticated) await projectStore.getUserProjects()
+
+      if (!isAuthenticated) {
+        stage.value = OnboardingSteps.REGISTER
+        return
+      }
+
+      await projectStore.getUserProjects()
+
+      // 2. Authenticated but profile is incomplete
       const userHasNameAndUserName =
         isAuthenticated && auth.profile?.username !== null && auth.profile?.name !== null
+      //3. Profile complete but no projects.
       const userBelongsToAProject = projectStore.projects.length > 0
 
-      console.log({
-        userHasNameAndUserName,
-        userBelongsToAProject,
-      })
-      if (!isAuthenticated) {
-        stage.value = null
-      } else if (!userHasNameAndUserName) {
+      if (!userHasNameAndUserName) {
         stage.value = OnboardingSteps.PROFILE
       } else if (!userBelongsToAProject) {
         stage.value = OnboardingSteps.PROJECTS
       } else {
         stage.value = OnboardingSteps.FINISH
       }
-
-      return null
     }
 
-    watch(() => auth.isAuthenticated, (hasAuth) => {
-      // if user logs out their onboarding status is returned to null
-      if(!hasAuth){
-        stage.value = null
-      }
-    })
+    watch(
+      () => auth.isAuthenticated,
+      (hasAuth) => {
+        // if user logs out their onboarding status is returned to null
+        if (!hasAuth) {
+          stage.value = null
+        }
+      },
+    )
 
     return {
       stage,
