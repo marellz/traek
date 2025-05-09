@@ -30,16 +30,6 @@ const router = createRouter({
         layout: 'auth',
       },
     },
-    /*
-    {
-      path: '/register',
-      name: 'register',
-      component: () => import('@/views/auth/register.vue'),
-      meta: {
-        layout: 'auth',
-      },
-    },
-    */
     {
       path: '/forgot-password',
       name: 'forgot-password',
@@ -253,7 +243,7 @@ router.beforeEach((to, from, next) => {
   const guestOnlyRoutes: RouteRecordNameGeneric[] = [
     'login',
     'forgot-password',
-    'update-password',
+    'reset-password',
     'onboarding',
   ]
   const noAuthRoutes: RouteRecordNameGeneric[] = ['home', 'register', ...guestOnlyRoutes]
