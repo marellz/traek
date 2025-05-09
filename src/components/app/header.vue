@@ -23,7 +23,9 @@
           </li>
           <li>
             <router-link :to="{ name: 'onboarding' }">
-              <base-button>Get started</base-button>
+              <base-button>
+                <span>Get started</span>
+              </base-button>
             </router-link>
           </li>
         </template>
