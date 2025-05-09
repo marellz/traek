@@ -2,13 +2,16 @@
   <div class="h-screen  dark:bg-black dark:text-white">
     <div class="grid grid-cols-2 gap-10">
       <div class="p-12 min-h-screen">
-        <div class="bg-slate-100 dark:bg-slate-200/10 h-full rounded-xl flex flex-col">
-          <div class="flex justify-left p-12">
+        <div class="bg-slate-100 dark:bg-slate-200/10 h-full rounded-xl flex flex-col relative">
+          <img src="@/assets/images/auth-bg.jpg" class="left-0 right-0 absolute inset-0 rounded-xl dark:opacity-20 h-full w-full object-cover object-center"
+            alt="Photo by Armando Belsoj: https://www.pexels.com/photo/moody-workspace-by-a-window-in-black-and-white-31970783/">
+            <span class="absolute inset-0 bg-white/95 dark:bg-black/55 scale-105"></span>
+          <div class="flex justify-left p-12 relative">
             <Logo class="h-8" />
           </div>
           <div class="mt-auto pb-4">
             <ul class="px-8 relative overflow-hidden">
-              <li v-for="(testimonial,i) in testimonials" :key="i">
+              <li v-for="(testimonial, i) in testimonials" :key="i">
                 <div v-show="i === index" v-motion-fade-visible class="flex items-center space-x-2 p-2">
                   <img class="h-10 w-10 rounded-full" :src="testimonial.avatar" :alt="testimonial.user">
                   <div>
@@ -24,7 +27,7 @@
           </div>
         </div>
       </div>
-      <div>
+      <div class="">
         <div class="flex flex-col h-full pb-20 mx-auto max-w-lg">
           <div class="flex justify-end pt-12">
             <DarkMode></DarkMode>
@@ -49,7 +52,7 @@ import Logo from '@/assets/images/logo.vue';
 import DarkMode from '@/components/app/dark-mode.vue';
 import { testimonials } from '@/data/home.test.data';
 import { ArrowLeft } from 'lucide-vue-next';
-import {  onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const interval = ref()
 const index = ref<number>(0)
