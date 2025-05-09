@@ -11,7 +11,7 @@
       <div class="space-y-4">
         <form-input label="Email address" v-model="email" type="email" :error="errors.email" :disabled="sent"
           required></form-input>
-        <base-button class="w-full" :loading="auth.loading" :disabled="sent">
+        <base-button class="w-full" :loading :disabled="sent">
           <template v-if="sent">
             <span>Sent!</span>
             <MailCheck />
@@ -36,13 +36,13 @@ import AuthTitle from '@/components/auth/title.vue'
 import AuthSubtitle from '@/components/auth/subtitle.vue'
 import FormInput from "@/components/form/input.vue"
 import BaseButton from "@/components/base/button.vue"
-import { useAuthStore } from "@/stores/auth"
+import { AuthLoading, useAuthStore } from "@/stores/auth"
 import { Form, useForm } from "vee-validate"
 import * as yup from "yup"
-import { onMounted, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { MailCheck, SendHorizonal } from "lucide-vue-next"
 const auth = useAuthStore()
-
+const loading = computed(() => auth.isLoading(AuthLoading.RESETTING_PASSWORD))
 const schema = yup.object({
   email: yup.string().email().required("Email is required"),
 })

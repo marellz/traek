@@ -20,8 +20,8 @@
         ref="input"
       />
       <button
-        class="p-1 rounded absolute right-2 top-1/2 -translate-y-1/2 transition-all"
-        :class="{ 'opacity-50': !showPassword }"
+        class="p-1 rounded absolute right-2 top-1/2 -translate-y-1/2 transition-all dark:text-white"
+        :class="{ 'opacity-50 dark:!text-slate-400': !showPassword }"
         type="button"
         v-if="type === 'password' && allowPasswordToggle"
         :disabled="type !== 'password' && !allowPasswordToggle"

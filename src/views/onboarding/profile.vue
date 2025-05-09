@@ -2,19 +2,8 @@
   <Form @submit="update()">
     <div class="space-y-4">
       <form-input label="Name" :error="errors.name" v-model="name" required></form-input>
-      <form-input
-        v-if="!auth.user?.email"
-        label="Email"
-        :error="errors.email"
-        v-model="email"
-        required
-      ></form-input>
-      <form-input
-        label="Username"
-        :error="errors.username"
-        v-model="username"
-        required
-      ></form-input>
+      <form-input v-if="!auth.user?.email" label="Email" :error="errors.email" v-model="email" required></form-input>
+      <form-input label="Username" :error="errors.username" v-model="username" required></form-input>
       <form-input label="Phone" :error="errors.phone" v-model="phone"></form-input>
       <div>
         <base-button class="w-full" :loading>
@@ -35,15 +24,15 @@
 import FormInput from '@/components/form/input.vue'
 import BaseAlert from '@/components/base/alert.vue'
 import BaseButton from '@/components/base/button.vue'
-import { useAuthStore } from '@/stores/auth'
+import { AuthLoading, useAuthStore } from '@/stores/auth'
 import { computed, onMounted, ref, watch } from 'vue'
-import * as yup from 'yup'
+import { useOnboardingStore } from '@/stores/onboarding'
 import { Form, useForm } from 'vee-validate'
+import * as yup from 'yup'
 
 const auth = useAuthStore()
-const emit = defineEmits(['complete'])
 
-const loading = computed(() => auth.loading)
+const loading = computed(() => auth.isLoading(AuthLoading.UPDATING_PROFILE))
 const user = computed(() => auth.user)
 const error = ref('')
 
@@ -63,6 +52,9 @@ const [username] = defineField('username')
 const [phone] = defineField('phone')
 const [email] = defineField('email')
 
+
+const onboardingStore = useOnboardingStore()
+
 const update = handleSubmit(async (values) => {
   if (!user.value) {
     error.value = 'No user in store'
@@ -81,9 +73,7 @@ const update = handleSubmit(async (values) => {
   })
 
   if (success) {
-    emit('complete')
-
-    console.log('updated!')
+    onboardingStore.nextStage()
   }
 })
 

@@ -29,16 +29,24 @@ export type UserProfileForm = {
 }
 
 export enum AuthLoading {
-  UPLOADING = 'uploading-user-avatar',
-  DELETING = 'deleting-user-avatar',
-  GETTING = 'getting-user-avatar',
+  UPLOADING_USER_AVATAR = 'uploading-user-avatar',
+  DELETING_USER_AVATAR = 'deleting-user-avatar',
+  GETTING_USER_AVATAR = 'getting-user-avatar',
+
+  LOGGING_IN = 'logging-in',
+  LOGGING_OUT = 'logging-out',
+  REGISTERING = 'registering-user',
+  RESETTING_PASSWORD = 'resetting-user-password',
+  UPDATING_PASSWORD = 'updating-user-password',
+
+  GETTING_USER = 'getting-user',
 
   GETTING_PROFILE = 'getting-user-profile',
   UPDATING_PROFILE = 'updating-user-profile',
 }
 
 export enum AuthErrors {
-  UNAUTHENCATED = 'User not authenticated'
+  UNAUTHENCATED = 'User not authenticated',
 }
 
 export const useAuthStore = defineStore(
@@ -47,7 +55,6 @@ export const useAuthStore = defineStore(
     const { handleError } = useErrorStore()
 
     const user = ref<User | null>(null)
-    const loading = ref(false)
     const errors = ref<Record<string, string> | null>(null)
     const isAuthenticated = computed(() => user.value !== null)
     const userId = computed(() => (user.value ? user.value.id : null))
@@ -71,7 +78,7 @@ export const useAuthStore = defineStore(
     }
 
     const login = async (payload: AuthPayload) => {
-      loading.value = true
+      begin(AuthLoading.LOGGING_IN)
       resetErrors()
       try {
         const {
@@ -80,7 +87,7 @@ export const useAuthStore = defineStore(
         } = await AuthService.login(payload)
         if (error) {
           errors.value = {
-            Login: error.message,
+            login: error.message,
           }
         }
 
@@ -94,11 +101,12 @@ export const useAuthStore = defineStore(
         handleError('Login error', error)
         return false
       } finally {
-        loading.value = false
+        finish(AuthLoading.LOGGING_IN)
       }
     }
 
     const getUser = async () => {
+      begin(AuthLoading.GETTING_USER)
       try {
         const { data, error } = await AuthService.getUser()
         if (error) {
@@ -112,13 +120,15 @@ export const useAuthStore = defineStore(
         return null
       } catch (error) {
         handleError('Getting user error', error)
+      } finally {
+        finish(AuthLoading.GETTING_USER)
       }
     }
 
     const register = async (payload: AuthPayload) => {
       resetErrors()
-      loading.value = true
       try {
+        begin(AuthLoading.REGISTERING)
         const { data, error } = await AuthService.register(payload)
         if (error) {
           handleError('Registering user', error.message)
@@ -134,13 +144,13 @@ export const useAuthStore = defineStore(
       } catch (error) {
         handleError('Registration error', error)
       } finally {
-        loading.value = false
+        finish(AuthLoading.REGISTERING)
       }
     }
 
     const logout = async () => {
-      loading.value = true
       try {
+        begin(AuthLoading.LOGGING_OUT)
         const { error } = await AuthService.logout()
         if (error) {
           handleError('Logging out', error.message)
@@ -152,13 +162,13 @@ export const useAuthStore = defineStore(
         handleError('Logout error', error)
       } finally {
         user.value = null
-        loading.value = false
+        finish(AuthLoading.LOGGING_OUT)
       }
     }
 
     const resetPassword = async (email: string) => {
-      loading.value = true
       try {
+        begin(AuthLoading.RESETTING_PASSWORD)
         const { data, error } = await AuthService.resetPassword(email)
         if (error) {
           handleError('Resetting password', error.message)
@@ -171,15 +181,15 @@ export const useAuthStore = defineStore(
       } catch (err) {
         handleError('Resetting password', err)
       } finally {
-        loading.value = false
+        finish(AuthLoading.RESETTING_PASSWORD)
       }
 
       return false
     }
 
     const updatePassword = async (password: string) => {
-      loading.value = true
       try {
+        begin(AuthLoading.UPDATING_PASSWORD)
         const token = await AuthService.updatePassword(password)
         if (token) {
           return true
@@ -188,7 +198,7 @@ export const useAuthStore = defineStore(
       } catch (error) {
         handleError('Updating password', error)
       } finally {
-        loading.value = false
+        finish(AuthLoading.UPDATING_PASSWORD)
       }
     }
 
@@ -259,8 +269,9 @@ export const useAuthStore = defineStore(
       // update
       try {
         begin(AuthLoading.UPDATING_PROFILE)
-        const { status } = await AuthService.updateProfile(userId.value, form)
-        if (status === 204) {
+        const { status, error } = await AuthService.updateProfile(userId.value, form)
+        if(error) throw new Error(error.message)
+        if (status === 200) {
           profile.value = { ...profile.value, ...form }
           return true
         }
@@ -268,6 +279,7 @@ export const useAuthStore = defineStore(
         return false
       } catch (error) {
         handleError('Updating profile', error)
+        return false
       } finally {
         finish(AuthLoading.UPDATING_PROFILE)
       }
@@ -281,7 +293,7 @@ export const useAuthStore = defineStore(
     const deleteAvatar = async () => {
       ensureProfile()
       try {
-        begin(AuthLoading.DELETING)
+        begin(AuthLoading.DELETING_USER_AVATAR)
         const path = profile.value?.avatar
         if (!path) throw new Error('User profile has no avatar saved')
         const { data, error } = await avatarService.deleteAvatar(path)
@@ -297,14 +309,14 @@ export const useAuthStore = defineStore(
       } catch (error) {
         handleError('Deleting user avatar', error)
       } finally {
-        finish(AuthLoading.DELETING)
+        finish(AuthLoading.DELETING_USER_AVATAR)
       }
     }
 
     const uploadAvatar = async (file: File) => {
       ensureProfile()
       try {
-        begin(AuthLoading.UPLOADING)
+        begin(AuthLoading.UPLOADING_USER_AVATAR)
         // const name = profile.value?.id + file.name
         const name = generateAvatarName(file.name, profile.value!.id)
         const { data, error } = await avatarService.uploadAvatar(file, name)
@@ -322,7 +334,7 @@ export const useAuthStore = defineStore(
       } catch (error) {
         handleError('Uploading user avatar', error)
       } finally {
-        finish(AuthLoading.UPLOADING)
+        finish(AuthLoading.UPLOADING_USER_AVATAR)
       }
     }
 
@@ -334,7 +346,6 @@ export const useAuthStore = defineStore(
       isAuthenticated,
       user,
       userId,
-      loading,
       errors,
       init,
       login,

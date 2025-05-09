@@ -22,10 +22,7 @@
           <button type="button" class="p-1">
             <Settings />
           </button>
-          <button type="button" class="p-1" @click="toggleDarkMode()">
-            <Sun v-if="isDark" />
-            <Moon v-else />
-          </button>
+          <dark-mode></dark-mode>
         </div>
       </div>
     </layout-container>
@@ -34,11 +31,10 @@
 <script lang="ts" setup>
 import NotificationWrapper from '@/components/notifications/wrapper.vue'
 import UserMenu from '@/components/user/menu.vue'
-import { Moon, Search, Settings, Sun } from 'lucide-vue-next'
+import { Search, Settings } from 'lucide-vue-next'
 import { ref, useTemplateRef } from 'vue'
-import { onClickOutside, useDark, useToggle } from '@vueuse/core'
-const isDark = useDark()
-const toggleDarkMode = useToggle(isDark)
+import { onClickOutside } from '@vueuse/core'
+import DarkMode from '@/components/app/dark-mode.vue'
 const showUserMenu = ref(false)
 const headerRef = useTemplateRef('header')
 onClickOutside(headerRef, () => {

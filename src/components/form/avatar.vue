@@ -62,9 +62,9 @@ const userStore = useUserStore()
 const avatar = ref<string | null>(null)
 
 const loading = computed(() => ({
-  uploading: auth.isLoading(AuthLoading.UPLOADING),
+  uploading: auth.isLoading(AuthLoading.UPLOADING_USER_AVATAR),
   getting: userStore.isLoading(UserLoading.GETTING_LINK),
-  deleting: auth.isLoading(AuthLoading.DELETING),
+  deleting: auth.isLoading(AuthLoading.DELETING_USER_AVATAR),
 }))
 
 const file = ref<File | null>(null)
