@@ -1,7 +1,7 @@
 <template>
   <button type="button" class="p-1" @click="toggleDarkMode()">
-    <Sun v-if="isDark" class="text-white" />
-    <Moon v-else />
+    <Sun v-motion-slide-left v-if="isDark" class="text-white" />
+    <Moon v-motion-slide-right v-else />
   </button>
 </template>
 <script lang="ts" setup>
