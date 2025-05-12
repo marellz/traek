@@ -1,12 +1,9 @@
 <template>
-  <div class="mb-10">
-    <h1 class="mb-4 text-4xl">Get into a project</h1>
-    <p class="text-slate-600">Welcome on board. You're ready to be part of projects.</p>
-  </div>
-  <h1>Lorem ipsum dolor sit amet consectetur adipisicing elit. Adipisci beatae voluptatibus consequatur, sapiente totam,
-    perspiciatis quam maiores optio ut deleniti rerum facilis asperiores nobis nisi dolores, nesciunt reiciendis neque!
-    Maxime!</h1>
 
+  <div class="py-6 space-y-1">
+    <h1 class="text-2xl font-medium">It's not you, it's me.</h1>
+    <p>This part is under development. Feel free to skip it.</p>
+  </div>
   <div>
     <base-button @click="nextStage">
       <span>Skip step for now</span>
