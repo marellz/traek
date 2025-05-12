@@ -1,36 +1,14 @@
 <template>
-  <div class="mb-10">
-    <base-button @click="byPass">
-      <span>Generate user</span>
-    </base-button>
-  </div>
   <Form @submit="register()">
     <div class="space-y-4">
       <!-- <form-input label="Name" v-model="name" required :error="errors.name" v-bind="nameAttrs"></form-input> -->
-      <form-input
-        label="Email"
-        :error="errors.email"
-        v-model="email"
-        type="email"
-        required
-      ></form-input>
+      <form-input label="Email" :error="errors.email" v-model="email" type="email" required></form-input>
 
-      <form-input
-        label="Password"
-        v-model="password"
-        type="password"
-        required
-        :error="errors.password"
-        allow-password-toggle
-      ></form-input>
+      <form-input label="Password" v-model="password" type="password" required :error="errors.password"
+        allow-password-toggle></form-input>
 
-      <form-input
-        label="Confirm password"
-        v-model="confirmPassword"
-        type="password"
-        required
-        :error="errors.password_confirmation"
-      ></form-input>
+      <form-input label="Confirm password" v-model="confirmPassword" type="password" required
+        :error="errors.password_confirmation"></form-input>
       <div v-if="error">
         <p class="text-red-500">
           {{ error }}
@@ -41,7 +19,9 @@
           <span>Register</span>
         </base-button>
       </div>
-      <div></div>
+      <a href="#" @click.prevent="byPass" class="text-sm font-medium">
+        <span>Generate user</span>
+      </a>
       <base-alert v-if="auth.errors" variant="error" title="Authentication error">
         <div class="space-y-2">
           <p v-for="(err, key) in auth.errors" :key>
@@ -50,7 +30,7 @@
         </div>
       </base-alert>
       <div>
-        <p class="text-center text-gray-600">
+        <p class="text-center text-gray-600 font-medium">
           Already have an account?
           <router-link class="font-medium text-primary dark:text-indigo-400" to="/login">Login</router-link>
         </p>
@@ -59,16 +39,18 @@
   </Form>
 </template>
 <script lang="ts" setup>
+
 import FormInput from '@/components/form/input.vue'
 import BaseAlert from '@/components/base/alert.vue'
 import BaseButton from '@/components/base/button.vue'
 import * as yup from 'yup'
 import { Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
-import { useAuthStore } from '@/stores/auth'
+import { AuthLoading, useAuthStore } from '@/stores/auth'
 import { faker } from '@faker-js/faker'
+import { OnboardingSteps, useOnboardingStore } from '@/stores/onboarding'
 
-const loading = computed(() => auth.loading)
+const loading = computed(() => auth.isLoading(AuthLoading.REGISTERING))
 
 const auth = useAuthStore()
 
@@ -88,7 +70,6 @@ const { errors, defineField, handleSubmit, resetForm } = useForm({
 const [email] = defineField('email')
 const [password] = defineField('password')
 const [confirmPassword] = defineField('password_confirmation')
-const emit = defineEmits(['complete'])
 const error = ref('')
 
 const byPass = () => {
@@ -101,6 +82,8 @@ const byPass = () => {
   })
 }
 
+const onboardingStore = useOnboardingStore()
+
 const register = handleSubmit(async (values) => {
   error.value = ''
   const _user = await auth.register({
@@ -109,7 +92,7 @@ const register = handleSubmit(async (values) => {
   })
 
   if (_user) {
-    emit('complete')
+    onboardingStore.nextStage()
   } else {
     error.value = 'Error registering user'
   }
@@ -117,5 +100,6 @@ const register = handleSubmit(async (values) => {
 
 onMounted(() => {
   auth.resetErrors()
+  if(onboardingStore.stage === null) onboardingStore.setStage(OnboardingSteps.REGISTER)
 })
 </script>

@@ -19,6 +19,7 @@
     "@vee-validate/yup": "^4.15.0",
     "@vueup/vue-quill": "^1.2.0",
     "@vueuse/core": "^12.5.0",
+    "@vueuse/motion": "^3.0.3",
     "appwrite": "^17.0.0",
     "lucide-vue-next": "^0.475.0",
     "moment": "^2.30.1",

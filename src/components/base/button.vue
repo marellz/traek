@@ -1,9 +1,9 @@
 <template>
   <button
-    class="px-3 py-1.5 md:px-4 text-sm md:text-base font-semibold font-secondary rounded-full transition-colors border inline-flex items-center space-x-2 justify-center relative focus:ring disabled:cursor-not-allowed focus:ring-offset-2 focus:outline-none disabled:pointer-events-none"
+    class="px-3 py-2 md:px-6 leading-normal text-xs md:text-sm font-medium font-secondary rounded-lg transition-colors border inline-flex items-start space-x-2 justify-center relative focus:ring disabled:cursor-not-allowed focus:ring-offset-2 focus:outline-none disabled:pointer-events-none"
     :type :class="themes[variant]" :disabled="loading || disabled">
     <slot />
-    <base-loader class="absolute right-0 top-1/2 -translate-y-1/2 !py-0" loader-class="!h-4 !w-4" v-if="loading" />
+    <base-loader class="absolute right-2 top-1/2 -translate-y-1/2 !py-0" loader-class="!h-3 !w-3" v-if="loading" />
   </button>
 </template>
 <script lang="ts" setup>

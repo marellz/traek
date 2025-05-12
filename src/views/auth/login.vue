@@ -17,18 +17,13 @@
           <router-link class="text-primary dark:text-indigo-400 font-medium" to="/forgot-password">Forgot password?
           </router-link>
         </div>
-        <base-button class="w-full" :loading="auth.loading">
+        <base-button class="w-full" :loading>
           <span>Login</span>
         </base-button>
-        <base-alert v-if="auth.errors" variant="error" title="Authentication error">
-          <p v-for="(err, key) in auth.errors" :key>
-            <span>{{ err }}</span>
-          </p>
-        </base-alert>
         <div class="space-y-2">
           <p class="text-gray-600 text-center">
             Dont have an account?
-            <router-link class="text-primary dark:text-indigo-400 font-medium" to="/register">Register</router-link>
+            <router-link class="text-primary dark:text-indigo-400 font-medium" to="/onboarding">Register</router-link>
           </p>
         </div>
       </div>
@@ -41,16 +36,17 @@ import AuthSubtitle from '@/components/auth/subtitle.vue'
 import FormInput from "@/components/form/input.vue"
 import FormCheckbox from "@/components/form/checkbox.vue"
 import BaseButton from "@/components/base/button.vue"
-import BaseAlert from "@/components/base/alert.vue"
-import { onMounted, ref } from "vue"
-import { useAuthStore } from "@/stores/auth"
+import { computed, onMounted, ref, watch } from "vue"
+import { AuthLoading, useAuthStore } from "@/stores/auth"
+import { OnboardingSteps, useOnboardingStore } from '@/stores/onboarding'
 import { Form, useForm } from "vee-validate"
 import * as yup from "yup"
 import { useRouter } from 'vue-router'
 
 const auth = useAuthStore()
+const loading = computed(() => auth.isLoading(AuthLoading.LOGGING_IN))
 
-const { errors, defineField, handleSubmit, resetForm } = useForm({
+const { errors, defineField, handleSubmit, resetForm, setErrors } = useForm({
   validationSchema: yup.object({
     email: yup.string().email().required("Email is required"),
     password: yup.string().min(6).required("Password is required"),
@@ -65,6 +61,15 @@ const router = useRouter()
 
 const stack = ref('')
 
+watch(() => auth.errors, (v) => {
+  if (v) {
+    setErrors({
+      email: v.login
+    })
+
+  }
+})
+
 const login = handleSubmit(async (values) => {
   stack.value = 'Logging you in'
   const success = await auth.login({
@@ -74,20 +79,19 @@ const login = handleSubmit(async (values) => {
 
   if (!success) {
     return false;
-    // show error
   }
 
   await getProfile()
 })
 
+const onboardingStore = useOnboardingStore()
 const getProfile = async () => {
-  const _profile = await auth.getProfile()
-
-   if (_profile && auth.hasProfile) {
-    router.push({ name: "dashboard" })
+  await auth.getProfile()
+  await onboardingStore.evaluateCompletion()
+  if (onboardingStore.stage && onboardingStore.stage !== OnboardingSteps.FINISH) {
+    router.push(`/onboarding/${onboardingStore.stage}`)
   } else {
-    if (auth.user)
-      router.push({ name: "user-profile", params: { id: auth.user.id } })
+    router.push({ name: "dashboard" })
   }
 }
 
