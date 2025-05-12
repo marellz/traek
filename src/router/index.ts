@@ -159,15 +159,49 @@ const router = createRouter({
       ],
     },
 
+    /**
+     *
+     *
+     *
+     * PROJECT FORM
+     *
+     *
+     *
+     */
+
+    // new project
     {
-      path: '/projects/new',
+      path: '/project/create',
       name: 'create-project',
-      component: () => import('@/views/projects/create.vue'),
+      component: () => import('@/views/projects/form/basic.vue'),
+      meta: {
+        layout: 'project-form'
+      }
+    },
+
+    // updated project: same component
+    {
+      path: "/project/form/:id/basic",
+      name: "edit-project",
+      component: () => import('@/views/projects/form/basic.vue'),
+      meta: {
+        layout: 'project-form'
+      }
     },
     {
-      path: '/projects/update/:id',
-      name: 'update-project',
-      component: () => import('@/views/projects/update.vue'),
+      path: '/projects/form/:id/about',
+      name: 'project-form-about',
+      component: () => import('@/views/projects/form/about.vue'),
+    },
+    {
+      path: '/projects/form/:id/team',
+      name: 'project-form-team',
+      component: () => import('@/views/projects/form/team.vue'),
+    },
+    {
+      path: '/projects/form/:id/review',
+      name: 'project-form-review',
+      component: () => import('@/views/projects/form/review.vue'),
     },
 
     /**
