@@ -11,7 +11,7 @@
       :id
     />
     <slot>
-      <p class="ml-2 text-sm text-gray-600">{{ label }}</p>
+      <p class="ml-2 text-sm text-gray-600" :class="labelClass">{{ label }}</p>
     </slot>
   </label>
 </template>
@@ -25,6 +25,7 @@ const props = defineProps<{
   required?: boolean
   disabled?: boolean
   label?: string
+  labelClass?: string
   name?: string
 }>()
 
