@@ -1,4 +1,4 @@
-import type { ProjectForm } from '@/stores/project'
+import type { Project, ProjectForm } from '@/stores/project'
 import { supabase } from '@/database/supabase'
 
 export const useProjectService = () => {
@@ -19,7 +19,8 @@ export const useProjectService = () => {
   const get = async (id: string) => {
     return await supabase
       .from('projects')
-      .select(`*,
+      .select(
+        `*,
          creator: created_by(id, name, email, username, avatar),
          members: project_members(...users(id, name, email, username, avatar))`,
       )
@@ -27,10 +28,17 @@ export const useProjectService = () => {
   }
 
   const create = async (form: ProjectForm) => {
-    return await supabase.from('projects').insert(form).select(`*, creator: created_by(id, name, email, username, avatar)`)
+    return await supabase
+      .from('projects')
+      .insert(form)
+      .select(
+        `*,
+         creator: created_by(id, name, email, username, avatar),
+         members: project_members(...users(id, name, email, username, avatar))`,
+      )
   }
 
-  const update = async (id: string, form: ProjectForm) => {
+  const update = async (id: string, form: Partial<Project>) => {
     return await supabase.from('projects').update(form).eq('id', id)
   }
 

@@ -25,6 +25,15 @@ export type Project = {
   updated_at: string | null
   description: string
   closed_at?: string | null
+  priority: string
+  category: string
+  progress: number | null
+  settings: any
+  start_date: string | null
+  end_date: string | null
+  archived_at?: string | null
+  status: string
+  image: string | null
 }
 
 export interface ProjectStats {
@@ -46,7 +55,16 @@ export interface ProjectForm {
   created_by: string
   created_at: string
   updated_at?: string | null
-  closed_at?: string | null
+
+  priority: string
+  category: string
+  progress?: number | null
+  settings: Record<any, any>
+  start_date?: string | null
+  end_date?: string | null
+  archived_at?: string | null
+  status: string
+  image?: string | null
 }
 
 export interface ProjectMember extends ProjectUser {
@@ -194,6 +212,7 @@ export const useProjectStore = defineStore(
       }
     }
 
+    /*
     const closeProject = async (id: string) => {
       try {
         begin(ProjectLoading.CLOSING)
@@ -231,6 +250,7 @@ export const useProjectStore = defineStore(
         finish(ProjectLoading.CLOSING)
       }
     }
+
 
     /**
      * MEMBERS
@@ -305,7 +325,7 @@ export const useProjectStore = defineStore(
       getProjectStats,
       createProject,
       updateProject,
-      closeProject,
+      // closeProject,
 
       addMembers,
       getMembers,
