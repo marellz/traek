@@ -20,12 +20,11 @@
           </button>
         </li>
       </ul>
-      <p>id: {{ id || 'null' }}</p>
     </nav>
     <main class="overflow-auto py-10 max-w-4xl w-full">
       <layout-banner>
         <div class="flex items-center justify-between">
-          <layout-banner-title>Create new project</layout-banner-title>
+          <layout-banner-title>Project form</layout-banner-title>
           <!-- todo: prompt user to delete project or keep it as draft -->
           <router-link :to="{ name: 'projects' }">
             <base-button variant="secondary-outline">Cancel</base-button>
