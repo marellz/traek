@@ -2,9 +2,8 @@
   <Form @submit="submitForm()">
     <fieldset>
       <legend>Basic information</legend>
-      <div class="grid grid-cols-3 gap-10">
-        <form-file label="Add an image"></form-file>
-        <div class="space-y-4 col-span-2">
+      <div class="space-y-8">
+        <div class="space-y-4">
           <form-input label="Name" required v-model="name" :error="errors.name" />
           <form-select label="Category" v-model="category" :options="categories" label-key="label" value-key="key">
             <form-select-option v-for="(option, index) in categories" :key="index" :value="option"
@@ -19,11 +18,20 @@
           </form-select>
           <form-group label='Priority'>
             <div class="flex flex-wrap gap-4">
-              <form-radio name="priority" v-model="priority" :value="item" v-for="item in priorities" :key="item"
-                :label="item" label-class="capitalize">
+              <form-radio name="priority" v-model="priority" :value="item" v-for="item in priorities" :key="item">
+                <div>
+                  <h3 class="capitalize font-medium">{{ item }} priority</h3>
+                </div>
               </form-radio>
             </div>
           </form-group>
+          <form-file label="Add an image"></form-file>
+          <div>
+            <base-button>
+              <span>Next</span>
+              <ArrowRight :size="20" />
+            </base-button>
+          </div>
         </div>
       </div>
     </fieldset>
@@ -42,6 +50,9 @@ import { Form, useForm } from 'vee-validate'
 import * as yup from 'yup'
 import { ProjectCategories, projectCategoryDescription, projectCategoryLabels, ProjectPriorities } from '@/data/projects.data'
 import { useRoute, useRouter } from 'vue-router'
+import { ArrowRight } from 'lucide-vue-next'
+import { useProjectFormStore } from '@/stores/project.form'
+import { watch } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -66,7 +77,31 @@ const categories = computed(() => Object.values(ProjectCategories))
 const priorities = computed(() => Object.values(ProjectPriorities))
 
 const projectStore = useProjectStore()
+const projectFormStore = useProjectFormStore()
 
+const project = computed(() => projectFormStore.project)
+watch(project, (v) => {
+  if (v) {
+    setFormValues()
+  }
+})
+
+
+const setFormValues = () => {
+  if(!project.value) throw new Error('Project does not exist.')
+  const {
+    name,
+    category,
+    priority,
+  } = project.value!
+
+  resetForm({
+    values: {
+      name, priority, category
+    }
+  })
+}
+// submission
 const submitForm = handleSubmit(async (values) => {
   const form = values as ProjectForm
   // create or update
@@ -74,20 +109,29 @@ const submitForm = handleSubmit(async (values) => {
   if (id.value) { // update
     projectStore.updateProject(id.value, form)
   } else { // create new
-    const project = await projectStore.createProject(form)
-    if (!project) return
-    _id = project.id
+    const _project = await projectStore.createProject(form)
+    if (!_project) return
+    _id = _project.id
+    projectFormStore.setId(_id)
+    projectFormStore.setProject({ ..._project })
   }
 
   router.push({ name: 'project-form-about', params: { id: _id } })
 })
 
 onMounted(() => {
-  resetForm({
-    values: {
-      priority: ProjectPriorities.MEDIUM,
-      categories: ProjectCategories.GENERAL
-    }
-  })
+
+  if (project.value) {
+    setFormValues()
+    if (id.value) projectFormStore.getProject()
+  } else {
+    // new identity
+    resetForm({
+      values: {
+        priority: ProjectPriorities.MEDIUM,
+        category: ProjectCategories.GENERAL
+      }
+    })
+  }
 })
 </script>
