@@ -54,5 +54,42 @@ export enum ProjectPriorities {
 export const projectPriorities = {
   [ProjectPriorities.LOW]: 'Low',
   [ProjectPriorities.MEDIUM]: 'Medium',
-  [ProjectPriorities.HIGH]: 'High'
+  [ProjectPriorities.HIGH]: 'High',
+}
+
+export const formPages = [
+  {
+    routeName: 'edit-project',
+    label: 'Basic Info',
+    description: 'Simple intro to the project.',
+  },
+  {
+    routeName: 'project-form-about',
+    label: 'About & Goals',
+    description: 'Define the intent and targets of the project.',
+  },
+  {
+    routeName: 'project-form-team',
+    label: 'Team',
+    description: 'Decide who’s in and what roles they might play.',
+  },
+  {
+    routeName: 'project-form-review',
+    label: 'Review & Create',
+    description: 'Recap entries and confirm before submission.',
+  },
+]
+
+export enum ProjectGoalStatusEnum {
+  PENDING = 'pending',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
+}
+
+export type ProjectGoalStatus = `${ProjectGoalStatusEnum}`
+
+export const projectGoalStatuses : Record<ProjectGoalStatus, string> = {
+  [ProjectGoalStatusEnum.PENDING]: 'Pending',
+  [ProjectGoalStatusEnum.IN_PROGRESS]: 'In progress',
+  [ProjectGoalStatusEnum.COMPLETED]: 'Completed',
 }
