@@ -192,16 +192,25 @@ const router = createRouter({
       path: '/projects/form/:id/about',
       name: 'project-form-about',
       component: () => import('@/views/projects/form/about.vue'),
+      meta: {
+        layout: 'project-form'
+      }
     },
     {
       path: '/projects/form/:id/team',
       name: 'project-form-team',
       component: () => import('@/views/projects/form/team.vue'),
+      meta: {
+        layout: 'project-form'
+      }
     },
     {
       path: '/projects/form/:id/review',
       name: 'project-form-review',
       component: () => import('@/views/projects/form/review.vue'),
+      meta: {
+        layout: 'project-form'
+      }
     },
 
     /**
