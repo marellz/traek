@@ -98,7 +98,7 @@
 <script lang="ts" setup>
 import { useProjectStore, type ProjectGoal } from '@/stores/project';
 import { useProjectFormStore } from '@/stores/project.form';
-import { CheckCheck, Edit, Edit2, User } from 'lucide-vue-next';
+import { CheckCheck, Edit, User } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
