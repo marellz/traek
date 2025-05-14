@@ -71,7 +71,7 @@ export const useProjectService = () => {
   const getMembers = async (project: string) => {
     return await supabase
       .from('project_members')
-      .select('joined_at: created_at, ...users(id, name, email, username, avatar) ')
+      .select('role, project_id, user_id, special_permissions, settings, joined_at: created_at, ...users(id, name, email, username, avatar) ')
       .eq('project_id', project)
   }
 

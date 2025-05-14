@@ -71,6 +71,9 @@ export interface ProjectForm {
 
 export interface ProjectMember extends ProjectUser {
   joined_at: string
+  role: string;
+  settings: any,
+  special_permissions: any,
 }
 
 export type PartialProjectForm = Partial<Record<keyof ProjectForm, any>>
