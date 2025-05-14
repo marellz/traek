@@ -24,7 +24,7 @@ export type Project = {
   members: ProjectUser[]
   created_at: string
   updated_at: string | null
-  description: string
+  description: string | null
   closed_at?: string | null
   priority: string
   category: string
@@ -52,7 +52,7 @@ export type ProjectInfo = Omit<Project, 'created_by' | 'members'> &
 export interface ProjectForm {
   id?: string
   name: string
-  description: string
+  description: string |null
   created_by: string
   created_at: string
   updated_at?: string | null
