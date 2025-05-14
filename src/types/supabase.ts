@@ -409,18 +409,30 @@ export type Database = {
           created_at: string
           id: number
           project_id: string
+          role: string
+          settings: Json
+          special_permissions: Json
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: number
           project_id: string
+          role?: string
+          settings?: Json
+          special_permissions?: Json
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           id?: number
           project_id?: string
+          role?: string
+          settings?: Json
+          special_permissions?: Json
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -447,7 +459,7 @@ export type Database = {
           closed_at: string | null
           created_at: string
           created_by: string
-          description: string
+          description: string | null
           end_date: string | null
           features_enabled: Json
           id: string
@@ -466,7 +478,7 @@ export type Database = {
           closed_at?: string | null
           created_at?: string
           created_by?: string
-          description: string
+          description?: string | null
           end_date?: string | null
           features_enabled?: Json
           id?: string
@@ -485,7 +497,7 @@ export type Database = {
           closed_at?: string | null
           created_at?: string
           created_by?: string
-          description?: string
+          description?: string | null
           end_date?: string | null
           features_enabled?: Json
           id?: string
