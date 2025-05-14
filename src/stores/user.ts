@@ -14,7 +14,7 @@ export enum UserLoading {
 }
 
 export interface AvatarTransform {
-  size:number
+  size: number
 }
 
 export const useUserStore = defineStore(
@@ -70,12 +70,12 @@ export const useUserStore = defineStore(
       }
     }
 
-    const queryUsers = async (query: string) => {
+    const queryUsers = async (query: string, params: { limit: number } = { limit: 10}) => {
       auth.ensureAuth()
 
       try {
         begin(UserLoading.QUERYING_USERS)
-        const { data, error } = await service.queryUsers({ query })
+        const { data, error } = await service.queryUsers({ query, ...params })
         if (error) {
           handleError('Querying users', error.message)
         }

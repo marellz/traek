@@ -5,9 +5,12 @@
       <div class="flex">
         <h1 class="text-4xl font-light">Project overview</h1>
         <div class="ml-auto">
-          <base-button v-if="createdByMe">
-            <span>Edit</span>
-          </base-button>
+          <router-link :to="{ name: 'edit-project', params: { id } }">
+            <base-button v-if="createdByMe">
+              <span>Edit</span>
+            </base-button>
+
+          </router-link>
         </div>
       </div>
 

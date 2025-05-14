@@ -36,7 +36,7 @@
             </div>
           </td>
           <td>
-            <base-tag><span>Active</span></base-tag>
+            <base-tag class="text-xs"><span>{{ user.role }}</span></base-tag>
           </td>
           <td class="py-4">
             <p>
@@ -56,9 +56,9 @@
     <base-modal title="Add members" v-model:show="showAddMemberModal">
       <form @submit.prevent="addMembers">
         <div class="space-y-4">
-          <form-user-selector label="Search users" v-model="newMembers" :queried-users
-            @search-users="handleQuery"></form-user-selector>
-          <base-button> <span> Add Members </span></base-button>
+          <form-user-selector label="Search users" v-model="newMembers"
+            :exclude="members.map(m => m.id)"></form-user-selector>
+          <base-button :disabled="!newMembers.length || addingNewMembers"> <span> Add Members </span></base-button>
         </div>
       </form>
     </base-modal>
@@ -67,16 +67,14 @@
 <script lang="ts" setup>
 import UserAvatar from '@/components/user/avatar.vue'
 import FormUserSelector from '@/components/form/user-selector.vue'
-import { useProjectStore, type Project, type ProjectMember, type ProjectUser } from '@/stores/project'
-import { useUserStore } from '@/stores/user'
-import { useDebounceFn } from '@vueuse/core'
+import { ProjectLoading, useProjectStore, type Project, type ProjectMember } from '@/stores/project'
 import { Mail } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { parseDate } from '@/utils/parseDate'
+import type { UserRole } from '@/data/users.data'
 
 const route = useRoute()
-const userStore = useUserStore()
 const id = computed(() => route.params.id as string)
 const projectStore = useProjectStore()
 const loading = computed(() => ({
@@ -93,24 +91,11 @@ const getMembers = async () => {
 }
 
 const showAddMemberModal = ref(false)
-const queriedUsers = ref<ProjectUser[]>([])
 
-const searchUsers = async (q: string) => {
-  const _users = await userStore.queryUsers(q)
-  if (_users && _users.length) {
-    const notMembers = _users.filter((u) => {
-      return members.value.findIndex((m) => m.id === u.id) === -1
-    })
-    queriedUsers.value = notMembers
-  }
-}
-
-const handleQuery = useDebounceFn(searchUsers, 1000)
-
-const newMembers = ref([])
-
+const newMembers = ref<{ user_id: string, role: UserRole }[]>([])
+const addingNewMembers = computed(() => projectStore.isLoading(ProjectLoading.ADDING_MEMBERS))
 const addMembers = async () => {
-  const payload = newMembers.value
+  const payload = newMembers.value.map(({ user_id, role }) => ({ user_id, role, project_id: id.value }))
   const success = await projectStore.addMembers(id.value, payload)
   if (success) {
     showAddMemberModal.value = false
@@ -121,6 +106,7 @@ const addMembers = async () => {
     // todo: toast
   }
 }
+
 
 const removeMember = async (userId: string) => {
   if (!confirm('Remove member?')) {

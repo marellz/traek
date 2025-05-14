@@ -14,9 +14,14 @@
       <div v-show="active"
         class="border rounded-lg py-2 absolute top-full bg-white border-slate-200 dark:border-slate-500 mt-1 dark:bg-slate-800 w-full z-10">
         <PerfectScrollbar class="max-h-64">
-          <custom-select-option v-for="(option, index) in options" :key="index" :value="option[valueKey]" :name>
-            {{ option[valueKey] }}
-          </custom-select-option>
+          <slot>
+            <custom-select-option v-for="(option, index) in options" :key="index" :value="option[valueKey]" :name>
+              <p>
+                {{ option[labelKey] }}
+              </p>
+              <slot />
+            </custom-select-option>
+          </slot>
           <slot />
         </PerfectScrollbar>
       </div>
