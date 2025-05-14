@@ -7,6 +7,7 @@ import { useLoadingState } from '@/composables/useLoading'
 import { NotificationTypes, useNotificationStore } from '@/stores/notifications'
 import { ActivityTypes, useActivityStore } from '@/stores/activity'
 import { ref } from 'vue'
+import { UserRolesEnum, type UserRole } from '@/data/users.data'
 
 export interface ProjectUser {
   id: string
@@ -52,7 +53,7 @@ export type ProjectInfo = Omit<Project, 'created_by' | 'members'> &
 export interface ProjectForm {
   id?: string
   name: string
-  description: string |null
+  description: string | null
   created_by: string
   created_at: string
   updated_at?: string | null
@@ -74,6 +75,12 @@ export interface ProjectMember extends ProjectUser {
 
 export type PartialProjectForm = Partial<Record<keyof ProjectForm, any>>
 
+export interface ProjectMemberForm {
+  project_id: string
+  user_id: string
+  role: UserRole
+}
+
 export interface ProjectGoalForm {
   project_id: string
   status: string
@@ -88,6 +95,7 @@ export interface ProjectGoal extends ProjectGoalForm {
   updated_at: string | null
   completed_at: string | null
 }
+
 
 export enum ProjectLoading {
   GETTING_ALL = 'getting-projects',
@@ -203,7 +211,13 @@ export const useProjectStore = defineStore(
             is_private: false,
           })
 
-          await addMembers(id, [auth.userId!])
+          await addMembers(id, [
+            {
+              role: UserRolesEnum.CREATOR,
+              project_id: id,
+              user_id: auth.userId!,
+            },
+          ])
 
           await getUserProjects()
 
@@ -365,21 +379,21 @@ export const useProjectStore = defineStore(
      * MEMBERS
      */
 
-    const addMembers = async (project: string, members: string[]) => {
+    const addMembers = async (project: string, members: ProjectMemberForm[]) => {
       try {
         begin(ProjectLoading.ADDING_MEMBERS)
-        const payload = members.map((user_id) => ({ user_id, project_id: project }))
-        const { status, error } = await service.addMembers(payload)
+        const { status, error } = await service.addMembers(members)
+        const memberIds = members.map((m) => m.user_id)
         if (error) throw new Error(error.message)
         if (status === 201) {
-          notifyMemberAddition(project, members)
+          notifyMemberAddition(project, memberIds)
 
           await activityService.logActivity({
             project_id: project,
             type: ActivityTypes.MEMBERS_ADDED,
             content: `Added ${members.length} member${members.length > 1 ? 's' : ''}`,
             is_private: false,
-            target_user_ids: members,
+            target_user_ids: memberIds,
           })
 
           return true

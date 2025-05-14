@@ -1,4 +1,4 @@
-import type { Project, ProjectForm } from '@/stores/project'
+import type { Project, ProjectForm, ProjectMemberForm } from '@/stores/project'
 import { supabase } from '@/database/supabase'
 
 export const useProjectService = () => {
@@ -64,7 +64,7 @@ export const useProjectService = () => {
    * MEMBERS
    */
 
-  const addMembers = async (payload: { user_id: string; project_id: string }[]) => {
+  const addMembers = async (payload: ProjectMemberForm[]) => {
     return await supabase.from('project_members').insert(payload)
   }
 
