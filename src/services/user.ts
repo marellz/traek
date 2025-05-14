@@ -16,10 +16,10 @@ export const useUserService = () => {
       .eq('username', username)
   }
 
-  const queryUsers = async (params: { query: string }) => {
+  const queryUsers = async (params: { query: string; limit: number }) => {
     const { query } = params
     const matchesQuery = ['name', 'email', 'username'].map((c) => `${c}.ilike.%${query}%`).join(',')
-    return await supabase.from('users').select().or(matchesQuery)
+    return await supabase.from('users').select().or(matchesQuery).limit(params.limit)
   }
 
   return {
