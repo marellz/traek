@@ -1,14 +1,18 @@
 <template>
-  <label :for="id" class="flex items-center relative">
-    <input class="rounded-full border-gray-300 text-primary focus:ring-primary h-0 w-0 absolute -z-10" type="radio"
-      :value :disabled :required :name v-model="model" :id />
-    <div class="border border-slate-200 py-4 px-8 rounded-lg text-gray-600" :class="{ 'border-primary !text-primary': checked }">
-      <CheckCircle2 :size="20" class="absolute top-1 left-1 fill-current stroke-white" :class="{'invisible': !checked}" />
-      <slot>
-        <p class="ml-2 text-sm" :class="labelClass">{{ label }}</p>
-      </slot>
-    </div>
-  </label>
+  <div class="relative">
+    <label :for="id" class="flex items-center h-full">
+      <input class="rounded-full border-gray-300 text-primary focus:ring-primary h-0 w-0 absolute -z-10" type="radio"
+        :value :disabled :required :name v-model="model" :id />
+      <div class="border border-slate-200 dark:border-slate-800 py-4 px-8 rounded-lg text-gray-600 dark:text-gray-200 flex-auto h-full"
+        :class="{ '!border-primary': checked }">
+        <CheckCircle2 :size="20" class="absolute top-1 left-1 fill-current stroke-white dark:stroke-black"
+          :class="{ 'invisible': !checked, 'fill-primary': checked }" />
+        <slot>
+          <p class="ml-2 text-sm" :class="labelClass">{{ label }}</p>
+        </slot>
+      </div>
+    </label>
+  </div>
 </template>
 <script setup lang="ts">
 import useCustomId from '@/composables/useCustomId'
