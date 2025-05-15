@@ -79,7 +79,6 @@ export interface ProjectMember extends ProjectUser {
 export type PartialProjectForm = Partial<Record<keyof ProjectForm, any>>
 
 export interface ProjectMemberForm {
-  project_id: string
   user_id: string
   role: UserRole
 }
@@ -217,7 +216,6 @@ export const useProjectStore = defineStore(
           await addMembers(id, [
             {
               role: UserRolesEnum.CREATOR,
-              project_id: id,
               user_id: auth.userId!,
             },
           ])
@@ -385,7 +383,8 @@ export const useProjectStore = defineStore(
     const addMembers = async (project: string, members: ProjectMemberForm[]) => {
       try {
         begin(ProjectLoading.ADDING_MEMBERS)
-        const { status, error } = await service.addMembers(members)
+        const payload = members.map(m=>({...m, project_id: project}))
+        const { status, error } = await service.addMembers(payload)
         const memberIds = members.map((m) => m.user_id)
         if (error) throw new Error(error.message)
         if (status === 201) {
