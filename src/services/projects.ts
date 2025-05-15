@@ -10,7 +10,7 @@ export const useProjectService = () => {
         ...projects(
             *,
             creator: created_by(id, name, email, username, avatar),
-            members: project_members(...users(id, name, email, username, avatar))
+            members: project_members(role, project_id, user_id, special_permissions, settings, joined_at: created_at, ...users(id, name, email, username, avatar))
           )`,
       )
       .eq('user_id', user)
@@ -22,7 +22,7 @@ export const useProjectService = () => {
       .select(
         `*,
          creator: created_by(id, name, email, username, avatar),
-         members: project_members(...users(id, name, email, username, avatar))`,
+         members: project_members(role, project_id, user_id, special_permissions, settings, joined_at: created_at, ...users(id, name, email, username, avatar))`,
       )
       .eq('id', id)
   }
@@ -34,7 +34,7 @@ export const useProjectService = () => {
       .select(
         `*,
          creator: created_by(id, name, email, username, avatar),
-         members: project_members(...users(id, name, email, username, avatar))`,
+         members: project_members(role, project_id, user_id, special_permissions, settings, joined_at: created_at, ...users(id, name, email, username, avatar))`,
       )
   }
 
@@ -64,14 +64,18 @@ export const useProjectService = () => {
    * MEMBERS
    */
 
-  const addMembers = async (payload: ProjectMemberForm[]) => {
+  interface UpdatedProjectMemberForm extends ProjectMemberForm {
+    project_id: string;
+  }
+
+  const addMembers = async (payload: UpdatedProjectMemberForm[]) => {
     return await supabase.from('project_members').insert(payload)
   }
 
   const getMembers = async (project: string) => {
     return await supabase
       .from('project_members')
-      .select('role, project_id, user_id, special_permissions, settings, joined_at: created_at, ...users(id, name, email, username, avatar) ')
+      .select('role, project_id, user_id, special_permissions, settings, joined_at: created_at, ...users(id, name, email, username, avatar)')
       .eq('project_id', project)
   }
 

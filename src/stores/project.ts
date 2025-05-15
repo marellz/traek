@@ -17,12 +17,19 @@ export interface ProjectUser {
   avatar: string | null
 }
 
+export interface ProjectMember extends ProjectUser {
+  role: string
+  special_permissions: any
+  settings: any
+  user_id: string;
+}
+
 export type Project = {
   id: string
   name: string
   created_by: string
   creator: ProjectUser
-  members: ProjectUser[]
+  members: ProjectMember[]
   created_at: string
   updated_at: string | null
   description: string | null
@@ -71,9 +78,9 @@ export interface ProjectForm {
 
 export interface ProjectMember extends ProjectUser {
   joined_at: string
-  role: string;
-  settings: any,
-  special_permissions: any,
+  role: string
+  settings: any
+  special_permissions: any
 }
 
 export type PartialProjectForm = Partial<Record<keyof ProjectForm, any>>
@@ -97,7 +104,6 @@ export interface ProjectGoal extends ProjectGoalForm {
   updated_at: string | null
   completed_at: string | null
 }
-
 
 export enum ProjectLoading {
   GETTING_ALL = 'getting-projects',
@@ -383,7 +389,7 @@ export const useProjectStore = defineStore(
     const addMembers = async (project: string, members: ProjectMemberForm[]) => {
       try {
         begin(ProjectLoading.ADDING_MEMBERS)
-        const payload = members.map(m=>({...m, project_id: project}))
+        const payload = members.map((m) => ({ ...m, project_id: project }))
         const { status, error } = await service.addMembers(payload)
         const memberIds = members.map((m) => m.user_id)
         if (error) throw new Error(error.message)
