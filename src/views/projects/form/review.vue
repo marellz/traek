@@ -1,7 +1,6 @@
 <template>
-  <fieldset>
-    <legend>Project review</legend>
-    <div v-if="project" class="space-y-8">
+  <form-fieldset legend="Project review">
+    <template v-if="project">
       <div>
         <div class="border border-slate-200 p-4 rounded-xl space-y-6">
           <div class="flex items-center justify-between">
@@ -88,14 +87,17 @@
           <CheckCheck />
         </base-button>
       </div>
-    </div>
-    <div v-else>
-      <h3>Error</h3>
-      <p>Problem displaying the project information</p>
-    </div>
-  </fieldset>
+    </template>
+    <template v-else>
+      <div>
+        <h3>Error</h3>
+        <p>Problem displaying the project information</p>
+      </div>
+    </template>
+  </form-fieldset>
 </template>
 <script lang="ts" setup>
+import FormFieldset from '@/components/form/fieldset.vue';
 import Avatar from '@/components/user/avatar.vue';
 import { userRoles, type UserRole } from '@/data/users.data';
 import { useProjectStore, type ProjectGoal } from '@/stores/project';

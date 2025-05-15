@@ -1,82 +1,79 @@
 <template>
-  <fieldset>
-    <legend>About & goals</legend>
-    <div class="space-y-8">
-      <Form @submit="submitForm()">
-        <div class="space-y-4">
-          <form-text label="What is this project about?" v-model="description" :error="errors.description"></form-text>
-
-          <div class="mt-4">
-            <base-button>
-              <span>Save changes</span>
-            </base-button>
-          </div>
-        </div>
-      </Form>
-
+  <form-fieldset legend="About & goals">
+    <Form @submit="submitForm()">
       <div class="space-y-4">
-        <div class="flex space-x-4 items-center">
-          <h1 class="text-xl font-medium">Project goals</h1>
-          <button type="button" class="p-1" @click="goalFormActive = true">
-            <Plus />
-          </button>
+        <form-text label="What is this project about?" v-model="description" :error="errors.description"></form-text>
 
+        <div class="mt-4">
+          <base-button>
+            <span>Save changes</span>
+          </base-button>
         </div>
-        <ul class="space-y-2">
-          <li v-if="loadingGoals" class="text-center py-4">
-            <base-loader></base-loader>
-          </li>
-          <template v-else-if="goals.length">
-            <li class="border border-slate-100 rounded-xl hover:bg-slate-100 flex space-x-2 items-center p-2"
-              v-for="goal in goals" :key="goal.id">
-              <div class="flex-auto">
-                <div class="flex items-center space-x-2">
-                  <h1 class="font-medium text-lg">
-                    {{ goal.title }}
-                  </h1>
-                  <base-tag>{{ goal.status }}</base-tag>
-                </div>
-                <p class="flex-auto text-sm text-slate-500">
-                  {{ goal.description }}
-                </p>
-              </div>
-              <base-action type="button" class="p-1 rounded hover:text-red-500" @click="editGoal(goal.id)">
-                <Edit2 :size="20" />
-                <span>Edit</span>
-              </base-action>
-              <base-action type="button" class="p-1 rounded hover:text-red-500" @click="deleteGoal(goal.id)">
-                <Trash :size="20" />
-                <span>Delete</span>
-              </base-action>
-            </li>
-          </template>
-          <li v-else>
-            <div class="border p-4 rounded-xl border-slate-200 flex items-start space-x-2">
-              <div class="pt-1">
-                <FileX2 />
-              </div>
-              <div>
-                <h2 class="font-medium">No records</h2>
-                <p class="text-slate-500 text-sm">You have not added any goals yet for this project.</p>
-              </div>
-            </div>
-          </li>
-        </ul>
-        <GoalForm v-model:show="goalFormActive" ref="goal-form" :selected="selectedGoal" @create="createGoal"
-          @update="updateGoal" @cancel="hideGoalForm">
-        </GoalForm>
       </div>
-      <div class="flex justify-end">
-        <base-button @click="goToNext">
-          <span>Next</span>
-          <ArrowRight :size="20" />
-        </base-button>
-      </div>
-    </div>
+    </Form>
 
-  </fieldset>
+    <div class="space-y-4">
+      <div class="flex space-x-4 items-center">
+        <h1 class="text-xl font-medium">Project goals</h1>
+        <button type="button" class="p-1" @click="goalFormActive = true">
+          <Plus />
+        </button>
+
+      </div>
+      <ul class="space-y-2">
+        <li v-if="loadingGoals" class="text-center py-4">
+          <base-loader></base-loader>
+        </li>
+        <template v-else-if="goals.length">
+          <li class="border border-slate-100 rounded-xl hover:bg-slate-100 flex space-x-2 items-center p-2"
+            v-for="goal in goals" :key="goal.id">
+            <div class="flex-auto">
+              <div class="flex items-center space-x-2">
+                <h1 class="font-medium text-lg">
+                  {{ goal.title }}
+                </h1>
+                <base-tag>{{ goal.status }}</base-tag>
+              </div>
+              <p class="flex-auto text-sm text-slate-500">
+                {{ goal.description }}
+              </p>
+            </div>
+            <base-action type="button" class="p-1 rounded hover:text-red-500" @click="editGoal(goal.id)">
+              <Edit2 :size="20" />
+              <span>Edit</span>
+            </base-action>
+            <base-action type="button" class="p-1 rounded hover:text-red-500" @click="deleteGoal(goal.id)">
+              <Trash :size="20" />
+              <span>Delete</span>
+            </base-action>
+          </li>
+        </template>
+        <li v-else>
+          <div class="border p-4 rounded-xl border-slate-200 flex items-start space-x-2">
+            <div class="pt-1">
+              <FileX2 />
+            </div>
+            <div>
+              <h2 class="font-medium">No records</h2>
+              <p class="text-slate-500 text-sm">You have not added any goals yet for this project.</p>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <GoalForm v-model:show="goalFormActive" ref="goal-form" :selected="selectedGoal" @create="createGoal"
+        @update="updateGoal" @cancel="hideGoalForm">
+      </GoalForm>
+    </div>
+    <div class="flex justify-end">
+      <base-button @click="goToNext">
+        <span>Next</span>
+        <ArrowRight :size="20" />
+      </base-button>
+    </div>
+  </form-fieldset>
 </template>
 <script lang="ts" setup>
+import FormFieldset from '@/components/form/fieldset.vue'
 import { ProjectLoading, useProjectStore, type Project, type ProjectGoal } from '@/stores/project'
 import GoalForm from '@/components/object-forms/goal.form.vue'
 import FormText from '@/components/form/text.vue'

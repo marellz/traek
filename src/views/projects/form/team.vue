@@ -1,43 +1,41 @@
 <template>
-  <fieldset>
-    <legend>Project users</legend>
-    <div class="space-y-8">
-      <div class="space-y-4">
-        <h2 class="font-medium">Current members</h2>
-        <!-- todo: creatively limit this list to 5, and a search for it only -->
-        <ul class="space-y-2">
-          <li v-for="(user, index) in currentMembers" :key="index">
-            <div class="flex space-x-2 items-center">
-              <Avatar :avatar="user.avatar" size="h-8 w-8"></Avatar>
-              <div class="flex-auto">
-                <div class="flex items-center space-x-2">
-                  <h1 class="font-medium">{{ user.name || 'No name' }}</h1>
-                  <base-tag class="text-xs">
-                    {{ user.role }}
-                  </base-tag>
-                </div>
-                <p class="text-sm text-slate-500">{{ user.email }}</p>
+  <form-fieldset legend="Project users">
+    <div class="space-y-4">
+      <h2 class="font-medium">Current members</h2>
+      <!-- todo: creatively limit this list to 5, and a search for it only -->
+      <ul class="space-y-2">
+        <li v-for="(user, index) in currentMembers" :key="index">
+          <div class="flex space-x-2 items-center">
+            <Avatar :avatar="user.avatar" size="h-8 w-8"></Avatar>
+            <div class="flex-auto">
+              <div class="flex items-center space-x-2">
+                <h1 class="font-medium">{{ user.name || 'No name' }}</h1>
+                <base-tag class="text-xs">
+                  {{ user.role }}
+                </base-tag>
               </div>
-              <button type="button" class="p-1 hover:text-red-500" @click="removeMember(user.user_id)">
-                <X />
-              </button>
+              <p class="text-sm text-slate-500">{{ user.email }}</p>
             </div>
-          </li>
-        </ul>
-      </div>
-      <div class="space-y-4">
-        <form-user-selector :label="userSelectorLabel" v-model="members" :exclude></form-user-selector>
-      </div>
-      <div class="flex justify-end">
-        <base-button @click="submit">
-          <span>Add members</span>
-          <Plus />
-        </base-button>
-      </div>
+            <button type="button" class="p-1 hover:text-red-500" @click="removeMember(user.user_id)">
+              <X />
+            </button>
+          </div>
+        </li>
+      </ul>
     </div>
-  </fieldset>
+    <div class="space-y-4">
+      <form-user-selector :label="userSelectorLabel" v-model="members" :exclude></form-user-selector>
+    </div>
+    <div class="flex justify-end">
+      <base-button @click="submit">
+        <span>Add members</span>
+        <Plus />
+      </base-button>
+    </div>
+  </form-fieldset>
 </template>
 <script lang="ts" setup>
+import FormFieldset from '@/components/form/fieldset.vue'
 import { useProjectStore, type ProjectMember } from '@/stores/project'
 import FormUserSelector from '@/components/form/user-selector.vue'
 import { computed, onMounted, ref } from 'vue'
@@ -66,7 +64,7 @@ const getCurrentMembers = async () => {
 }
 
 const removeMember = async (user_id: string) => {
-  if(!confirm('Are you sure you want to remove this member?')) return
+  if (!confirm('Are you sure you want to remove this member?')) return
   const _deleted = await projectStore.removeMember(user_id, id.value)
   if (_deleted) {
     const _index = currentMembers.value.findIndex(m => m.user_id === user_id)

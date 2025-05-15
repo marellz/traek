@@ -67,19 +67,3 @@ onUnmounted(() => {
 
 
 </script>
-<style>
-fieldset {
-  display: block;
-  border: 1px solid var(--color-slate-100);
-  border-radius: var(--radius-lg);
-  padding: 32px
-}
-
-fieldset legend {
-  margin-left: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-slate-500);
-
-}
-</style>

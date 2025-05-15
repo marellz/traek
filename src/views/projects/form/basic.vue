@@ -1,43 +1,41 @@
 <template>
   <Form @submit="submitForm()">
-    <fieldset>
-      <legend>Basic information</legend>
-      <div class="space-y-8">
-        <div class="space-y-4">
-          <form-input label="Name" required v-model="name" :error="errors.name" />
-          <form-select label="Category" v-model="category" :options="categories" label-key="label" value-key="key">
-            <form-select-option v-for="(option, index) in categories" :key="index" :value="option"
-              name="project-category">
-              <div>
-                <h5 class="text-base font-medium">
-                  {{ projectCategoryLabels[option] }}
-                </h5>
-                <p class="text-sm text-slate-500">{{ projectCategoryDescription[option] }}</p>
-              </div>
-            </form-select-option>
-          </form-select>
-          <form-group label='Priority'>
-            <div class="flex flex-wrap gap-4">
-              <form-radio name="priority" v-model="priority" :value="item" v-for="item in priorities" :key="item">
-                <div>
-                  <h3 class="capitalize font-medium">{{ item }} priority</h3>
-                </div>
-              </form-radio>
+    <form-fieldset legend="Basic information">
+      <div class="space-y-4">
+        <form-input label="Name" required v-model="name" :error="errors.name" />
+        <form-select label="Category" v-model="category" :options="categories" label-key="label" value-key="key">
+          <form-select-option v-for="(option, index) in categories" :key="index" :value="option"
+            name="project-category">
+            <div>
+              <h5 class="text-base font-medium">
+                {{ projectCategoryLabels[option] }}
+              </h5>
+              <p class="text-sm text-slate-500">{{ projectCategoryDescription[option] }}</p>
             </div>
-          </form-group>
-          <form-file label="Add an image"></form-file>
-          <div>
-            <base-button>
-              <span>Next</span>
-              <ArrowRight :size="20" />
-            </base-button>
+          </form-select-option>
+        </form-select>
+        <form-group label='Priority'>
+          <div class="flex flex-wrap gap-4">
+            <form-radio name="priority" v-model="priority" :value="item" v-for="item in priorities" :key="item">
+              <div>
+                <h3 class="capitalize font-medium">{{ item }} priority</h3>
+              </div>
+            </form-radio>
           </div>
+        </form-group>
+        <form-file label="Add an image"></form-file>
+        <div>
+          <base-button>
+            <span>Next</span>
+            <ArrowRight :size="20" />
+          </base-button>
         </div>
       </div>
-    </fieldset>
+    </form-fieldset>
   </Form>
 </template>
 <script lang="ts" setup>
+import FormFieldset from '@/components/form/fieldset.vue'
 import FormInput from '@/components/form/input.vue'
 import FormRadio from '@/components/form/radio.vue'
 import FormSelect from '@/components/form/custom/select.vue'
@@ -88,7 +86,7 @@ watch(project, (v) => {
 
 
 const setFormValues = () => {
-  if(!project.value) throw new Error('Project does not exist.')
+  if (!project.value) throw new Error('Project does not exist.')
   const {
     name,
     category,
