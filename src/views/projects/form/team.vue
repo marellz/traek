@@ -3,25 +3,28 @@
     <div class="space-y-4">
       <h2 class="font-medium">Current members</h2>
       <!-- todo: creatively limit this list to 5, and a search for it only -->
-      <ul class="space-y-2">
-        <li v-for="(user, index) in currentMembers" :key="index">
-          <div class="flex space-x-2 items-center">
-            <Avatar :avatar="user.avatar" size="h-8 w-8"></Avatar>
-            <div class="flex-auto">
-              <div class="flex items-center space-x-2">
-                <h1 class="font-medium">{{ user.name || 'No name' }}</h1>
-                <base-tag class="text-xs">
-                  {{ user.role }}
-                </base-tag>
+      <div v-if="loadingCurrentMembers" class="flex justify-center">
+        <base-loader></base-loader>
+      </div>
+        <ul v-else class="space-y-2">
+          <li v-for="(user, index) in currentMembers" :key="index">
+            <div class="flex space-x-4 items-center">
+              <Avatar :avatar="user.avatar" size="h-12 w-12"></Avatar>
+              <div class="flex-auto">
+                <div class="flex items-center space-x-2">
+                  <h1 class="font-medium">{{ user.name || 'No name' }}</h1>
+                  <base-tag class="text-xs">
+                    {{ user.role }}
+                  </base-tag>
+                </div>
+                <p class="text-sm text-slate-500">{{ user.email }}</p>
               </div>
-              <p class="text-sm text-slate-500">{{ user.email }}</p>
+              <button type="button" class="p-1 hover:text-red-500" @click="removeMember(user.user_id)">
+                <X />
+              </button>
             </div>
-            <button type="button" class="p-1 hover:text-red-500" @click="removeMember(user.user_id)">
-              <X />
-            </button>
-          </div>
-        </li>
-      </ul>
+          </li>
+        </ul>
     </div>
     <div class="space-y-4">
       <form-user-selector :label="userSelectorLabel" v-model="members" :exclude></form-user-selector>
@@ -36,7 +39,7 @@
 </template>
 <script lang="ts" setup>
 import FormFieldset from '@/components/form/fieldset.vue'
-import { useProjectStore, type ProjectMember } from '@/stores/project'
+import { ProjectLoading, useProjectStore, type ProjectMember } from '@/stores/project'
 import FormUserSelector from '@/components/form/user-selector.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -55,6 +58,7 @@ const projectFormStore = useProjectFormStore()
 
 const userSelectorLabel = computed(() => currentMembers.value.length > 0 ? 'Add more team members' : 'Add your team members')
 
+const loadingCurrentMembers = computed(() => projectStore.isLoading(ProjectLoading.GETTING_MEMBERS))
 const getCurrentMembers = async () => {
   const _members = await projectStore.getMembers(id.value)
 

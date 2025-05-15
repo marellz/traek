@@ -1,16 +1,16 @@
 <template>
-  <div class="flex justify-center gap-10 h-screen">
+  <div class="flex justify-center gap-10 h-screen dark:bg-black dark:text-white">
     <nav class="sticky top-20 w-64 xl:w-96 flex-none rounded-xl p-4 mt-12">
       <ul class="space-y-4">
         <li v-for="({ routeName, label, description }, index) in pages" :key="index">
           <button type="button"
-            class="text-left rounded-lg w-full hover:bg-slate-100 p-2 disabled:text-slate-300 disabled:hover:bg-transparent"
+            class="text-left rounded-lg w-full hover:bg-slate-100 dark:hover:bg-slate-800/50 p-2 disabled:text-slate-300 disabled:hover:bg-transparent"
             @click="goTo(routeName)" :disabled="routeName === null" :class="{
-              'bg-slate-100': routeName === route.name
+              'bg-slate-100 dark:bg-slate-800': routeName === route.name
             }">
             <div class="flex items-start space-x-2">
               <span
-                class="h-6 w-6 text-center text-xs font-bold transform translate-y-0.5 leading-6 rounded-full flex-none bg-slate-100"
+                class="h-6 w-6 text-center text-xs font-bold transform translate-y-0.5 leading-6 rounded-full flex-none bg-slate-100 dark:bg-slate-800"
                 :class="{ '!bg-black text-white': routeName === route.name }">{{ index + 1 }}</span>
               <div class="space-y-0.5">
                 <h2 class="text-sm xl:text-base font-medium">{{ label }}</h2>
