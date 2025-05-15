@@ -69,11 +69,11 @@
           <ul class="space-y-4">
             <li v-for="(user, index) in project.members" :key="index">
               <div class="flex items-start space-x-2">
-                <User :size="20" class="mt-1" />
+                <Avatar :avatar="user.avatar" size="h-8 w-8" />
                 <div>
                   <div class="flex items-center space-x-2">
-                    <h1 class="font-medium">{{ user.name }}</h1>
-                    <base-tag class="text-xs">current_role</base-tag>
+                    <h1 class="font-medium">{{ user.name || 'No name' }}</h1>
+                    <base-tag class="text-xs">{{ userRoles[user.role as UserRole] }}</base-tag>
                   </div>
                   <p class="text-slate-500 text-sm">{{ user.email }}</p>
                 </div>
@@ -96,9 +96,11 @@
   </fieldset>
 </template>
 <script lang="ts" setup>
+import Avatar from '@/components/user/avatar.vue';
+import { userRoles, type UserRole } from '@/data/users.data';
 import { useProjectStore, type ProjectGoal } from '@/stores/project';
 import { useProjectFormStore } from '@/stores/project.form';
-import { CheckCheck, Edit, User } from 'lucide-vue-next';
+import { CheckCheck, Edit } from 'lucide-vue-next';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
@@ -120,5 +122,6 @@ const getGoals = async () => {
   const _goals = await projectStore.getGoals(id.value)
   if (_goals) goals.value = _goals
 }
+
 onMounted(getGoals)
 </script>
