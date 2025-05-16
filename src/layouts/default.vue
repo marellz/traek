@@ -1,16 +1,18 @@
 <template>
   <!-- dashboard -->
-  <div class="h-full flex flex-col min-h-screen dark:bg-slate-900 dark:text-white">
-    <div class="container flex-auto mx-auto flex space-x-2 h-full max-h-screen">
-      <partials-nav />
-      <div class="flex-auto flex flex-col overflow-auto">
-        <partials-header />
-        <main class="flex-auto">
-          <slot />
-        </main>
+  <div class="flex min-h-screen dark:bg-slate-900 dark:text-white overflow h-screen relative">
+      <partials-nav class="sticky top-0" />
+      <div class="overflow-auto flex-auto">
+        <div class="container mx-auto h-full">
+          <div class="flex-auto flex flex-col">
+            <partials-header />
+            <main class="flex-auto">
+              <slot />
+            </main>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 </template>
 <script lang="ts" setup>
 import PartialsNav from '@/components/partials/default-layout/nav.vue'
