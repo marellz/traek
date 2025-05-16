@@ -77,6 +77,14 @@ export const useProjectService = () => {
       .from('project_members')
       .select('role, project_id, user_id, special_permissions, settings, joined_at: created_at, ...users(id, name, email, username, avatar)')
       .eq('project_id', project)
+    }
+
+    const getMember = async (project: string, user: string) => {
+      return await supabase
+        .from('project_members')
+        .select('role, project_id, user_id, special_permissions, settings, joined_at: created_at, ...users(id, name, email, username, avatar)')
+        .eq('project_id', project)
+        .eq('user_id', user)
   }
 
   const removeMember = async (user_id: string, project_id: string) => {
@@ -97,6 +105,7 @@ export const useProjectService = () => {
     //
     addMembers,
     getMembers,
+    getMember,
     removeMember,
   }
 }

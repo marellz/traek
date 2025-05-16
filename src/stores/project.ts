@@ -125,6 +125,9 @@ export enum ProjectLoading {
   CREATING_GOAL = 'creating-project-goal',
   UPDATING_GOAL = 'updating-project-goal',
   DELETING_GOAL = 'deleting-project-goal',
+
+  //
+  GETTING_AUTHENTICATED_MEMBER = 'getting-authenticated-member',
 }
 
 export const useProjectStore = defineStore(
@@ -414,6 +417,21 @@ export const useProjectStore = defineStore(
       }
     }
 
+    const getMember = async (project: string, user_id: string) => {
+      try {
+        begin(ProjectLoading.GETTING_AUTHENTICATED_MEMBER)
+        const { data, error } = await service.getMember(project, user_id)
+        if (error) throw new Error(error.message)
+        if (data) return data[0]
+        return null
+      } catch (error) {
+        handleError('Getting authenticated member', error)
+        return null
+      } finally {
+        finish(ProjectLoading.GETTING_AUTHENTICATED_MEMBER)
+      }
+    }
+
     const getMembers = async (project: string) => {
       try {
         begin(ProjectLoading.GETTING_MEMBERS)
@@ -460,6 +478,7 @@ export const useProjectStore = defineStore(
 
       addMembers,
       getMembers,
+      getMember,
       removeMember,
       isLoading,
 
