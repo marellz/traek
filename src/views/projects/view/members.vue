@@ -1,18 +1,27 @@
 <template>
   <div>
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-4">
       <h1 class="text-4xl font-light">Project members</h1>
-      <template v-if="userCanCreate">
-        <base-button class="!ml-auto" @click="showAddMemberModal = true">
-          <span>Add member</span>
+      <div class="flex items-center space-x-2 ml-auto">
+        <template v-if="userCanCreate">
+          <base-button @click="showAddMemberModal = true">
+            <span>Add member</span>
+          </base-button>
+          <base-button>
+            <span>Send invitation</span>
+          </base-button>
+        </template>
+        <base-button variant="secondary-outline" @click="getMembers" :loading="gettingMembers">
+          <span>Refresh</span>
         </base-button>
-        <base-button>
-          <span>Send invitation</span>
-        </base-button>
-      </template>
+      </div>
     </div>
-    <base-loader class="py-20" v-if="loading.gettingTasks"></base-loader>
-    <table class="mt-10 member-table">
+
+    <div v-if="gettingMembers" class="py-20 flex justify-center">
+      <base-loader />
+    </div>
+
+    <table v-else class="mt-10 member-table">
       <!-- <thead>
         <tr class="border-b border-b-slate-200 text-left font-medium">
           <th class="font-medium" v-for="(header, index) in headers" :key="index">{{ header }}</th>
@@ -55,6 +64,8 @@
       </tbody>
     </table>
 
+    <!-- todo: add template in case no members/error? or nah? -->
+
     <base-modal title="Add members" v-model:show="showAddMemberModal">
       <form @submit.prevent="addMembers">
         <div class="space-y-4">
@@ -79,9 +90,8 @@ import type { UserRole } from '@/data/users.data'
 const route = useRoute()
 const id = computed(() => route.params.id as string)
 const projectStore = useProjectStore()
-const loading = computed(() => ({
-  gettingTasks: projectStore.isLoading('getting-tasks'),
-}))
+
+const gettingMembers = computed(() => projectStore.isLoading(ProjectLoading.GETTING_MEMBERS))
 
 const project = computed(() => projectStore.projectMetadata.project)
 const members = ref<ProjectMember[]>([])

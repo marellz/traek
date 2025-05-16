@@ -1,21 +1,28 @@
 <template>
   <div>
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-4">
       <h1 class="text-4xl font-light">Project events</h1>
-      <router-link v-if="userCanCreate" :to="{ name: 'create-event', params: { project: id } }" class="!ml-auto">
-        <base-button>
-          <span>Create event</span>
-          <CalendarPlus :size="20" />
+      <div class="flex items-center space-x-2 !ml-auto">
+        <router-link v-if="userCanCreate" :to="{ name: 'create-event', params: { project: id } }">
+          <base-button>
+            <span>Create event</span>
+            <CalendarPlus :size="20" />
+          </base-button>
+        </router-link>
+        <base-button variant="secondary-outline" @click="getEvents" :loading="gettingEvents">
+          <span>Refresh</span>
         </base-button>
-      </router-link>
+      </div>
     </div>
-    <base-loader class="py-20" v-if="loading.gettingEvents"></base-loader>
+    <div v-if="gettingEvents" class="py-20 flex justify-center">
+      <base-loader />
+    </div>
     <div v-else-if="filteredEvents.length" class="mt-10 space-y-4">
       <div class="mb-4">
         <form-checkbox v-model="showCancelled" label="Show cancelled"></form-checkbox>
       </div>
       <event-item v-for="item in filteredEvents" :key="item.id" :item
-        :cancelling="loading.cancelling && cancelId === item.id"></event-item>
+        :cancelling="cancellingEvent && cancelId === item.id"></event-item>
     </div>
     <Empty class="mt-10" text="No events created in the project" v-else />
   </div>
@@ -38,10 +45,11 @@ const route = useRoute()
 const id = computed(() => route.params.id as string)
 const eventStore = useEventStore()
 const events = ref<ProjectEvent[]>([])
-const loading = computed(() => ({
-  gettingEvents: eventStore.isLoading(EventLoading.GETTING),
-  cancelling: eventStore.isLoading(EventLoading.CANCELLING),
-}))
+
+// loading variables
+const gettingEvents = computed(() => eventStore.isLoading(EventLoading.GETTING))
+const cancellingEvent = computed(() => eventStore.isLoading(EventLoading.CANCELLING))
+
 
 const cancelId = ref<string | null>(null)
 

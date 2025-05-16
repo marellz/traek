@@ -1,6 +1,8 @@
 <template>
   <div>
-    <base-loader v-if="loading"></base-loader>
+    <div v-if="loading" class="py-20 flex justify-center">
+      <base-loader />
+    </div>
     <template v-if="project">
       <div class="flex">
         <h1 class="text-4xl font-light">Project overview</h1>

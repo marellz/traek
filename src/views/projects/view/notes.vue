@@ -1,22 +1,29 @@
 <template>
   <div>
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-4">
       <h1 class="text-4xl font-light">Project notes</h1>
-      <base-button v-if="userCanCreate" class="!ml-auto" @click="showNoteFormModal = true">
-        <span>Add note</span>
-      </base-button>
+      <div class="flex items-center space-x-2 !ml-auto">
+        <base-button v-if="userCanCreate" @click="showNoteFormModal = true">
+          <span>Add note</span>
+        </base-button>
+        <base-button variant="secondary-outline" @click="getNotes" :loading="gettingNotes">
+          <span>Refresh</span>
+        </base-button>
+      </div>
     </div>
-    <base-loader class="py-20" v-if="loading.gettingNotes"></base-loader>
+    <div v-if="gettingNotes" class="py-20 flex justify-center">
+      <base-loader />
+    </div>
     <div v-else-if="notes.length" class="mt-10 md:columns-2 xl:columns-3 space-y-4 gap-4 items-start">
       <note-item v-for="item in notes" :item :key="item.id" @edit-note="editNote" @delete-note="deleteNote"
         @open-note="openNote"></note-item>
     </div>
     <common-empty class="mt-10" v-else />
     <base-modal title="Add note" v-model:show="showNoteFormModal" @close="edit = null">
-      <note-form :edit @submit="handleSubmit" :loading="(loading.creating || loading.updating)"></note-form>
+      <note-form :edit @submit="handleSubmit" :loading="(creatingANote || updatingANote)"></note-form>
     </base-modal>
     <base-modal title="View note" v-model:show="showNoteViewModal">
-      <base-loader v-if="loading.gettingNote"></base-loader>
+      <base-loader v-if="gettingANote"></base-loader>
       <div v-else-if="noteDisplay" class="space-y-2">
         <h1 class="text-4xl font-bold">{{ noteDisplay.title }}</h1>
         <p v-html="noteDisplay.content"></p>
@@ -57,12 +64,10 @@ const id = computed(() => route.params.id as string)
 const edit = ref<string | null>(null)
 const show = ref<string | null>(null)
 
-const loading = computed(() => ({
-  gettingNotes: notesStore.isLoading(NotesLoading.GETTING),
-  gettingNote: notesStore.isLoading(NotesLoading.GETTING_ONE),
-  creating: notesStore.isLoading(NotesLoading.CREATING),
-  updating: notesStore.isLoading(NotesLoading.UPDATING),
-}))
+const gettingNotes = computed(() => notesStore.isLoading(NotesLoading.GETTING))
+const gettingANote = computed(() => notesStore.isLoading(NotesLoading.GETTING_ONE))
+const creatingANote = computed(() => notesStore.isLoading(NotesLoading.CREATING))
+const updatingANote = computed(() => notesStore.isLoading(NotesLoading.UPDATING))
 
 const showNoteFormModal = ref(false)
 const showNoteViewModal = ref(false)
