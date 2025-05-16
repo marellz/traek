@@ -2,7 +2,7 @@
   <div>
     <div class="flex items-center space-x-2">
       <h1 class="text-4xl font-light">Project notes</h1>
-      <base-button class="!ml-auto" @click="showNoteFormModal = true">
+      <base-button v-if="userCanCreate" class="!ml-auto" @click="showNoteFormModal = true">
         <span>Add note</span>
       </base-button>
     </div>
@@ -48,6 +48,7 @@ import { NotesLoading, useNotesStore, type ProjectNote, type ProjectNoteForm } f
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { parseDate } from '@/utils/parseDate'
+import { useProjectStore } from '@/stores/project'
 const notesStore = useNotesStore()
 const route = useRoute()
 
@@ -130,6 +131,10 @@ const handleSubmit = (form: ProjectNoteForm) => {
     createNote(form)
   }
 }
+
+const projectStore = useProjectStore()
+const userCanCreate = computed(() => projectStore.projectMetadata.permissions.canCreate)
+
 
 onMounted(() => {
   getNotes()

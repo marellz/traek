@@ -2,12 +2,14 @@
   <div>
     <div class="flex items-center space-x-2">
       <h1 class="text-4xl font-light">Project members</h1>
-      <base-button class="!ml-auto" @click="showAddMemberModal = true">
-        <span>Add member</span>
-      </base-button>
-      <base-button>
-        <span>Send invitation</span>
-      </base-button>
+      <template v-if="userCanCreate">
+        <base-button class="!ml-auto" @click="showAddMemberModal = true">
+          <span>Add member</span>
+        </base-button>
+        <base-button>
+          <span>Send invitation</span>
+        </base-button>
+      </template>
     </div>
     <base-loader class="py-20" v-if="loading.gettingTasks"></base-loader>
     <table class="mt-10 member-table">
@@ -125,6 +127,8 @@ const removeMember = async (userId: string) => {
     // todo: toast
   }
 }
+
+const userCanCreate = computed(() => projectStore.projectMetadata.permissions.canCreate)
 
 onMounted(async () => {
   getMembers()
