@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useLoadingState } from '@/composables/useLoading'
 import { NotificationTypes, useNotificationStore } from '@/stores/notifications'
 import { ActivityTypes, useActivityStore } from '@/stores/activity'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { UserRolesEnum, type UserRole } from '@/data/users.data'
 
 export interface ProjectUser {
@@ -21,7 +21,7 @@ export interface ProjectMember extends ProjectUser {
   role: string
   special_permissions: any
   settings: any
-  user_id: string;
+  user_id: string
 }
 
 export type Project = {
@@ -466,6 +466,40 @@ export const useProjectStore = defineStore(
       notifyService.create(NotificationTypes.PROJECT_MEMBER_ADDED, project, users)
     }
 
+    /**
+     * PROJECT VIEW
+     */
+
+    const currentProject = ref<Project | null>(null)
+    const authenticatedProjectMember = ref<ProjectMember | null>(null)
+    const projectMetadata = computed(() => ({
+      project: currentProject.value?.name,
+      user: authenticatedProjectMember.value,
+      permissions: {
+        canCreate:
+          authenticatedProjectMember.value !== null &&
+          ([UserRolesEnum.CREATOR, UserRolesEnum.EDITOR] as UserRole[]).includes(
+            authenticatedProjectMember.value?.role as UserRole,
+          ) || false,
+      },
+    }))
+    const setCurrentProject = async (id: string | null) => {
+      try {
+        if (!id) {
+          currentProject.value = null
+          return
+        }
+
+        const _project = await getProject(id)
+        if (_project) currentProject.value = _project
+
+        const _member = await getMember(id, auth.userId!)
+        if (_member) authenticatedProjectMember.value = _member
+      } catch (error) {
+        handleError('Setting current project', error)
+      }
+    }
+
     return {
       projects,
 
@@ -487,6 +521,10 @@ export const useProjectStore = defineStore(
       createGoal,
       updateGoal,
       deleteGoal,
+
+      // view
+      projectMetadata,
+      setCurrentProject,
     }
   },
   {

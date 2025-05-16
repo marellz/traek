@@ -4,11 +4,8 @@
       <!-- <h1 class="font-bold text-2xl px-4 mt-4">-p</h1> -->
       <ul class="mt-4 flex border-b border-b-slate-200 dark:border-b-slate-800">
         <li v-for="({ name, label }, index) in links" :key="index">
-          <router-link
-            :to="{ name, params: { id } }"
-            class="-mb-px block border-b border-b-transparent px-4 py-2"
-            exact-active-class="!border-b-slate-800 dark:!border-b-slate-500"
-          >
+          <router-link :to="{ name, params: { id } }" class="-mb-px block border-b border-b-transparent px-4 py-2"
+            exact-active-class="!border-b-slate-800 dark:!border-b-slate-500">
             {{ label }}
           </router-link>
         </li>
@@ -16,6 +13,9 @@
     </layout-banner>
     <div>
       <layout-container class="py-10">
+      <code>
+
+      </code>
         <router-view :key="id" />
       </layout-container>
     </div>
@@ -24,8 +24,10 @@
 <script lang="ts" setup>
 import LayoutContainer from '@/components/layout/container.vue'
 import LayoutBanner from '@/components/layout/banner.vue'
-import { computed, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useProjectStore } from '@/stores/project'
+import { watch } from 'vue'
 
 const links = ref([
   {
@@ -53,5 +55,15 @@ const links = ref([
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)
+const projectStore = useProjectStore()
+
+watch(() => id.value, async (v) => {
+  await projectStore.setCurrentProject(v)
+}, { immediate: true })
+
+onUnmounted(() => {
+  console.log('unmounted')
+  projectStore.setCurrentProject(null)
+})
 
 </script>
