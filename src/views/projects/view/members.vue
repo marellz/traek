@@ -69,7 +69,7 @@
 <script lang="ts" setup>
 import UserAvatar from '@/components/user/avatar.vue'
 import FormUserSelector from '@/components/form/user-selector.vue'
-import { ProjectLoading, useProjectStore, type Project, type ProjectMember } from '@/stores/project'
+import { ProjectLoading, useProjectStore, type ProjectMember } from '@/stores/project'
 import { Mail } from 'lucide-vue-next'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -83,7 +83,7 @@ const loading = computed(() => ({
   gettingTasks: projectStore.isLoading('getting-tasks'),
 }))
 
-const project = ref<Project>()
+const project = computed(() => projectStore.projectMetadata.project)
 const members = ref<ProjectMember[]>([])
 const getMembers = async () => {
   const _users = await projectStore.getMembers(id.value)
@@ -132,11 +132,6 @@ const userCanCreate = computed(() => projectStore.projectMetadata.permissions.ca
 
 onMounted(async () => {
   getMembers()
-
-  const _project = await projectStore.getProject(id.value)
-  if (_project) {
-    project.value = _project
-  }
 })
 
 // const headers = ['Name', 'Email', 'Member since', 'Actions']
