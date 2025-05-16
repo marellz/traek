@@ -473,7 +473,7 @@ export const useProjectStore = defineStore(
     const currentProject = ref<Project | null>(null)
     const authenticatedProjectMember = ref<ProjectMember | null>(null)
     const projectMetadata = computed(() => ({
-      project: currentProject.value?.name,
+      project: currentProject.value,
       user: authenticatedProjectMember.value,
       permissions: {
         canCreate:
