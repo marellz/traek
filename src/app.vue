@@ -18,12 +18,13 @@ import HomeLayout from '@/layouts/home.vue'
 import BlankLayout from '@/layouts/blank.vue'
 import OnboardingLayout from '@/layouts/onboarding.vue';
 import projectForm from '@/layouts/project-form.vue';
+import ProjectView from '@/layouts/project-view.vue'
 import { useAuthStore } from '@/stores/auth';
 import { useRoute } from 'vue-router';
 import { useDark } from '@vueuse/core';
 import { computed, onMounted, type Component } from 'vue';
 
-type LayoutNames = "default" | "auth" | "home" | "blank" | "onboarding" | "project-form"
+type LayoutNames = "default" | "auth" | "home" | "blank" | "onboarding" | "project-form" | "project-view"
 
 const layouts: {
   [key in LayoutNames]: Component
@@ -33,7 +34,8 @@ const layouts: {
   home: HomeLayout,
   blank: BlankLayout,
   onboarding: OnboardingLayout,
-  "project-form": projectForm
+  "project-form": projectForm,
+  "project-view" : ProjectView
 }
 
 const route = useRoute()
