@@ -1,7 +1,7 @@
 <template>
   <!-- dashboard -->
   <div class="flex min-h-screen dark:bg-slate-900 dark:text-white overflow h-screen relative">
-      <partials-nav class="sticky top-0" />
+      <partials-nav />
       <div class="overflow-auto flex-auto">
         <div class="container mx-auto h-full">
           <div class="flex-auto flex flex-col">

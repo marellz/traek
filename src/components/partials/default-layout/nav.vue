@@ -1,7 +1,6 @@
 <template>
-  <div class="bg-sidebar-bg dark:bg-slate-900 dark:text-white h-full"></div>
-  <nav ref="sidebar"
-    class="z-2 md:w-64 lg:w-84 flex-none space-y-10 border-r border-r-slate-200 bg-sidebar-bg dark:bg-slate-900 dark:border-r-slate-800 dark:text-white p-4 pt-10">
+  <nav ref="sidebar" class="z-2 md:w-64 lg:w-84 flex-none space-y-10 border-r border-r-slate-200 bg-sidebar-bg dark:bg-slate-900 dark:border-r-slate-800 dark:text-white p-4 pt-10
+    sticky top-0">
     <ul class="space-y-1.5" v-for="(item, index) in menu" :key="index">
       <li v-if="item.title" class="mb-2 px-10">
         <p class="font-medium tracking-widest text-slate-400 uppercase">{{ item.title }}</p>
