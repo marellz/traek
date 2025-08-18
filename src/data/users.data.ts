@@ -13,3 +13,13 @@ export const userRoles: Record<UserRole, string> = {
 }
 
 export type UserRole = `${UserRolesEnum}`
+
+export type UserRoleOption = {
+  label: string;
+  key: UserRole
+}
+
+export const userRoleOptions : UserRoleOption[] = Object.values(UserRolesEnum).map((r) => ({
+  key: r,
+  label: userRoles[r],
+}))

@@ -29,25 +29,26 @@
 </template>
 <script lang="ts" setup>
 import useCustomId from '@/composables/useCustomId';
-import { userRoles, UserRolesEnum, type UserRole } from '@/data/users.data';
+import { userRoles, type UserRole } from '@/data/users.data';
 import { onClickOutside } from '@vueuse/core';
 import { Check, ChevronDown } from 'lucide-vue-next';
 import { computed, ref, useTemplateRef } from 'vue';
 
-defineProps<{
+type _UserRole = { key: string, label: string }
+withDefaults(defineProps<{
   disabled?: boolean;
-}>()
+  roleOptions?: _UserRole[] // todo: pass UserRole as type prop
+}>(), {
+
+})
 const emit = defineEmits(['change'])
 
-const onChange = (value: UserRole) => {
+const onChange = (value: UserRole | string) => { // again, fix
   emit('change', value)
   hide()
 }
 
-const roleOptions = computed(() => Object.values(UserRolesEnum).map(r => ({
-  key: r,
-  label: userRoles[r]
-})))
+
 
 const display = computed(() => model.value ? userRoles[model.value] : 'Select')
 const name = computed(() => useCustomId())
