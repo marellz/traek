@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="flex items-center space-x-2">
+    <div class="flex items-center space-x-4">
       <h1 class="text-4xl font-light">Project tasks</h1>
-      <div class="flex items-center !ml-auto space-x-2">
-        <router-link :to="{
+      <div class="flex items-center space-x-2 !ml-auto">
+        <router-link v-if="userCanCreate" :to="{
           name: 'create-task', params: {
             project: id
           }
@@ -12,12 +12,14 @@
             <span>Create task</span>
           </base-button>
         </router-link>
-        <base-button variant="secondary-outline" @click="getTasks" :loading="loading.gettingTasks">
+        <base-button variant="secondary-outline" @click="getTasks" :loading="gettingTasks">
           <span>Refresh</span>
         </base-button>
       </div>
     </div>
-    <base-loader class="py-20" v-if="loading.gettingTasks"></base-loader>
+    <div v-if="gettingTasks" class="py-20 flex justify-center">
+      <base-loader />
+    </div>
     <template v-else-if="tasks.length">
       <div class="mt-10">
         <checkbox label="Show completed" v-model="showCompleted" />
@@ -38,17 +40,16 @@ import TaskItem from '@/components/task/item.vue'
 import { TaskStatusEnum, useTaskStore, type Task } from '@/stores/task'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useProjectStore } from '@/stores/project'
 
 const route = useRoute()
 const id = computed(() => route.params.id as string)
 const tasksStore = useTaskStore()
 const tasks = ref<Task[]>([])
 const showCompleted = ref(false)
-const filteredTasks = computed(() => showCompleted.value? tasks.value : tasks.value.filter(t=>t.status !== TaskStatusEnum.COMPLETED))
+const filteredTasks = computed(() => showCompleted.value ? tasks.value : tasks.value.filter(t => t.status !== TaskStatusEnum.COMPLETED))
 
-const loading = computed(() => ({
-  gettingTasks: tasksStore.isLoading('getting-tasks'),
-}))
+const gettingTasks = computed(() => tasksStore.isLoading('getting-tasks'))
 
 const getTasks = async () => {
   const _tasks = await tasksStore.list(id.value)
@@ -75,6 +76,8 @@ const editTask = (id: string) => {
   })
 }
 
+const projectStore = useProjectStore()
+const userCanCreate = computed(() => projectStore.projectMetadata.permissions.canCreate)
 
 onMounted(async () => {
   await getTasks()

@@ -126,48 +126,101 @@ const router = createRouter({
       // default projects page is tasks
       component: () => import('@/views/projects/index.vue'),
     },
+
+    // NEW LAYOUT
     {
-      path: '/projects/view/:id',
-      // default projects page is tasks
-      component: () => import('@/views/projects/view/[id].vue'),
-      children: [
-        {
-          path: '', // overview -> default
-          name: 'project',
-          component: () => import('@/views/projects/view/[id]/index.vue'),
-        },
-        {
-          path: 'tasks',
-          name: 'project-tasks',
-          component: () => import('@/views/projects/view/[id]/tasks.vue'),
-        },
-        {
-          path: 'members',
-          name: 'project-members',
-          component: () => import('@/views/projects/view/[id]/members.vue'),
-        },
-        {
-          path: 'events',
-          name: 'project-events',
-          component: () => import('@/views/projects/view/[id]/events.vue'),
-        },
-        {
-          path: 'notes',
-          name: 'project-notes',
-          component: () => import('@/views/projects/view/[id]/notes.vue'),
-        },
-      ],
+      path: '/projects/view/:id', // overview -> default
+      name: 'project',
+      component: () => import('@/views/projects/view/index.vue'),
+      meta: {
+        layout: 'project-view',
+      },
+    },
+    {
+      path: '/projects/view/:id/tasks',
+      name: 'project-tasks',
+      component: () => import('@/views/projects/view/tasks.vue'),
+      meta: {
+        layout: 'project-view',
+      },
+    },
+    {
+      path: '/projects/view/:id/members',
+      name: 'project-members',
+      component: () => import('@/views/projects/view/members.vue'),
+      meta: {
+        layout: 'project-view',
+      },
+    },
+    {
+      path: '/projects/view/:id/events',
+      name: 'project-events',
+      component: () => import('@/views/projects/view/events.vue'),
+      meta: {
+        layout: 'project-view',
+      },
+    },
+    {
+      path: '/projects/view/:id/notes',
+      name: 'project-notes',
+      component: () => import('@/views/projects/view/notes.vue'),
+      meta: {
+        layout: 'project-view',
+      },
     },
 
+    /**
+     *
+     *
+     *
+     * PROJECT FORM
+     *
+     *
+     *
+     */
+
+    // new project
     {
-      path: '/projects/new',
+      path: '/project/create',
       name: 'create-project',
-      component: () => import('@/views/projects/create.vue'),
+      component: () => import('@/views/projects/form/basic.vue'),
+      meta: {
+        layout: 'project-form',
+      },
+    },
+
+    // updated project: same component
+    {
+      path: '/project/form/:id/basic',
+      name: 'edit-project',
+      component: () => import('@/views/projects/form/basic.vue'),
+      meta: {
+        layout: 'project-form',
+      },
     },
     {
-      path: '/projects/update/:id',
-      name: 'update-project',
-      component: () => import('@/views/projects/update.vue'),
+      path: '/projects/form/:id/about',
+      name: 'project-form-about',
+      component: () => import('@/views/projects/form/about.vue'),
+      meta: {
+        layout: 'project-form',
+      },
+    },
+    {
+      path: '/projects/form/:id/team',
+      name: 'project-form-team',
+      component: () => import('@/views/projects/form/team.vue'),
+      meta: {
+        layout: 'project-form',
+      },
+    },
+    {
+      path: '/projects/form/:id/review',
+      name: 'project-form-review',
+      component: () => import('@/views/projects/form/review.vue'),
+      meta: {
+        layout: 'project-form',
+      },
     },
 
     /**

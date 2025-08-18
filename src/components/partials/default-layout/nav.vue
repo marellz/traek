@@ -1,11 +1,7 @@
 <template>
-  <div class="bg-sidebar-bg dark:bg-slate-900 dark:text-white fixed h-full left-0" :style="{
-    width: left + 'px'
-  }"></div>
-  <nav ref="sidebar"
-    class="z-2 w-64 flex-none space-y-10 border-r border-r-slate-200 bg-sidebar-bg dark:bg-slate-900 dark:border-r-slate-800 dark:text-white p-4 pt-10">
+  <sidebar-wrap ref="sidebar">
     <ul class="space-y-1.5" v-for="(item, index) in menu" :key="index">
-      <li v-if="item.title" class="mb-2 px-2">
+      <li v-if="item.title" class="mb-2 px-10">
         <p class="font-medium tracking-widest text-slate-400 uppercase">{{ item.title }}</p>
       </li>
       <li v-for="(link, index) in item.links" :key="index">
@@ -14,13 +10,14 @@
         </nav-link>
       </li>
     </ul>
-  </nav>
+  </sidebar-wrap>
 </template>
 <script lang="ts" setup>
 import navLink from '@/components/sidebar/nav-link.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useProjectStore } from '@/stores/project'
 import { onMounted, ref, watch } from 'vue'
+import SidebarWrap from '@/components/app/sidebar.vue'
 type NavSection = 'home' | 'projects'
 export type SidebarLink = {
   name: string
@@ -37,11 +34,9 @@ type Nav = Record<
   }
 >
 
-import { useElementBounding } from '@vueuse/core'
 import { useTemplateRef } from 'vue'
 
 const sidebar = useTemplateRef('sidebar')
-const { left } = useElementBounding(sidebar)
 
 const menu = ref<Nav>({
   home: {

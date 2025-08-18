@@ -353,23 +353,86 @@ export type Database = {
           },
         ]
       }
+      project_goals: {
+        Row: {
+          added_by: string
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          project_id: string
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          added_by: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          project_id?: string
+          status?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          added_by?: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          project_id?: string
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_goals_added_by_fkey"
+            columns: ["added_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_goals_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       project_members: {
         Row: {
           created_at: string
           id: number
           project_id: string
+          role: string
+          settings: Json
+          special_permissions: Json
+          updated_at: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: number
           project_id: string
+          role?: string
+          settings?: Json
+          special_permissions?: Json
+          updated_at?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           id?: number
           project_id?: string
+          role?: string
+          settings?: Json
+          special_permissions?: Json
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -391,30 +454,60 @@ export type Database = {
       }
       projects: {
         Row: {
+          archived_at: string | null
+          category: string
           closed_at: string | null
           created_at: string
           created_by: string
-          description: string
+          description: string | null
+          end_date: string | null
+          features_enabled: Json
           id: string
+          image: string | null
           name: string
+          priority: string
+          progress: number | null
+          settings: Json
+          start_date: string | null
+          status: string
           updated_at: string | null
         }
         Insert: {
+          archived_at?: string | null
+          category?: string
           closed_at?: string | null
           created_at?: string
           created_by?: string
-          description: string
+          description?: string | null
+          end_date?: string | null
+          features_enabled?: Json
           id?: string
+          image?: string | null
           name: string
+          priority: string
+          progress?: number | null
+          settings?: Json
+          start_date?: string | null
+          status?: string
           updated_at?: string | null
         }
         Update: {
+          archived_at?: string | null
+          category?: string
           closed_at?: string | null
           created_at?: string
           created_by?: string
-          description?: string
+          description?: string | null
+          end_date?: string | null
+          features_enabled?: Json
           id?: string
+          image?: string | null
           name?: string
+          priority?: string
+          progress?: number | null
+          settings?: Json
+          start_date?: string | null
+          status?: string
           updated_at?: string | null
         }
         Relationships: [

@@ -1,109 +1,79 @@
 <template>
-  <form-group :label>
-    <div v-if="model.length" class="flex flex-wrap gap-4 py-4">
-      <div
-        v-for="(user, i) in profiles"
-        :key="user.id"
-        class="flex rounded-xl border border-slate-300 p-2"
-      >
-        <div class="flex-auto pr-4">
-          <p class="font-medium">
-            {{ user.name || user.username || 'Unknown' }}
-          </p>
-          <p class="text-xs">
-            {{ user.email }}
-          </p>
-        </div>
-        <button type="button" class="p-1" @click="removeUser(i, user.id)">
-          <Trash2 :size="20" />
+  <div class="space-y-8">
+    <form-group :label>
+      <div class="form-input !flex space-x-2">
+        <Search />
+        <input type="text" class="flex-auto outline-0" v-model="query" @input="debounceSearch" :placeholder />
+        <button v-show="!!query" type="button" @click="resetQuery" class="hover:text-red-500">
+          <X />
         </button>
       </div>
+    </form-group>
+
+    <div v-if="query" class="space-y-4">
+      <h3 class="font-medium">Search results for "{{ query }}"</h3>
+      <div v-if="loadingResults" class="flex justify-center py-4">
+        <base-loader></base-loader>
+      </div>
+      <ul v-else-if="results.length" class="space-y-2">
+        <user-result-item @add-user="addUser" v-for="(user, index) in results" :user :key="index" />
+      </ul>
     </div>
-    <!-- <div v-else>
-      <p>No users selected</p>
-    </div> -->
-    <form-dropdown
-      @query="searchUsers"
-      @change="onChange"
-      v-model="model"
-      :options="queriedUsers"
-      label-key="name"
-      value-key="id"
-      :placeholder="model.length === 0 ? `Add users` : `Added ${model.length}`"
-    >
-      <template #item="{ item }">
-        <div>
-          <p class="font-bold">
-            {{ item.name }} <span class="text-slate-500">@{{ item.username }}</span>
-          </p>
-          <p class="text-sm">{{ item.email }}</p>
-        </div>
-      </template>
-    </form-dropdown>
-  </form-group>
+
+    <div v-if="selected.length" class="space-y-4">
+      <h3 class="font-medium">Selected users</h3>
+      <ul class="space-y-2">
+        <user-selected-item v-for="({ user, role }, index) in selected" :key="index" :user :selected-role="userRoles[role]"></user-selected-item>
+      </ul>
+
+    </div>
+  </div>
 </template>
 <script lang="ts" setup>
+import { userRoles } from '@/data/users.data';
+import UserSelectedItem from '@/components/user/selector/selected-item.vue'
+import UserResultItem from '@/components/user/selector/result-item.vue'
+import { UserLoading, useUserStore } from '@/stores/user';
+import { Search, X } from 'lucide-vue-next';
+import { computed, onUnmounted, } from 'vue';
 import FormGroup from '@/components/form/group.vue'
-import FormDropdown from '@/components/form/dropdown.vue'
-import { watchDebounced } from '@vueuse/core'
-import { onMounted, ref } from 'vue'
-import { Trash2 } from 'lucide-vue-next'
-import type { ProjectUser } from '@/stores/project'
-import { useUserStore } from '@/stores/user'
+import { watch } from 'vue';
+import { useUserSelector } from '@/composables/useUserSelector';
+import type { ProjectMemberForm } from '@/stores/project';
+
+withDefaults(defineProps<{
+  label?: string
+  placeholder?: string
+  exclude?: string[]
+}>(), {
+  label: 'Add users',
+  placeholder: 'Search users...'
+})
 
 const userStore = useUserStore()
 
-defineProps<{
-  label: string
-  queriedUsers: ProjectUser[]
-}>()
-
-const model = defineModel<string[]>({ default: [] })
-const emit = defineEmits(['search-users', 'remove-user', 'add-user'])
-
-const profiles = ref<ProjectUser[]>([])
-const getProfiles = async () => {
-  const _users = await userStore.getProfiles(model.value, 'id')
-  if (_users) {
-    profiles.value = _users
-  }
+const queryUsers = async () => {
+  return await userStore.queryUsers(query.value)
 }
 
-watchDebounced(
-  model,
-  async (n, o) => {
-    // don't repeat requests for removed users
-    if (o.length > n.length) {
-      profiles.value = profiles.value.filter((mP) => model.value.includes(mP.id))
-      return
-    }
+const { selected, query, roles, results, addUser, debounceSearch, resetQuery, /*removeSelected*/ } = useUserSelector(queryUsers)
 
-    await getProfiles()
+const loadingResults = computed(() => userStore.isLoading(UserLoading.QUERYING_USERS))
+const model = defineModel<Omit<ProjectMemberForm, 'project_id'>[]>({ default: [] })
+watch(
+  roles,
+  (v) => {
+    // add to model
+    model.value = Object.keys(v).map((k) => ({
+      user_id: k,
+      role: v[k],
+    }))
   },
-  { debounce: 1000, maxWait: 1500 },
+  { deep: true },
 )
 
-const onChange = (value: string, isAdded: boolean) => {
-  if (isAdded) {
-    emit('add-user', value)
-  } else {
-    emit('remove-user', value)
-  }
-}
 
-const removeUser = (i: number, id: string) => {
-  const _m = [...model.value]
-  _m.splice(i, 1)
-  model.value = _m
-
-  emit('remove-user', id)
-}
-
-const searchUsers = (q: string) => {
-  emit('search-users', q)
-}
-
-onMounted(() => {
-  getProfiles()
+onUnmounted(() => {
+  resetQuery()
 })
 </script>

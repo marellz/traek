@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen min-h-screen flex dark:bg-black dark:text-white" :class="{ 'dark': isDark }">
+  <div class="h-screen min-h-screen flex dark:bg-black dark:text-white">
     <header class="w-96 flex-none p-4">
       <div class="space-y-8 pt-8 px-4 bg-gray-900/5 dark:bg-white/5 h-full flex flex-col rounded-lg">
         <div class="py-4">
@@ -66,10 +66,8 @@ import { onboardingLinks, OnboardingSteps, useOnboardingStore, type OnboardingSt
 import { ArrowLeft, Contact, FolderPlus, UserCheck, UserPlus } from 'lucide-vue-next';
 import { computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useDark } from '@vueuse/core';
 import DarkMode from '@/components/app/dark-mode.vue';
 import Logo from '@/assets/images/logo.vue';
-const isDark = useDark()
 
 const onboardingIcons = {
   [OnboardingSteps.REGISTER]: UserPlus,

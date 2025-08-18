@@ -14,7 +14,7 @@ export enum UserLoading {
 }
 
 export interface AvatarTransform {
-  size:number
+  size: number
 }
 
 export const useUserStore = defineStore(
@@ -43,6 +43,7 @@ export const useUserStore = defineStore(
         return null
       } catch (error) {
         handleError('Getting profiles', error)
+        return null
       } finally {
         finish(UserLoading.GETTING_ONE)
       }
@@ -65,17 +66,18 @@ export const useUserStore = defineStore(
         return null
       } catch (error) {
         handleError('Getting profiles', error)
+        return null
       } finally {
         finish(UserLoading.GETTING_MANY)
       }
     }
 
-    const queryUsers = async (query: string) => {
+    const queryUsers = async (query: string, params: { limit: number } = { limit: 10}) => {
       auth.ensureAuth()
 
       try {
         begin(UserLoading.QUERYING_USERS)
-        const { data, error } = await service.queryUsers({ query })
+        const { data, error } = await service.queryUsers({ query, ...params })
         if (error) {
           handleError('Querying users', error.message)
         }
@@ -87,6 +89,7 @@ export const useUserStore = defineStore(
         return null
       } catch (error) {
         handleError('Querying users', error)
+        return null
       } finally {
         finish(UserLoading.QUERYING_USERS)
       }
@@ -100,6 +103,7 @@ export const useUserStore = defineStore(
         return data.publicUrl
       } catch (error) {
         handleError('Getting avatar link', error)
+        return null
       } finally {
         finish(UserLoading.GETTING_LINK)
       }
@@ -120,6 +124,7 @@ export const useUserStore = defineStore(
         return false
       } catch (error) {
         handleError('Checking username', error)
+        return false
       } finally {
         finish(UserLoading.CHECKING_USERNAME)
       }

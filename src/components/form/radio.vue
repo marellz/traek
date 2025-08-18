@@ -1,40 +1,41 @@
 <template>
-  <label :for="id" class="flex items-center">
-    <input
-      class="rounded-full border-gray-300 text-primary focus:ring-primary"
-      type="radio"
-      :value
-      :disabled
-      :required
-      :name
-      v-model="model"
-      :id
-    />
-    <slot>
-      <p class="ml-2 text-sm text-gray-600">{{ label }}</p>
-    </slot>
-  </label>
+  <div class="relative">
+    <label :for="id" class="flex items-center h-full">
+      <input class="rounded-full border-gray-300 text-primary focus:ring-primary h-0 w-0 absolute -z-10" type="radio"
+        :value :disabled :required :name v-model="model" :id />
+      <div class="border border-slate-200 dark:border-slate-800 py-4 px-8 rounded-lg text-gray-600 dark:text-gray-200 flex-auto h-full"
+        :class="{ '!border-primary': checked }">
+        <CheckCircle2 :size="20" class="absolute top-1 left-1 fill-current stroke-white dark:stroke-black"
+          :class="{ 'invisible': !checked, 'fill-primary': checked }" />
+        <slot>
+          <p class="ml-2 text-sm" :class="labelClass">{{ label }}</p>
+        </slot>
+      </div>
+    </label>
+  </div>
 </template>
 <script setup lang="ts">
 import useCustomId from '@/composables/useCustomId'
-import { onMounted, ref } from 'vue'
+import { CheckCircle2 } from 'lucide-vue-next';
+import { computed, onMounted, ref } from 'vue'
 
 const props = defineProps<{
-  checked?: boolean
   value?: boolean | string | number
   required?: boolean
   disabled?: boolean
   label?: string
+  labelClass?: string
   name?: string
 }>()
 
 const id = ref()
 
-const model =defineModel()
+const model = defineModel()
+const checked = computed(() => props.value === model.value)
 
 onMounted(() => {
   id.value = useCustomId()
-  if(props.value){
+  if (props.value) {
     model.value = props.value
   }
 })
