@@ -22,11 +22,6 @@
     </div>
 
     <table v-else class="mt-10 member-table">
-      <!-- <thead>
-        <tr class="border-b border-b-slate-200 text-left font-medium">
-          <th class="font-medium" v-for="(header, index) in headers" :key="index">{{ header }}</th>
-        </tr>
-      </thead> -->
       <tbody>
         <tr v-for="user in members" :key="user.id" :class="{ 'disabled': project?.creator.id === user.id }">
           <td class="py-4">
